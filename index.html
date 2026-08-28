@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Harness — Codex Operations Design</title>
+  <meta name="description" content="A design document on operating long-running AI agents, covering harnesses, safety boundaries, verification, recovery, external memory, and human responsibility.">
+  <meta name="robots" content="index,follow">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #ffffff;
+      --fg: #1f2328;
+      --muted: #59636e;
+      --border: #d0d7de;
+      --card: #f6f8fa;
+      --link: #0969da;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --fg: #e6edf3;
+        --muted: #8b949e;
+        --border: #30363d;
+        --card: #161b22;
+        --link: #58a6ff;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+                   "Noto Sans", "Noto Sans JP", sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 72px 24px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .intro {
+      margin: 0 0 36px;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .languages {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    a.card {
+      display: block;
+      padding: 22px 24px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    a.card:hover,
+    a.card:focus-visible {
+      border-color: var(--link);
+      outline: none;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .title {
+      display: block;
+      color: var(--link);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    footer {
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Agent Harness</h1>
+    <p class="intro">
+      A small design document about operating long-running AI agents:
+      harnesses, boundaries, verification, recovery, external memory,
+      and human responsibility.
+    </p>
+
+    <div class="languages">
+      <a class="card" href="codex-operations-design.html" lang="ja">
+        <span class="label">日本語</span>
+        <span class="title">Codex 運用設計</span>
+      </a>
+
+      <a class="card" href="codex-operations-design-en.html" lang="en">
+        <span class="label">English</span>
+        <span class="title">Codex Operations Design</span>
+      </a>
+    </div>
+
+    <footer>
+      This repository is intentionally small. The HTML files are the published documents.
+    </footer>
+  </main>
+</body>
+</html>
