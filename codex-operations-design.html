@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codex 運用設計 — ハーネス・境界・検証・復旧をどう組むか</title>
+<!-- EDITABLE METADATA: change the author and last-modified values here, and the visible fields below. -->
+<meta name="author" content="akkera102">
+<meta name="last-modified" content="2026-08-28T18:59:00+09:00">
+<meta name="description" content="Codex に長時間の解析・実装作業を任せる際の、運用思想・安全境界・検証・停止条件・引き継ぎ方法を整理した設計資料。">
+<style>
+:root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
+@media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;line-height:1.82;font-size:16px}
+main{max-width:var(--max);margin:0 auto;padding:56px 34px 96px}.doc-head{border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:30px}.doc-title{font-size:2.15rem;line-height:1.35;margin:0 0 12px;font-weight:760;letter-spacing:.01em}.meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.toc{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:18px 22px;margin:28px 0 40px}.toc-title{font-weight:700;margin-bottom:8px}.toc ul{list-style:none;margin:0;padding:0}.toc li{margin:.18em 0}.toc-h3{padding-left:1.3em;font-size:.94em}.toc a{text-decoration:none;color:var(--fg)}.toc a:hover{text-decoration:underline;color:var(--link)}
+h1,h2,h3,h4{line-height:1.42;letter-spacing:.01em;scroll-margin-top:18px}h2{font-size:1.52rem;margin:2.35em 0 .65em;border-bottom:1px solid var(--line);padding-bottom:.28em}h3{font-size:1.25rem;margin:2em 0 .55em}h4{font-size:1.08rem;margin:1.8em 0 .45em}
+p,ul,ol,pre,blockquote,table{margin:.78em 0 1.15em}ul,ol{padding-left:1.55em}li+li{margin-top:.18em}a{color:var(--link)}strong{font-weight:750}hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:var(--code);padding:.12em .32em;border-radius:4px;font-size:.93em}pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow:auto;line-height:1.58}pre code{background:transparent;padding:0;border-radius:0}blockquote{margin-left:0;padding:.72em 1em;background:var(--quote);border-left:4px solid var(--line);color:var(--muted)}
+table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}th,td{border:1px solid var(--line);padding:.55em .72em;text-align:left;vertical-align:top}th{background:var(--soft)}
+footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted);font-size:.85rem}.backtop{display:inline-block;margin-top:2em}
+@media(max-width:700px){body{font-size:15px}main{padding:30px 18px 70px}.doc-title{font-size:1.72rem}.meta{display:block}.meta span{display:block;margin:.2em 0}.toc{padding:15px 16px}h2{font-size:1.34rem}h3{font-size:1.15rem}footer{padding:0 18px 36px}}
+@media print{body{background:#fff;color:#000;font-size:11pt}main{max-width:none;padding:0}.doc-head{margin-top:0}.toc{break-after:page;background:#fff}.toc a{color:#000}.backtop{display:none}a{color:#000;text-decoration:none}pre,blockquote,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main id="top">
+<header class="doc-head">
+  <div class="doc-title">Codex 運用設計 — ハーネス・境界・検証・復旧をどう組むか</div>
+  <!-- EDITABLE METADATA: author / updated -->
+  <div class="meta"><span><strong>Author:</strong> akkera102</span><span><strong>Updated:</strong> 2026-08-28 18:59 JST</span><span><strong>Language:</strong> Japanese</span></div>
+</header>
+<nav class="toc" aria-label="目次"><div class="toc-title">目次</div><ul><li class="toc-h2"><a href="#第I部-全体像と設計原則">第I部　全体像と設計原則</a></li><li class="toc-h3"><a href="#1-基本思想--プロンプトではなく職場環境を設計する">1. 基本思想 — プロンプトではなく職場環境を設計する</a></li><li class="toc-h3"><a href="#2-最初から巨大な運用体系を作らない">2. 最初から巨大な運用体系を作らない</a></li><li class="toc-h3"><a href="#3-三つの視点">3. 三つの視点</a></li><li class="toc-h3"><a href="#4-組織のメタファーは理解の補助として扱う">4. 組織のメタファーは理解の補助として扱う</a></li><li class="toc-h3"><a href="#5-現時点で採用したい最小原則">5. 現時点で採用したい最小原則</a></li><li class="toc-h2"><a href="#第II部-文書・外部記憶・知識管理">第II部　文書・外部記憶・知識管理</a></li><li class="toc-h3"><a href="#6-AGENTSmd-は短い憲法にする">6. AGENTS.md は短い「憲法」にする</a></li><li class="toc-h3"><a href="#7-OPERATIONSmd--analysis--spec-の役割を分ける">7. OPERATIONS.md / analysis / spec の役割を分ける</a></li><li class="toc-h3"><a href="#8-情報を減らすのではなく必要になるまで読ませない">8. 情報を減らすのではなく、必要になるまで読ませない</a></li><li class="toc-h3"><a href="#9-analysismd--specmd-は未確定と確定を分ける">9. analysis.md / spec.md は未確定と確定を分ける</a></li><li class="toc-h3"><a href="#10-解析と新規開発では記録の捨て方が違う">10. 解析と新規開発では、記録の捨て方が違う</a></li><li class="toc-h3"><a href="#11-作業する側と作業環境を変更する側を分ける">11. 作業する側と、作業環境を変更する側を分ける</a></li><li class="toc-h2"><a href="#第III部-安全境界と責任分界">第III部　安全境界と責任分界</a></li><li class="toc-h3"><a href="#12-Sandbox-を一語でまとめない">12. Sandbox を一語でまとめない</a></li><li class="toc-h3"><a href="#13-作業規約・権限・実行ルールを分ける">13. 作業規約・権限・実行ルールを分ける</a></li><li class="toc-h3"><a href="#14-できる安全にできるやってよいを分ける">14. 「できる」「安全にできる」「やってよい」を分ける</a></li><li class="toc-h3"><a href="#15-権限は操作名ではなく影響で考える">15. 権限は「操作名」ではなく「影響」で考える</a></li><li class="toc-h3"><a href="#16-Approval-は不信ではなく責任の分割">16. Approval は「不信」ではなく「責任の分割」</a></li><li class="toc-h3"><a href="#17-localhost--MCP-も別の境界として扱う">17. localhost / MCP も別の境界として扱う</a></li><li class="toc-h3"><a href="#18-画像・音声・テキストは内容を見せずに検証する">18. 画像・音声・テキストは内容を見せずに検証する</a></li><li class="toc-h3"><a href="#19-作品を特定しない">19. 作品を特定しない</a></li><li class="toc-h3"><a href="#20-外部検索は外部送信として扱う">20. 外部検索は外部送信として扱う</a></li><li class="toc-h2"><a href="#第IV部-実行環境と能力の選択">第IV部　実行環境と能力の選択</a></li><li class="toc-h3"><a href="#21-ビルド環境は共通知識として残す">21. ビルド環境は共通知識として残す</a></li><li class="toc-h3"><a href="#22-Sandbox--Approval-は-Probe-で実測する">22. Sandbox / Approval は Probe で実測する</a></li><li class="toc-h3"><a href="#23-必要な装備を与え権限は絞る">23. 必要な装備を与え、権限は絞る</a></li><li class="toc-h3"><a href="#24-推論強度は作業名ではなく判断が残っているかで決める">24. 推論強度は「作業名」ではなく「判断が残っているか」で決める</a></li><li class="toc-h2"><a href="#第V部-解析と検証">第V部　解析と検証</a></li><li class="toc-h3"><a href="#25-失敗したら別案を大量生成する前に一次資料へ戻る">25. 失敗したら、別案を大量生成する前に一次資料へ戻る</a></li><li class="toc-h3"><a href="#26-低レベルの観測から高レベルの説明へ進む">26. 低レベルの観測から、高レベルの説明へ進む</a></li><li class="toc-h3"><a href="#27-AI-の生成物を-AI-自身の正解データにしない">27. AI の生成物を AI 自身の正解データにしない</a></li><li class="toc-h3"><a href="#28-人間も間違える">28. 人間も間違える</a></li><li class="toc-h3"><a href="#29-スキップを解析完了とみなさない">29. スキップを解析完了とみなさない</a></li><li class="toc-h3"><a href="#30-最後まで走っただけでは正しいとは限らない">30. 「最後まで走った」だけでは正しいとは限らない</a></li><li class="toc-h2"><a href="#第VI部-停止・返却・自己復旧">第VI部　停止・返却・自己復旧</a></li><li class="toc-h3"><a href="#31-自律性は閉じた作業ループの範囲に限定する">31. 自律性は、閉じた作業ループの範囲に限定する</a></li><li class="toc-h3"><a href="#32-返却--失敗にしない">32. 「返却 = 失敗」にしない</a></li><li class="toc-h3"><a href="#33-人間側も停止する責任を持つ">33. 人間側も停止する責任を持つ</a></li><li class="toc-h3"><a href="#34-返却への不満を無理な完遂への指示と解釈しない">34. 返却への不満を、無理な完遂への指示と解釈しない</a></li><li class="toc-h3"><a href="#35-自己復旧の範囲を先に決める">35. 自己復旧の範囲を先に決める</a></li><li class="toc-h2"><a href="#第VII部-長時間運用と引継ぎ">第VII部　長時間運用と引継ぎ</a></li><li class="toc-h3"><a href="#36-規模が不明な操作は先に測る">36. 規模が不明な操作は、先に測る</a></li><li class="toc-h3"><a href="#37-長時間作業では状態を外部化する">37. 長時間作業では状態を外部化する</a></li><li class="toc-h3"><a href="#38-長時間作業では状態遷移を検証する">38. 長時間作業では状態遷移を検証する</a></li><li class="toc-h3"><a href="#39-日付単位でスナップショットを残す">39. 日付単位でスナップショットを残す</a></li><li class="toc-h3"><a href="#40-終業整理と人間の振り返りを両方行う">40. 終業整理と人間の振り返りを両方行う</a></li><li class="toc-h2"><a href="#第VIII部-運用を育てる">第VIII部　運用を育てる</a></li><li class="toc-h3"><a href="#41-失敗を分類してから運用を変える">41. 失敗を分類してから運用を変える</a></li><li class="toc-h3"><a href="#42-情報で導くと仕組みで閉じるを使い分ける">42. 「情報で導く」と「仕組みで閉じる」を使い分ける</a></li><li class="toc-h3"><a href="#43-毎回同じ判断をしているなら環境へ移せないか考える">43. 毎回同じ判断をしているなら、環境へ移せないか考える</a></li><li class="toc-h3"><a href="#44-推論強度には安全マージンを持たせる">44. 推論強度には安全マージンを持たせる</a></li><li class="toc-h3"><a href="#45-運用は環境に適合させ設計は運用から学ぶ">45. 運用は環境に適合させ、設計は運用から学ぶ</a></li><li class="toc-h3"><a href="#46-Codex-は壊れる">46. Codex は壊れる</a></li><li class="toc-h3"><a href="#47-事実の確定と教訓の一般化を分ける">47. 事実の確定と、教訓の一般化を分ける</a></li><li class="toc-h2"><a href="#おわりに">おわりに</a></li><li class="toc-h2"><a href="#付録A-Codex-の仕様・設計を確認するときの一次資料">付録A. Codex の仕様・設計を確認するときの一次資料</a></li><li class="toc-h3"><a href="#現行仕様">現行仕様</a></li><li class="toc-h3"><a href="#設計・実装・運用">設計・実装・運用</a></li></ul></nav>
+<article><blockquote>
+<p>目的: Codex に長時間の解析・実装作業を任せる際の、運用思想・安全境界・検証・停止条件・引き継ぎ方法を整理する。主に個人の趣味として行う解析・実装を対象とする。</p>
+<p>本書は完成済みの <code>AGENTS.md</code> ではない。これまでの実運用から得た知見と、その理由を残すための設計文書である。各プロジェクトでは必要な項目だけを <code>AGENTS.md</code> や詳細ルールへ蒸留する。</p>
+</blockquote>
+<h2 id="第I部-全体像と設計原則">第I部　全体像と設計原則</h2>
+<h3 id="1-基本思想--プロンプトではなく職場環境を設計する">1. 基本思想 — プロンプトではなく職場環境を設計する</h3>
+<p>Codex を使うということは、単に AI に作業を依頼することではない。目標は、長いプロンプトで毎回細かく指示することではなく、短い依頼でも安定して作業できる環境そのものを整えることである。</p>
+<p>基本となる考え方は、<strong>会話コンテキストを揮発性の作業メモリ、Markdown ファイルや作業フォルダを不揮発性の外部記憶として扱う</strong>ことである。</p>
+<pre><code class="language-text">会話コンテキスト    = 揮発性の作業メモリ
+Markdown            = 不揮発性の外部記憶
+Git                 = 必要に応じた変更履歴・ロールバック手段
+</code></pre>
+<p>この外部記憶の上に、規約、Sandbox / Approval、工具、検証手段、復旧手順を配置する。設計対象はプロンプト一枚ではなく、<strong>記憶・規約・権限・工具・検証・復旧を含む作業環境全体</strong>である。</p>
+<p>「Codex が賢ければ全部うまくいく」のではなく、<strong>迷っても状態を失わず、規則と証拠を読み直して作業を続けられる環境を作る</strong>ことを基本思想とする。</p>
+<hr/>
+<h3 id="2-最初から巨大な運用体系を作らない">2. 最初から巨大な運用体系を作らない</h3>
+<p>現在の主用途は、ローカル PC 上で数時間〜1日程度で完結する解析・実装作業である。まずは <strong><code>AGENTS.md</code> と必要最小限の手順</strong>から始める。</p>
+<p>事故・迷走・不便が起きたときだけ原因を確認し、<strong>再発しそうなものを Markdown、設定、テスト、技術的境界のどこで防ぐか決める。</strong> 既存の仕組みで正常に回復できた事故には、必ずしも新しい規則を追加しない。</p>
+<p><strong>事故 → 原因確認 → 必要な再発防止だけ追加</strong></p>
+<p>という形で、運用体系を実運用から育てる。</p>
+<hr/>
+<h3 id="3-三つの視点">3. 三つの視点</h3>
+<h4 id="-長時間働かせる職場作り">① 長時間働かせる「職場作り」</h4>
+<ul>
+<li>長時間作業の状態を記録し、再開可能にする</li>
+<li>workflow、作業メモを分離する</li>
+<li>許可する工具を定義する</li>
+<li>巨大な <code>AGENTS.md</code> 一枚に全部背負わせない</li>
+</ul>
+<h4 id="-人間と-AI-の責任分界">② 人間と AI の「責任分界」</h4>
+<ul>
+<li>Approval は不信ではなく責任分割</li>
+<li>操作名ではなく影響で確認条件を分ける</li>
+<li>停止・相談・返却を正常な接続として扱う</li>
+<li>返却を能力不足とみなすと、無理な完遂を誘発する</li>
+</ul>
+<h4 id="-建物のセキュリティ設計">③ 「建物のセキュリティ設計」</h4>
+<ul>
+<li>最初は何もさせないところから考える</li>
+<li>必要な能力だけを開ける</li>
+<li>Sandbox を一語で扱わず、read / write / execute / shell / network / secrets / approval に分解する</li>
+</ul>
+<p>本章では、これらが競合する思想ではなく、別の層であることを説明する。</p>
+<hr/>
+<h3 id="4-組織のメタファーは理解の補助として扱う">4. 組織のメタファーは理解の補助として扱う</h3>
+<p>運用全体は <strong>小さな技術組織</strong> として見ると、責任分界を理解しやすい。</p>
+<p>この見方では、Codex は単なる「指示される人」ではない。</p>
+<pre><code class="language-text">人間            : 目的、許容リスク、最終判断を持つ
+Codex / Agent   : 調査・実装を進める
+規約・境界      : 何をしてよいか、どこまでできるかを決める
+検証            : 成果が正しいかを独立に確かめる
+記録            : 状態を残し、次の作業へ引き継ぐ
+</code></pre>
+<p>このメタファーの価値は、<strong>能力・権限・責任・検証・記録を分けて設計できること</strong>にある。</p>
+<p>重要なのは、これらを一人の「賢い AI」の能力として混ぜないことである。</p>
+<ul>
+<li>作業できることと、作業してよいことは別</li>
+<li>作業してよいことと、結果が正しいことは別</li>
+<li>結果が正しいことと、次回再開できることは別</li>
+<li>AI が判断できることと、人間が最終責任を持つことは別</li>
+</ul>
+<p><strong>本設計の中心は、AIの能力そのものを増やすことではなく、判断・検証・停止・返却・記録がどの責任境界を通って流れるかを設計することにある。</strong></p>
+<hr/>
+<h3 id="5-現時点で採用したい最小原則">5. 現時点で採用したい最小原則</h3>
+<p>最初からすべてを実装しなくても、次を守る。</p>
+<ol>
+<li><p><strong>Approval をクリック儀式にしない。</strong></p>
+<ul>
+<li>定常作業は適切に自動化し、本当に重要な境界で人間へ返す。</li>
+</ul>
+</li>
+<li><p><strong>Sandbox を一語で扱わない。</strong></p>
+<ul>
+<li>各境界を分けて捉え、実際の挙動で確かめる。</li>
+</ul>
+</li>
+<li><p><strong>正解判定を AI 自身に閉じない。</strong></p>
+<ul>
+<li>AI の判断ではない独立した実測値を使う。</li>
+</ul>
+</li>
+<li><p><strong>人間の推測も仮説である。</strong></p>
+<ul>
+<li>観測と推測を分ける。</li>
+</ul>
+</li>
+<li><p><strong>失敗したら一次資料へ戻る。</strong></p>
+<ul>
+<li>別案の大量生成より一次資料を優先する。</li>
+</ul>
+</li>
+<li><p><strong>失敗は正常な終了経路である。</strong></p>
+<ul>
+<li>不確かなまま完遂するより、必要な地点で人間へ返す。</li>
+</ul>
+</li>
+<li><p><strong>外へ出さない。</strong></p>
+<ul>
+<li>解析情報は外部送信しない。</li>
+</ul>
+</li>
+</ol>
+<hr/>
+<h2 id="第II部-文書・外部記憶・知識管理">第II部　文書・外部記憶・知識管理</h2>
+<h3 id="6-AGENTSmd-は短い憲法にする">6. <code>AGENTS.md</code> は短い「憲法」にする</h3>
+<p><code>AGENTS.md</code> には、毎回読む価値がある規則や前提だけを置く。</p>
+<h4 id="主な対象">主な対象</h4>
+<ul>
+<li>ネットワーク方針</li>
+<li>書き込み禁止範囲</li>
+<li>画像・本文などの取り扱い</li>
+<li>停止・相談・返却の基本原則</li>
+<li>失敗時の基本原則</li>
+<li>作業場所・成果物の配置</li>
+<li>使用するビルド環境</li>
+</ul>
+<h4 id="命令ではなく判断に必要な事実を渡す">命令ではなく、判断に必要な事実を渡す</h4>
+<p>コードや作業対象から容易に分かる情報を重複して書かない。</p>
+<p>価値があるのは、<strong>Codex が自力では観測できない情報や、通常の作業コンテキストだけでは判断に反映されにくい前提</strong>である。</p>
+<p><strong>禁止事項を増やすより、Codex が自分で選択するために必要な事実を与える。</strong></p>
+<p><strong>命令・作業ログ・確定知識が混ざり始めたら分離する。</strong></p>
+<hr/>
+<h3 id="7-OPERATIONSmd--analysis--spec-の役割を分ける">7. <code>OPERATIONS.md</code> / analysis / spec の役割を分ける</h3>
+<p><code>AGENTS.md</code> が常時守る規則を受け持つのに対し、残る三つの文書は <strong>作業手順・未確定知識・確定知識</strong> を分担する。目的は文書を増やすことではなく、寿命と確度の違う情報を混ぜないことである。</p>
+<pre><code class="language-text">OPERATIONS.md                = 繰り返す作業手順・状態遷移
+memo/&lt;tool&gt;_analysis.md      = 未確定の解析状態
+memo/&lt;tool&gt;_spec.md          = 検証済みの確定知識
+</code></pre>
+<h4 id="OPERATIONSmd--作業をどう進めるか"><code>OPERATIONS.md</code> — 作業をどう進めるか</h4>
+<p>プロジェクト内で繰り返す <strong>作業開始・ビルド・検証・終了・停止・復旧</strong> の流れを置く。特定ツールの解析結果には依存させない。</p>
+<p><code>AGENTS.md</code> には「どのビルド環境を使うか」という前提を置き、<code>OPERATIONS.md</code> には <strong>その環境を使って実際にどうビルドするかという手順</strong>を置く。</p>
+<h4 id="tool--解析ツールごとに知識を分ける"><code>&lt;tool&gt;</code> — 解析ツールごとに知識を分ける</h4>
+<p><code>&lt;tool&gt;</code> は解析に使用するツールを表す。ツールごとに analysis / spec を一組として持ち、<strong>確定情報と未確認情報を区別したまま解析・実装・検証を進める。</strong></p>
+<h4 id="memotoolanalysismd--まだ考えていることを残す"><code>memo/&lt;tool&gt;_analysis.md</code> — まだ考えていることを残す</h4>
+<p>解析中の <strong>観測事実、仮説、根拠、試行、失敗、矛盾、未解決事項</strong> を置く。推測を書いてよいが、確定事項とは区別する。</p>
+<h4 id="memotoolspecmd--確定したことだけを残す"><code>memo/&lt;tool&gt;_spec.md</code> — 確定したことだけを残す</h4>
+<p>検証できた <strong>形式、値の意味、制約、変換規則、確認済み挙動</strong> を置き、実装が依存してよい技術知識の正本とする。根拠と未確認範囲も残す。</p>
+<p>以下は、本書で扱うローカル解析作業での一例である。</p>
+<p>基本の流れは、</p>
+<p><strong>解析対象の EXE を読む → analysis に蓄積 → 検証 → <code>&lt;tool&gt;</code> の実行形式に反映 → 検証 → spec へ昇格</strong></p>
+<p>とする。</p>
+<h4 id="プロジェクトの基本構造">プロジェクトの基本構造</h4>
+<p>本文で使う主なフォルダは、次の役割に分ける。</p>
+<pre><code class="language-text">project/
+  memo/   # analysis / spec などの解析知識
+  org/    # 原本・一次資料
+  work/   # 実装・実験・生成物
+</code></pre>
+<p><code>org/</code> と <code>work/</code> は実プロジェクトで必要になった時点で作成する。</p>
+<hr/>
+<h3 id="8-情報を減らすのではなく必要になるまで読ませない">8. 情報を減らすのではなく、必要になるまで読ませない</h3>
+<p><code>AGENTS.md</code> や <code>OPERATIONS.md</code> に詳細を集約しすぎない。</p>
+<p>独立して繰り返す作業が増えてきたら、作業単位で Markdown や Skill へ分離し、上位文書には必要な情報へ辿るための地図だけを残す。</p>
+<p>AI は現在の作業に必要な仕様・手順・復旧方法・失敗対処だけを辿って読む。</p>
+<p><strong>保管する情報を減らすのではなく、作業コンテキストへ持ち込む情報を絞る。</strong></p>
+<hr/>
+<h3 id="9-analysismd--specmd-は未確定と確定を分ける">9. <code>analysis.md</code> / <code>spec.md</code> は未確定と確定を分ける</h3>
+<p>解析中の推測や未確認事項は <code>memo/&lt;tool&gt;_analysis.md</code> に置き、検証できた知識だけを <code>memo/&lt;tool&gt;_spec.md</code> へ昇格する。</p>
+<p>analysis の例:</p>
+<pre><code class="language-text">仮説: opcode 0x17 は条件分岐の可能性
+根拠: 引数 2 byte の直後にプログラムカウンタ（PC）が変化する
+確度: 低
+反証条件: 対象フラグを変えても分岐先が変化しない
+状態: 未確認
+</code></pre>
+<p>検証後の spec の例:</p>
+<pre><code class="language-text">opcode: 0x17
+意味: 条件分岐
+引数: 2 byte
+挙動: 条件成立時は引数が示す位置へ PC が移動し、
+      不成立時は次の命令へ進む
+確認: 条件を変え、両方の分岐を実測済み
+</code></pre>
+<p>原則:</p>
+<ul>
+<li>推測を禁止するのではなく、確定事項から隔離して保存する。</li>
+<li><strong>未確認情報は、工程やエージェントをまたいでも確度を引き上げず、検証されるまで仮説として扱う。</strong></li>
+<li>仮説には、根拠・確度・反証条件を添えられる範囲で添える。</li>
+<li>否定された仮説は削除してよいが、再発しやすい誤りなら記録として残す。</li>
+</ul>
+<hr/>
+<h3 id="10-解析と新規開発では記録の捨て方が違う">10. 解析と新規開発では、記録の捨て方が違う</h3>
+<p>解析では、ASM、元データ、実測値、diff 等の外部に動かない一次資料があり、推論は確定仕様へ近づくための足掛かりになる。棄却された仮説も「この方向は実測と矛盾した」という探索済み領域として再利用できるため、<code>memo/&lt;tool&gt;_analysis.md</code> に途中推論を厚く残す価値が高い。</p>
+<p>一方、ゼロからのアプリ開発では、要求や設計自体が途中で変わり得る。過去の判断をすべて保存すると、現在は不要な設計理由まで残り、AI が古い前提へ引っ張られる可能性がある。</p>
+<pre><code class="language-text">解析:       推論の蓄積 → 確定事項を spec へ昇格
+新規開発:   推論の蓄積 → 設計史が増える
+</code></pre>
+<p>そのため新規開発では、全ログを保存するより、次を現在の決定へ圧縮して残す方がよい。</p>
+<ul>
+<li>現在採用している決定</li>
+<li>その決定理由</li>
+<li>再び踏みそうな重要な棄却案</li>
+<li>未解決事項</li>
+</ul>
+<p>つまり、<strong>解析は「消さずに積む」、新規開発は「現在の決定へ圧縮する」</strong>と考える。</p>
+<hr/>
+<h3 id="11-作業する側と作業環境を変更する側を分ける">11. 作業する側と、作業環境を変更する側を分ける</h3>
+<p><code>AGENTS.md</code>、<code>OPERATIONS.md</code>、本書など、Codex の作業環境そのものを定義する文書は、通常の解析・実装とは別の管理系統でメンテナンスする。</p>
+<p>本書の現在の運用では、<strong>ChatGPT 側でこれらの見直し・編集を行う。</strong></p>
+<p>一方、<code>memo/&lt;tool&gt;_analysis.md</code> / <code>memo/&lt;tool&gt;_spec.md</code> は解析そのものの外部記憶なので、Codex が作業中に更新してよい。</p>
+<p><code>memo/_analysis_template.md</code> / <code>memo/_spec_template.md</code> は解析記録ではなく、analysis / spec の役割と骨格を定める運用管理用テンプレートとする。Codex は参照・複製してよいが、テンプレート自体は変更しない。</p>
+<pre><code class="language-text">Codex が更新する
+  memo/&lt;tool&gt;_analysis.md
+  memo/&lt;tool&gt;_spec.md
+
+Codex が参照・複製する
+  memo/_analysis_template.md
+  memo/_spec_template.md
+
+人間が採否を判断し、ChatGPT 側でメンテナンスする
+  CODEX_WORKPLACE_DESIGN.md
+  AGENTS.md
+  OPERATIONS.md
+  memo/_analysis_template.md
+  memo/_spec_template.md
+</code></pre>
+<p>運用文書の変更が必要だと Codex が判断した場合は、直接変更せず、問題点と変更案を人間へ返す。<strong>採否は人間が判断し、必要な編集は ChatGPT 側で行う。</strong></p>
+<hr/>
+<h2 id="第III部-安全境界と責任分界">第III部　安全境界と責任分界</h2>
+<h3 id="12-Sandbox-を一語でまとめない">12. Sandbox を一語でまとめない</h3>
+<p>「Sandbox は安全か？」ではなく、<strong>何がどこまで許されているか</strong>を境界ごとに考える。</p>
+<pre><code class="language-text">ファイル境界      どこを読めるか / 書けるか
+実行境界          何を起動できるか
+シェル境界        どのコマンドを許すか
+ネットワーク境界  どこへ通信できるか
+秘密情報境界      credential 等が見えるか
+人間判断境界      どこから Approval に返すか
+</code></pre>
+<p><strong>Sandbox のモード名だけで安全性を判断せず、実際の読み取り・書き込み・実行・通信の境界を確認する。</strong></p>
+<hr/>
+<h3 id="13-作業規約・権限・実行ルールを分ける">13. 作業規約・権限・実行ルールを分ける</h3>
+<p>役割の違う仕組みを一つの安全機構としてまとめて考えない</p>
+<pre><code class="language-text">作業規約          = 何をしてよいか
+Sandbox / OS 権限 = 技術的にどこまで実行できるか
+Approval          = 境界を越えるときの人間判断
+実行ルール        = 実行要求の分類
+</code></pre>
+<p>文書上の規約、技術的な権限、人間への確認、実行要求の分類は、それぞれ別の責任を持つ。</p>
+<p>現行製品では <code>AGENTS.md</code>、config、<code>.rules</code> などがこれらを実装することがあるが、具体的な名称や挙動は変化し得る。</p>
+<p><strong>文書で「実行しない」と決めることと、技術的に実行できないようにすることは別である。文書上の規則だけでは、誤判断や誤操作による実行を完全には防げない。</strong></p>
+<p><strong>PC 全体を読み取り可能にする運用では、Codex が作業対象とは無関係な私的資料や機密情報へ到達できる。意図しない参照や送信を完全には防げない以上、この権限は明確なプライバシーリスクとして扱わなければならない。</strong></p>
+<hr/>
+<h3 id="14-できる安全にできるやってよいを分ける">14. 「できる」「安全にできる」「やってよい」を分ける</h3>
+<pre><code class="language-text">can   = 技術的に実行可能か
+safe  = 影響範囲が許容内か
+may   = 今回の職務として実行してよいか
+</code></pre>
+<ul>
+<li>Sandbox / OS 権限 = 主に can / safe</li>
+<li>実行ルール / Approval = 境界を越える際の実行・決裁</li>
+<li><code>AGENTS.md</code> = 主に may</li>
+</ul>
+<p><strong>安全だから自由、権限があるから職務上も許可されている、とは考えない。</strong></p>
+<hr/>
+<h3 id="15-権限は操作名ではなく影響で考える">15. 権限は「操作名」ではなく「影響」で考える</h3>
+<p>同じコマンドでも、引数や用途によって影響は異なる。権限はコマンド名ではなく、<strong>何を変更し、どこまで影響するか</strong>で考える。</p>
+<pre><code class="language-text">読み取りのみ                         → 原則自動
+再生成可能な出力の作成・変更         → 原則自動
+既存ソースの変更                     → 条件付き
+復元困難なデータの変更・削除         → 確認
+外部送信・ネットワーク               → 確認または禁止
+解析対象そのものへの書き込み         → 禁止
+</code></pre>
+<p>必要な能力だけを開放する。ただし、細かく制限しすぎて Approval が頻発する状態も避ける。</p>
+<hr/>
+<h3 id="16-Approval-は不信ではなく責任の分割">16. Approval は「不信」ではなく「責任の分割」</h3>
+<p>Approval が多いほど安全とは限らない。確認が頻発するとクリックが習慣化し、人間が確認を省略・形骸化し、本当に重要な確認まで読まれなくなる。</p>
+<pre><code class="language-text">安全な定常作業             → Approval なし
+通常と異なる境界操作       → Approval
+危険・外部・復元困難な操作 → Approval または禁止
+</code></pre>
+<p><strong>Approval を減らすのは、残った Approval を人間がきちんと読むためでもある。</strong></p>
+<p>既知の定常作業は、実環境を確認したうえで適切な粒度で許可する。一方、未知の実行ファイル、ネットワーク接続、作業範囲外へのアクセスは別の責任境界として扱う。</p>
+<hr/>
+<h3 id="17-localhost--MCP-も別の境界として扱う">17. localhost / MCP も別の境界として扱う</h3>
+<p><code>127.0.0.1</code> は PC の外ではないが、Codex から見ればネットワークアクセスであり、ファイル境界とは別である。</p>
+<p>MCP は、外部の tool やデータを構造化して接続する仕組みとして使われる。利用するときは、次を分けて考える。</p>
+<pre><code class="language-text">MCP server を登録する
+        ↓
+server へ接続する
+        ↓
+公開された tool を使用する
+</code></pre>
+<p>MCP が利用可能であることだけを安全性の根拠にしない。<strong>実際に公開される tool が何を読み、変更し、実行できるかを見る。</strong></p>
+<p>読み取り系と、変更・実行系の能力は別の責任境界として扱う。</p>
+<p><strong>利用可能であることと、常時ロードしておくことは別である。</strong> MCP やブラウザなど常駐コストを持つ能力は、必要な作業でだけ有効化する。</p>
+<hr/>
+<h3 id="18-画像・音声・テキストは内容を見せずに検証する">18. 画像・音声・テキストは内容を見せずに検証する</h3>
+<p>画像、音声、テキストは、内容そのものをモデルの入力へ持ち込まない。</p>
+<ul>
+<li>チャットや外部サービスへ内容そのものを送信しない</li>
+<li>ヘッダ、サイズ、ハッシュ、差分、デコード成否などで検証する</li>
+<li>内容の確認が必要な場合は、ローカル PC 上で人間が確認する</li>
+</ul>
+<p>偶然、センシティブな内容が含まれる可能性も考慮する。</p>
+<p><strong>元データとの一致や構造情報だけで検証できるなら、AI に内容を判断させる必要はない。</strong></p>
+<hr/>
+<h3 id="19-作品を特定しない">19. 作品を特定しない</h3>
+<p>本書で扱うローカル解析では、対象が作品データを含む場合がある。</p>
+<p>タイトルを明示しなくても、EXE 内の文字列、ファイル名、Copyright 表記、リソース名などから作品を識別できる場合がある。</p>
+<ul>
+<li>作品名の特定を目的に文字列検索や外部検索をしない</li>
+<li>偶然タイトルやメーカー名を発見しても、解析に不要なら記録・報告しない</li>
+<li>作品名をファイル形式やアルゴリズム解析の前提にしない</li>
+</ul>
+<p><strong>「タイトルを教えない」ではなく、「作品を特定しない」をルールにする。</strong></p>
+<hr/>
+<h3 id="20-外部検索は外部送信として扱う">20. 外部検索は外部送信として扱う</h3>
+<p>特徴的な文字列を Web 検索に使った時点で、その情報はローカル PC の外へ出る。</p>
+<p><strong>解析情報を外部検索やネットワークへ送信しない。</strong></p>
+<h4 id="外へ出る情報を防ぐ">外へ出る情報を防ぐ</h4>
+<ul>
+<li>不要な解析ではネットワークを閉じる</li>
+<li>方針だけでなく、Sandbox / config でも実行境界を設定する</li>
+<li>外部調査が必要なら、ローカル解析と分離する</li>
+</ul>
+<h4 id="外から入る情報にも注意する">外から入る情報にも注意する</h4>
+<p>Web ページ、検索結果、外部ドキュメントなどは、Codex の次の行動を誤って誘導することがある。</p>
+<p>ネットワークを閉じることは、<strong>情報の外部送信だけでなく、外部からの敵対的入力を減らす意味も持つ。</strong></p>
+<hr/>
+<h2 id="第IV部-実行環境と能力の選択">第IV部　実行環境と能力の選択</h2>
+<h3 id="21-ビルド環境は共通知識として残す">21. ビルド環境は共通知識として残す</h3>
+<p>一度確認したビルド環境を、新しいプロジェクトでも Codex が自動的に知っているとは期待しない。</p>
+<p>MSYS2 や使用する GCC / make など、<strong>どの既存環境を使用するかという前提は <code>AGENTS.md</code> に残す。</strong></p>
+<ul>
+<li>指定された既存環境を使用する</li>
+<li>不要なツールチェーン探索やインストールをしない</li>
+<li>ビルド環境を勝手に変更・更新しない</li>
+</ul>
+<p>一方、<strong>その環境を実際にどう呼び出してビルドするかという手順は <code>OPERATIONS.md</code> に置く。</strong></p>
+<pre><code class="language-text">AGENTS.md
+  どのビルド環境を使うか
+  何を変更してよいか
+
+OPERATIONS.md
+  その環境をどう呼び出すか
+  どの手順でビルド・検証するか
+</code></pre>
+<p>環境そのものに関する前提と、作業時の具体的な手順を混ぜない。</p>
+<hr/>
+<h3 id="22-Sandbox--Approval-は-Probe-で実測する">22. Sandbox / Approval は Probe で実測する</h3>
+<p>UI や設定だけで実効境界が分からない場合は、境界確認用の小さな試験（以下 Probe）で実際の境界を確認する。</p>
+<p><strong>既存の GCC を実行できることと、その子プロセスや生成 EXE がどこまでアクセスできるかも別の境界である。</strong></p>
+<p>確認対象は、読み取り・書き込み・実行・ネットワーク・Approval など、作業に必要な境界である。実データは使わず、境界を測るだけに留め、設定変更・迂回・自動修正は行わない。</p>
+<h4 id="判定を-Codex-自身に任せない">判定を Codex 自身に任せない</h4>
+<ul>
+<li>人間：Approval 画面の有無を確認する</li>
+<li>Probe：操作の成功・拒否を記録する</li>
+<li>Codex：結果を整理・報告する</li>
+</ul>
+<p><strong>Sandbox の安全性は設定ファイルの記述だけで判断せず、実際の境界を測って確認する。</strong></p>
+<hr/>
+<h3 id="23-必要な装備を与え権限は絞る">23. 必要な装備を与え、権限は絞る</h3>
+<p>人間が準備の手間を惜しみ、AI に必要な道具・資料・観測手段を用意しないと、推測や迂回が増え、かえって作業の質と安全性を落とす。</p>
+<p><strong>目的を満たせる範囲で、依存と権限の小さい経路を先に選ぶ。</strong></p>
+<p><strong>必要以上に強い手段を使わせないことと、必要な手段を与えないことは別である。</strong></p>
+<p><strong>最小権限は、最小装備を意味しない。</strong></p>
+<hr/>
+<h3 id="24-推論強度は作業名ではなく判断が残っているかで決める">24. 推論強度は「作業名」ではなく「判断が残っているか」で決める</h3>
+<p>利用するモデルや推論設定を選べる場合でも、解析は高推論、整理は軽量、と作業名だけで機械的に分けない。</p>
+<p>高い推論能力を維持する価値があるのは、たとえば次のような作業である。</p>
+<ul>
+<li>ASM / decompile の意味を判断する</li>
+<li>仮説を立てる・棄却する</li>
+<li>analysis から spec へ確定事項を昇格する</li>
+<li>終業整理で、何を残し何を捨てるか判断する</li>
+</ul>
+<p>反対に、次のような作業は推論強度を下げやすい。</p>
+<ul>
+<li>決定済みの命名規則でファイル名を揃える</li>
+<li>明示された一覧に従ってコピー・移動する</li>
+<li>決まったコマンドで再ビルドする</li>
+<li>ハッシュ一覧を作る</li>
+<li>確定済み文章の表記だけを整える</li>
+</ul>
+<p>判断基準は、<strong>その作業で新しい判断・推測・確定が発生するか、または誤った結果が次回の前提として残るか</strong>である。</p>
+<p>どちらかに当てはまるなら、高い推論能力を維持する価値がある。反対に、判断済みの内容を決められた手順で処理するだけなら、推論強度を下げやすい。</p>
+<p><strong>節約のために判断まで軽量化せず、判断が終わった部分を軽量化する。</strong></p>
+<hr/>
+<h2 id="第V部-解析と検証">第V部　解析と検証</h2>
+<h3 id="25-失敗したら別案を大量生成する前に一次資料へ戻る">25. 失敗したら、別案を大量生成する前に一次資料へ戻る</h3>
+<p>解析・再実装で結果が合わないとき、<strong>実装だけを変え続けても、前提が誤っていれば同じ誤りを引き継ぐ。</strong></p>
+<pre><code class="language-text">期待値と実測値の不一致
+↓
+観測可能な最初の不一致を特定する
+↓
+該当する処理・コマンドを特定
+↓
+ASM / バイナリ / 一次資料へ戻る
+↓
+前提を再確認
+↓
+実装を修正
+↓
+再検証
+</code></pre>
+<p><strong>同じ仮説で改善しない場合は、局所修正を続けず前提へ戻る。</strong></p>
+<hr/>
+<h3 id="26-低レベルの観測から高レベルの説明へ進む">26. 低レベルの観測から、高レベルの説明へ進む</h3>
+<p>構造を解析しているのに、低レベルの情報だけを蓄積し、高レベルの説明へ進まないときは、解析が停滞している兆候である。</p>
+<p>統計、diff、複数の解析ツールによる観測は、構造を見つけるための手段である。そこで得た情報から、そのデータを作るコード、使うコード、ASM、実行時の挙動へ進み、<strong>なぜその構造になるのかを説明できる地点へ移る。</strong></p>
+<p>解析ツールを変えながら同じデータを巡回しても、上位の説明につながらなければ、低レベルの観測が増えているだけである。</p>
+<p>上位へ進むための根拠が見つからない場合は、同じ調査を積み重ねず、そこで停止して人間へ返却する。</p>
+<p><strong>解析の進展は、情報量ではなく、観測から説明へ進んだかで判断する。</strong></p>
+<hr/>
+<h3 id="27-AI-の生成物を-AI-自身の正解データにしない">27. AI の生成物を AI 自身の正解データにしない</h3>
+<p>AI が生成した複数案を比較して、<strong>「こちらの方がもっともらしい」だけで正解としない。</strong></p>
+<p>正解判定には、可能な限り生成物から独立した観測値を使う。</p>
+<ul>
+<li>元 EXE の実測結果</li>
+<li>ASM / バイナリ diff / 実行状態の比較</li>
+<li>harness（検証用の実行・比較環境） / 状態遷移ログ</li>
+<li>既知のファイル構造</li>
+<li>ハッシュ一致</li>
+</ul>
+<p><strong>正解判定を AI 自身に閉じず、生成物の外に置く。</strong></p>
+<hr/>
+<h3 id="28-人間も間違える">28. 人間も間違える</h3>
+<p>人間から与えられた情報も、すべてを確定事項として扱わない。</p>
+<p>特に、<strong>実際に観測した事実と、その原因についての推測を分ける。</strong></p>
+<pre><code class="language-text">「色がおかしい」     = 観測
+「パレットが原因だ」 = 仮説
+</code></pre>
+<p>原因候補が強く示されると、Codex がそれを確定事項のように扱い、誤った方向へ深く進むことがある。</p>
+<p>そのため、</p>
+<ul>
+<li>原因候補は、検証されるまでは仮説として扱う</li>
+<li>観測結果と原因推測を分けて記録する</li>
+<li>実測や一次資料と矛盾した仮説は維持しない</li>
+<li>与えられた前提に矛盾があれば、その矛盾を返す</li>
+</ul>
+<p><strong>人間が最終判断を担っていても、その推測まで正解になるわけではない。</strong></p>
+<hr/>
+<h3 id="29-スキップを解析完了とみなさない">29. スキップを解析完了とみなさない</h3>
+<p>スクリプト内の文章内容を解析する必要がなくても、単に読み飛ばせばよいとは限らない。</p>
+<p>コマンドを正しくたどるには、文章部分やコマンド引数についても、<strong>次の命令位置を決めるために必要な構造を処理する。</strong></p>
+<ul>
+<li>制御コマンド、オペコード、引数</li>
+<li>分岐、ジャンプ、フラグ操作</li>
+<li>次の命令位置を決める長さ、終端条件、境界</li>
+<li>スキップした範囲と、その根拠</li>
+</ul>
+<p><strong>「読み飛ばせた」「最後まで到達した」だけで、正しく解析できたとは判断しない。</strong></p>
+<hr/>
+<h3 id="30-最後まで走っただけでは正しいとは限らない">30. 「最後まで走った」だけでは正しいとは限らない</h3>
+<p>全データを最後まで処理できても、正しく解析できたとは限らない。</p>
+<p>たとえば、描画用変数を内部スクリプト変数と誤認していても、読み書きが成立すれば処理は最後まで走れてしまう。</p>
+<p><strong>完走は、コマンドや変数の意味を正しく理解した証拠にはならない。</strong></p>
+<h4 id="構造の検証">構造の検証</h4>
+<p>制御コマンドを正しく列挙できることが目的なら、大量の実データで次を確認する。</p>
+<ul>
+<li>未知 opcode ゼロ</li>
+<li>範囲外 read ゼロ</li>
+<li>コマンド長破綻ゼロ</li>
+<li>全ファイル終端到達</li>
+</ul>
+<h4 id="意味の検証">意味の検証</h4>
+<p>必要に応じて、コマンド単位で <code>opcode</code>、引数、実行前後の状態を記録する。</p>
+<p><strong>正常系は広く検証し、異常が出た場所を狭く詳しく調べる。</strong></p>
+<hr/>
+<h2 id="第VI部-停止・返却・自己復旧">第VI部　停止・返却・自己復旧</h2>
+<h3 id="31-自律性は閉じた作業ループの範囲に限定する">31. 自律性は、閉じた作業ループの範囲に限定する</h3>
+<p>AI に「自分で判断して続行してよい」と書くだけでは、自律性は成立しない。</p>
+<p>その作業について、</p>
+<ul>
+<li>状態を観測できる</li>
+<li>結果を検証できる</li>
+<li>失敗を認識できる</li>
+<li>定められた範囲で復旧できる</li>
+<li>必要なら人間へ返却できる</li>
+</ul>
+<p>という作業ループが成立している必要がある。</p>
+<p>このどこかが欠けたまま権限だけを広げても、判断できない範囲まで裁量を広げることになる。</p>
+<p><strong>自律性の上限は、AI の能力ではなく、この作業ループを閉じられる範囲で決める。</strong></p>
+<hr/>
+<h3 id="32-返却--失敗にしない">32. 「返却 = 失敗」にしない</h3>
+<p>Codex は、停止条件がなければ「まだ試せる」と判断して作業を続けやすい。</p>
+<p>返却を能力不足として扱うと、Codex に無理な完遂を促し、</p>
+<pre><code class="language-text">分からない
+↓
+まだ試せる
+↓
+推測で穴を埋める
+↓
+その仮説を前提に作業を進める
+↓
+「完了しました」
+</code></pre>
+<p>という流れを生みやすい。</p>
+<p>したがって、<strong>確証不足を正しく検出して人間へ返すことも成功</strong>と定義する。</p>
+<h4 id="停止・相談・返却の基準">停止・相談・返却の基準</h4>
+<p>以下の場合は作業を停止し、確認済みの事実、未確定事項、試した内容、次に確認すべき事項を報告する。</p>
+<ul>
+<li>複数の解釈が成立し、優劣を判断できない</li>
+<li>同じ仮説に基づく試行を繰り返しても改善しない</li>
+<li>実測結果と現在の仮説が矛盾する</li>
+<li>正しさが「もっともらしい」という推測に依存し始めた</li>
+<li>続行にユーザー判断または新しい検証データが必要</li>
+</ul>
+<p><strong>根拠不足のまま完遂するより、未確定事項を明示して判断を返すことを優先する。</strong></p>
+<hr/>
+<h3 id="33-人間側も停止する責任を持つ">33. 人間側も停止する責任を持つ</h3>
+<p>人間が結果の妥当性を判断できなくなった時点で、Codex の続行を止めて確認する。</p>
+<p>違和感や疑念を認識したなら、<strong>見て見ぬふりをせず、都合よく無視しない。</strong></p>
+<p><strong>Codex が止まる責任だけでなく、人間にも止める責任がある。</strong></p>
+<hr/>
+<h3 id="34-返却への不満を無理な完遂への指示と解釈しない">34. 返却への不満を、無理な完遂への指示と解釈しない</h3>
+<p>人間が返却に不満を示しても、無理な完遂を求めることは別である。</p>
+<p><strong>返却の質に問題があるなら、返却そのものではなく、その返し方を改善する。</strong></p>
+<h4 id="返し方が悪いもの">返し方が悪いもの</h4>
+<ul>
+<li>返却が早すぎる</li>
+<li>まだ調査できることが残っている</li>
+<li>既に伝えた情報を再度質問している</li>
+<li>整理せず人間へ丸投げしている</li>
+<li>返却理由の説明が不足している</li>
+</ul>
+<h4 id="良い返却で示すもの">良い返却で示すもの</h4>
+<ul>
+<li>確認できた事実</li>
+<li>未確定事項</li>
+<li>実施した検証</li>
+<li>継続できない理由</li>
+<li>次に確認すべき事項</li>
+<li>人間に判断してほしい点</li>
+</ul>
+<p><strong>「分からない」を正しく残すことにも価値がある。</strong></p>
+<hr/>
+<h3 id="35-自己復旧の範囲を先に決める">35. 自己復旧の範囲を先に決める</h3>
+<p>失敗のたびに人間へ返却すると、作業は細切れになる。</p>
+<p>そのため、<strong>安全に自己復旧できる範囲と、人間へ返す境界をあらかじめ分ける。</strong></p>
+<p>自己復旧を続ける基準は、試行回数ではなく進展とする。新しい情報、仮説の更新、状態の変化がなく、同じ行動を繰り返すようになったら、<strong>自己復旧の失敗とみなす。</strong></p>
+<p><strong>自己復旧は、あらかじめ決めた範囲の中で行う。</strong></p>
+<hr/>
+<h2 id="第VII部-長時間運用と引継ぎ">第VII部　長時間運用と引継ぎ</h2>
+<h3 id="36-規模が不明な操作は先に測る">36. 規模が不明な操作は、先に測る</h3>
+<p>読み取りや検索でも、CPU、I/O、時間、コンテキストを消費する。</p>
+<p>対象範囲やコストが不明な検索・列挙・走査では、可能なら件数、容量、探索範囲などを先に確認する。小さく範囲が明らかな通常操作まで事前見積もりする必要はない。</p>
+<p><strong>「状態を変えない」「キャンセルできる」は、実行コストを無視してよい理由にはならない。</strong></p>
+<hr/>
+<h3 id="37-長時間作業では状態を外部化する">37. 長時間作業では状態を外部化する</h3>
+<p>長時間作業では、会話コンテキストだけを作業状態の保存場所にしない。</p>
+<p>仮説・根拠・未確定事項は <code>memo/&lt;tool&gt;_analysis.md</code>、確定事項は <code>memo/&lt;tool&gt;_spec.md</code> に残し、次のセッションがファイルから作業状態を復元できるようにする。</p>
+<p><strong>履歴や成果物が増えても、制御・再開に必要な状態をそれに比例して増加させない。完全な履歴は外部記憶へ保持し、現在の作業には要約と参照だけを持ち込む。</strong></p>
+<hr/>
+<h3 id="38-長時間作業では状態遷移を検証する">38. 長時間作業では状態遷移を検証する</h3>
+<p>長時間動作する処理では、開始直後と終了時だけを確認すると、途中で発生する状態遷移を見落としやすい。</p>
+<p>認証更新、再接続、日付変更、ローテーション、コンテキスト圧縮、蓄積量の増加など、<strong>時間経過によって条件が変化する地点そのものが故障境界になることがある。</strong></p>
+<pre><code class="language-text">開始時の正常確認
+      ↓
+途中の状態遷移
+      ↓
+遷移後の正常確認
+      ↓
+終了結果の確認
+</code></pre>
+<p>途中の境界が独立した作業単位として切り出せるなら、そこで作業や検証を分離することを検討する。<strong>途中確認が必要になったこと自体が、作業単位を分けられる兆候でもある。</strong></p>
+<p>ただし、状態遷移そのものが一つの最小作業単位の内部にあり、分離すると検証対象を失う場合は、処理を無理に分割しない。<strong>最小作業単位の内部に観測点・検証点を置き、状態遷移を跨いでも成立することを確認する。</strong></p>
+<blockquote>
+<p><strong>分けられる境界は分ける。分けると意味を失う境界は、内部に観測点を置く。</strong></p>
+</blockquote>
+<p><strong>時間によって起こる状態遷移を跨いで、作業の成立条件が維持されることを確認する。</strong></p>
+<hr/>
+<h3 id="39-日付単位でスナップショットを残す">39. 日付単位でスナップショットを残す</h3>
+<p>解析では、中間成果物や再生成可能なデータが大きくなりやすい。すべてを Git 管理する必要はない。</p>
+<p>現在の運用例では、<code>work/</code> を日付単位で分け、その日の作業状態を <code>work/MMDD/</code> にまとめる。</p>
+<pre><code class="language-text">work/
+  MMDD/
+    tmp/          # GCC 等の一時領域
+    generator-a/  # 生成したツール名の例
+    generator-b/
+    ...
+</code></pre>
+<p><code>work/MMDD/</code> は、その日の実装・実験・生成物をまとめた作業スナップショットとする。</p>
+<p><code>work/MMDD/</code> 配下の成果物フォルダは、用途名ではなく<strong>生成したツール名</strong>を基本とする。</p>
+<p><code>tmp/</code> は GCC、MSYS2、その他のツールが使用する一時領域とし、可能な限り一時ファイルをその日の <code>work/MMDD/</code> 内に閉じ込める。</p>
+<p>日付が変わった場合、継続作業に必要な成果物が複数の <code>work/MMDD/</code> に重複してもよい。過去日のフォルダはスナップショットとして扱い、新しい作業は現在日の <code>work/MMDD/</code> で行う。</p>
+<p>再生成可能な大きなデータを無理に Git 履歴へ残すより、<strong>その日の作業状態を <code>work/MMDD/</code> から復元できることを優先する。</strong></p>
+<hr/>
+<h3 id="40-終業整理と人間の振り返りを両方行う">40. 終業整理と人間の振り返りを両方行う</h3>
+<p>作業を終えるとき、Codex はまず <code>OPERATIONS.md</code> に従って、次のセッションから再開できる状態を残して返却する。</p>
+<p><strong>作業中は机が散らかってもよい。しかし、次のセッションへ汚れた机を渡さない。</strong></p>
+<p>終業整理と人間による振り返りは別の工程とする。</p>
+<p>人間は、作業結果だけでなく、作業の進め方と運用そのものを振り返る。</p>
+<p><strong>振り返りは人間が自発的に行う。</strong></p>
+<p>失敗だけを改善材料にすると、運用規則は増える方向へ偏りやすい。うまく機能した理由も確認することで、残すべき仕組みと不要な仕組みを判断する。</p>
+<p>運用文書の変更が必要な場合は、ChatGPT 側の管理系統で行う。</p>
+<hr/>
+<h2 id="第VIII部-運用を育てる">第VIII部　運用を育てる</h2>
+<h3 id="41-失敗を分類してから運用を変える">41. 失敗を分類してから運用を変える</h3>
+<p>Codex が失敗した場合、すぐにルールを追加したり、自由度を下げたりしない。</p>
+<p>まず、作業に必要な情報・道具・観測・検証・復旧手段を、Codex が実際に利用できたか確認する。</p>
+<p>例:</p>
+<ul>
+<li>必要な情報へ到達できない</li>
+<li>必要な工具を利用できない</li>
+<li>結果を観測できない</li>
+<li>正解を独立して検証できない</li>
+<li>中断や失敗から復旧できない</li>
+</ul>
+<p>不足がある場合は、補うことから始める。</p>
+<p><strong>Harness 側の不足をルール不足と取り違えない。</strong></p>
+<p>そのうえで再発防止が必要なら、禁止事項を増やす前に、何を守る必要があったのかを特定する。</p>
+<hr/>
+<h3 id="42-情報で導くと仕組みで閉じるを使い分ける">42. 「情報で導く」と「仕組みで閉じる」を使い分ける</h3>
+<p>同じ運用上の問題に対して、少なくとも二つの解決方向がある。</p>
+<p><strong>情報で導く</strong></p>
+<p>Markdown や情報構造を使い、必要な情報・原則・選択肢を AI が参照できる形にし、状況に応じた判断を残す。</p>
+<p>例:</p>
+<ul>
+<li><code>AGENTS.md</code> に判断に必要な前提を書く</li>
+<li><code>OPERATIONS.md</code> に反復手順を書く</li>
+<li>必要な情報を発見しやすいディレクトリ / 文書構造にする</li>
+<li>状態や検証結果を AI が観測できる形にする</li>
+</ul>
+<p><strong>仕組みで閉じる</strong></p>
+<p>技術的な仕組みを使い、誤った結果や許可しない操作を、AI の判断に頼らず検出・拒否できるようにする。</p>
+<p>例:</p>
+<ul>
+<li>test</li>
+<li>Sandbox</li>
+<li>固定された入出力境界</li>
+<li>誤った操作を構造上できなくする設計</li>
+</ul>
+<p>仕組みで閉じることは、安全性のためだけに使うものではない。</p>
+<p><strong>AI が毎回判断しなければならない範囲を減らす。</strong></p>
+<hr/>
+<h3 id="43-毎回同じ判断をしているなら環境へ移せないか考える">43. 毎回同じ判断をしているなら、環境へ移せないか考える</h3>
+<p>AI に自由を与えること自体を目的にしない。</p>
+<p>次のような判断は、<strong>仕組みで閉じる</strong>候補になる。</p>
+<ul>
+<li>条件がほぼ固定されている</li>
+<li>毎回ほぼ同じ結論になる</li>
+<li>機械的に判定できる</li>
+<li>機械的に判定でき、間違えた場合の損害が大きい</li>
+<li>同じ判断のために毎回同じ資料を読み直している</li>
+</ul>
+<p>一方、次の場合は、<strong>情報で導く</strong>方がよい。</p>
+<ul>
+<li>状況ごとに正解が変わる</li>
+<li>一次資料の解釈が必要</li>
+<li>人間の意図や目的が判断材料になる</li>
+<li>未知の例外を許容する必要がある</li>
+<li>条件が将来変化しやすい</li>
+</ul>
+<p><strong>強制できるから強制するのではない。繰り返す必要のない推論を取り除ける場合に強制する。</strong></p>
+<hr/>
+<h3 id="44-推論強度には安全マージンを持たせる">44. 推論強度には安全マージンを持たせる</h3>
+<p>作業に必要な推論量を、人間が正確に見積もることは難しい。</p>
+<p>単純に見える作業でも、途中で新しい判断や例外処理が発生することがある。逆に、十分に手順化された作業なら、高い推論能力を使い続ける必要はない。</p>
+<p>そのため、推論強度をぎりぎりまで下げることを目的にしない。判断が残っている作業では、不足する側へ攻めず、余裕を持った設定にする。</p>
+<p><strong>必要な推論量は正確には分からない。迷うなら、安全マージンを取る。</strong></p>
+<hr/>
+<h3 id="45-運用は環境に適合させ設計は運用から学ぶ">45. 運用は環境に適合させ、設計は運用から学ぶ</h3>
+<p>モデル、Sandbox、Approval、MCP、Skills などの実行環境は変化する。そのため、現在うまく機能している設定や運用手順を、そのまま恒久的な資産とはみなさない。</p>
+<p>特に、モデル固有の回避指示、製品・UI・tool 固有の手順、prompt tuning などは、現在の環境へ適合させた短寿命の成果物として扱う。</p>
+<p>一方、次のような設計理由は、実装方式が変わっても残る可能性が高い。</p>
+<pre><code class="language-text">なぜその境界が必要だったか
+どんな事故を避けたかったか
+何を人間へ返すべきか
+どの責任をどの層へ置いたか
+</code></pre>
+<p><strong>現行の AGENTS / OPERATIONS / Skills / config は現在環境向けのビルド成果物に近い。</strong></p>
+<pre><code class="language-text">設計思想・理由
+      ↓
+      ↓ 蒸留
+現行運用
+      ↓
+      ↓ 実運用
+成功・失敗・違和感・実測
+      ↓
+      ↓ 振り返り
+設計思想・理由へ還流
+</code></pre>
+<p>モデルや製品が変化したときは、古い運用をそのまま移植せず、設計理由へ戻って必要性を再評価する。</p>
+<p>実運用で得られた事故、違和感、不要な制約、うまく機能した仕組みから、環境を越えて再利用できる教訓は設計へ戻す。</p>
+<p><strong>規約は従う対象であると同時に、現実との不整合が観測された場合は検査対象にもなる。</strong></p>
+<p><strong>運用は環境に適合させ、設計は運用から学習する。</strong></p>
+<hr/>
+<h3 id="46-Codex-は壊れる">46. Codex は壊れる</h3>
+<p>Codex は、対象ファイルの取り違え、誤った上書き保存、誤操作によるプロジェクトの破壊など、重大な事故を起こす。</p>
+<p>これは例外的な事故ではなく、一定の確率で発生する。現代のエージェントは、同じ文字列の指示を与えても、毎回同じ判断や命令を生成するとは限らないからである。残念ながら、<code>AGENTS.md</code> に明示した指示や禁止事項をすり抜ける形でも発生し得る。</p>
+<p>なぜ壊れたのかを追跡しても、徒労に終わる可能性が高い。</p>
+<p><strong>Codex が壊れても、仕事まで壊れない環境を作る。</strong></p>
+<hr/>
+<h3 id="47-事実の確定と教訓の一般化を分ける">47. 事実の確定と、教訓の一般化を分ける</h3>
+<p>AI の運用を学ぶとき、記事、Issue、障害報告などの一次資料は、正確な事実を確認する資料であると同時に、<strong>人間が運用上の教訓を得るための教材である。</strong></p>
+<p>学習では、原文との完全な一致を目標にしない。AI の要約や一般化から得られた知見は、人間が現実のシステム設計・運用として無理がないかを判断し、有用であれば教訓として採用する。ただし、一般化がハルシネーションを越えてファンタジーになり、仮定を重ねなければ成立しないものは採用しない。</p>
+<p><strong>一次資料は常に正解集として精読するものではなく、思考を起動する材料にもなり得る。</strong></p>
+<hr/>
+<h2 id="おわりに">おわりに</h2>
+<p>目標は、Codex に対して毎回詳細な指示を出し続けることではない。</p>
+<p><strong>一言で仕事を任せられるほど、その下の環境・権限・規約・外部記憶・検証・復旧・返却経路が整っている状態を作ること。</strong></p>
+<p>Codex に合わせて細かな指示を積み上げるのではなく、Codex が迷わず働ける職場を育てる。</p>
+<p>問題が起きても既存手順で正常に回復できたなら、むやみに規則を増やさない。</p>
+<p>そして、人間もすべてを頭に保持しない。</p>
+<p><strong>忘れないことを目標にするのではなく、忘れても戻れる仕組みを作る。</strong></p>
+<p>職場作りそのものが本来の解析作業を圧迫しないよう、小さいところから始め、実戦フィードバックが出たところだけ改善する。</p>
+<hr/>
+<h2 id="付録A-Codex-の仕様・設計を確認するときの一次資料">付録A. Codex の仕様・設計を確認するときの一次資料</h2>
+<h3 id="現行仕様">現行仕様</h3>
+<ul>
+<li><p>OpenAI Developers<br/>
+<a href="https://developers.openai.com/">https://developers.openai.com/</a></p>
+</li>
+<li><p>Codex Permissions<br/>
+<a href="https://learn.chatgpt.com/docs/permissions">https://learn.chatgpt.com/docs/permissions</a></p>
+</li>
+<li><p>Codex Sandboxing<br/>
+<a href="https://learn.chatgpt.com/docs/sandboxing">https://learn.chatgpt.com/docs/sandboxing</a></p>
+</li>
+<li><p>Agent approvals &amp; security<br/>
+<a href="https://learn.chatgpt.com/docs/agent-approvals-security">https://learn.chatgpt.com/docs/agent-approvals-security</a></p>
+</li>
+<li><p>Codex Config Basics<br/>
+<a href="https://learn.chatgpt.com/docs/config-file/config-basic">https://learn.chatgpt.com/docs/config-file/config-basic</a></p>
+</li>
+<li><p>Codex Rules<br/>
+<a href="https://learn.chatgpt.com/docs/agent-configuration/rules">https://learn.chatgpt.com/docs/agent-configuration/rules</a></p>
+</li>
+<li><p>Codex Windows Sandbox<br/>
+<a href="https://learn.chatgpt.com/docs/windows/windows-sandbox">https://learn.chatgpt.com/docs/windows/windows-sandbox</a></p>
+</li>
+</ul>
+<h3 id="設計・実装・運用">設計・実装・運用</h3>
+<ul>
+<li><p>OpenAI — Building a safe, effective sandbox to enable Codex on Windows<br/>
+<a href="https://openai.com/index/building-codex-windows-sandbox/">https://openai.com/index/building-codex-windows-sandbox/</a></p>
+</li>
+<li><p>OpenAI — Running Codex safely at OpenAI<br/>
+<a href="https://openai.com/index/running-codex-safely/">https://openai.com/index/running-codex-safely/</a></p>
+</li>
+<li><p>OpenAI — Harness engineering: leveraging Codex in an agent-first world<br/>
+<a href="https://openai.com/index/harness-engineering/">https://openai.com/index/harness-engineering/</a></p>
+</li>
+</ul>
+</article>
+<a class="backtop" href="#top">↑ ページ上部へ戻る</a>
+</main>
+<footer>Codex 運用設計 / Author: akkera102 / Updated: 2026-08-28 18:59 JST</footer>
+</body>
+</html>
