@@ -1,12 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-08 17:58 JST">
-<meta name="description" content="A guide to structuring Codex workplaces for long-running analysis and implementation, including harnesses, boundaries, verification, recovery, and handoff.">
-<title>Codex Workplace Design — How to Structure Harnesses, Boundaries, Verification, and Recovery</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="akkera102" name="author"/>
+<meta content="2026-09-09 21:40 JST" name="last-modified"/>
+<meta content="A guide to structuring Codex workplaces for long-running analysis and implementation, including harnesses, boundaries, verification, recovery, and handoff." name="description"/>
+<title>Codex Workplace Design Guide</title>
 <style>
 :root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
 @media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
@@ -24,79 +25,16 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 </head>
 <body>
 <main id="top">
-  <header class="doc-head">
-    <h1 class="doc-title">Codex Workplace Design — How to Structure Harnesses, Boundaries, Verification, and Recovery</h1>
-    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-08 17:58 JST</span><span>Language: English</span></div>
-  </header>
-  <nav class="toc" aria-label="Table of contents">
-    <div class="toc-title">Table of Contents</div>
-    <ul>
-    <li class="toc-h2"><a href="#Part-I--Overview-and-Design-Principles">Part I — Overview and Design Principles</a></li>
-    <li class="toc-h3"><a href="#1-Core-Idea--Design-the-Workplace-Not-the-Prompt">1. Core Idea — Design the Workplace, Not the Prompt</a></li>
-    <li class="toc-h3"><a href="#2-Do-Not-Build-a-Large-Operational-Framework-Up-Front">2. Do Not Build a Large Operational Framework Up Front</a></li>
-    <li class="toc-h3"><a href="#3-Three-Perspectives">3. Three Perspectives</a></li>
-    <li class="toc-h3"><a href="#4-Use-the-Organizational-Metaphor-as-an-Aid-to-Understanding">4. Use the Organizational Metaphor as an Aid to Understanding</a></li>
-    <li class="toc-h3"><a href="#5-Minimum-Principles-to-Adopt-at-Present">5. Minimum Principles to Adopt at Present</a></li>
-    <li class="toc-h2"><a href="#Part-II--Documents-External-Memory-and-Knowledge-Management">Part II — Documents, External Memory, and Knowledge Management</a></li>
-    <li class="toc-h3"><a href="#6-KeepAGENTSmda-Short-Constitution">6. KeepAGENTS.mda Short “Constitution”</a></li>
-    <li class="toc-h3"><a href="#7-Separate-the-Roles-ofOPERATIONSmd-analysis-and-spec">7. Separate the Roles ofOPERATIONS.md, analysis, and spec</a></li>
-    <li class="toc-h3"><a href="#8-Do-Not-Reduce-Information-Delay-Reading-It-Until-Needed">8. Do Not Reduce Information; Delay Reading It Until Needed</a></li>
-    <li class="toc-h3"><a href="#9-Useanalysismdspecmdto-Separate-Unconfirmed-and-Confirmed-Knowledge">9. Useanalysis.md/spec.mdto Separate Unconfirmed and Confirmed Knowledge</a></li>
-    <li class="toc-h3"><a href="#10-Analysis-and-Greenfield-Development-Discard-History-Differently">10. Analysis and Greenfield Development Discard History Differently</a></li>
-    <li class="toc-h3"><a href="#11-Separate-the-Worker-from-the-Maintainer-of-the-Working-Environment">11. Separate the Worker from the Maintainer of the Working Environment</a></li>
-    <li class="toc-h2"><a href="#Part-III--Safety-Boundaries-and-Division-of-Responsibility">Part III — Safety Boundaries and Division of Responsibility</a></li>
-    <li class="toc-h3"><a href="#12-Do-Not-Treat-Sandbox-as-One-Thing">12. Do Not Treat Sandbox as One Thing</a></li>
-    <li class="toc-h3"><a href="#13-Separate-Work-Rules-Authority-and-Execution-Rules">13. Separate Work Rules, Authority, and Execution Rules</a></li>
-    <li class="toc-h3"><a href="#14-Separate-Can-Safe-and-May">14. Separate “Can,” “Safe,” and “May”</a></li>
-    <li class="toc-h3"><a href="#15-Think-About-Authority-by-Impact-Not-Operation-Name">15. Think About Authority by Impact, Not Operation Name</a></li>
-    <li class="toc-h3"><a href="#16-Approval-Is-a-Division-of-Responsibility-Not-Distrust">16. Approval Is a Division of Responsibility, Not “Distrust”</a></li>
-    <li class="toc-h3"><a href="#17-Treat-localhost--MCP-as-Separate-Boundaries-Too">17. Treat localhost / MCP as Separate Boundaries Too</a></li>
-    <li class="toc-h3"><a href="#18-Verify-Images-Audio-and-Text-Without-Showing-Their-Contents">18. Verify Images, Audio, and Text Without Showing Their Contents</a></li>
-    <li class="toc-h3"><a href="#19-Do-Not-Identify-the-Creative-Work">19. Do Not Identify the Creative Work</a></li>
-    <li class="toc-h3"><a href="#20-Treat-External-Search-as-External-Transmission">20. Treat External Search as External Transmission</a></li>
-    <li class="toc-h2"><a href="#Part-IV--Execution-Environment-and-Capability-Selection">Part IV — Execution Environment and Capability Selection</a></li>
-    <li class="toc-h3"><a href="#21-Preserve-the-Build-Environment-as-Shared-Knowledge">21. Preserve the Build Environment as Shared Knowledge</a></li>
-    <li class="toc-h3"><a href="#22-Measure-Sandbox--Approval-with-a-Probe">22. Measure Sandbox / Approval with a Probe</a></li>
-    <li class="toc-h3"><a href="#23-Use-Rejection-to-Map-the-Effective-Specification">23. Use Rejection to Map the Effective Specification</a></li>
-    <li class="toc-h3"><a href="#24-Provide-the-Necessary-Tools-While-Keeping-Privilege-Narrow">24. Provide the Necessary Tools, While Keeping Privilege Narrow</a></li>
-    <li class="toc-h2"><a href="#Part-V--Analysis-and-Verification">Part V — Analysis and Verification</a></li>
-    <li class="toc-h3"><a href="#25-When-Something-Fails-Return-to-Primary-Sources-Before-Generating-Many-Alternatives">25. When Something Fails, Return to Primary Sources Before Generating Many Alternatives</a></li>
-    <li class="toc-h3"><a href="#26-Move-from-LowLevel-Observation-to-HighLevel-Explanation">26. Move from Low-Level Observation to High-Level Explanation</a></li>
-    <li class="toc-h3"><a href="#27-Do-Not-Use-AIGenerated-Artifacts-as-the-AIs-Own-Ground-Truth">27. Do Not Use AI-Generated Artifacts as the AI&#x27;s Own Ground Truth</a></li>
-    <li class="toc-h3"><a href="#28-Humans-Can-Be-Wrong-Too">28. Humans Can Be Wrong Too</a></li>
-    <li class="toc-h3"><a href="#29-Do-Not-Treat-Skipping-as-Analysis-Completion">29. Do Not Treat Skipping as Analysis Completion</a></li>
-    <li class="toc-h3"><a href="#30-It-Ran-to-the-End-Does-Not-Mean-It-Was-Correct">30. “It Ran to the End” Does Not Mean It Was Correct</a></li>
-    <li class="toc-h3"><a href="#31-The-Granularity-of-Observation-Constrains-Understanding">31. The Granularity of Observation Constrains Understanding</a></li>
-    <li class="toc-h2"><a href="#Part-VI--Stop-Return-and-SelfRecovery">Part VI — Stop, Return, and Self-Recovery</a></li>
-    <li class="toc-h3"><a href="#32-Limit-Autonomy-to-Closed-Work-Loops">32. Limit Autonomy to Closed Work Loops</a></li>
-    <li class="toc-h3"><a href="#33-Do-Not-Define-Return-=-Failure">33. Do Not Define “Return = Failure”</a></li>
-    <li class="toc-h3"><a href="#34-Humans-Also-Have-a-Responsibility-to-Stop">34. Humans Also Have a Responsibility to Stop</a></li>
-    <li class="toc-h3"><a href="#35-Do-Not-Interpret-Dissatisfaction-with-Return-as-a-Demand-for-Forced-Completion">35. Do Not Interpret Dissatisfaction with Return as a Demand for Forced Completion</a></li>
-    <li class="toc-h3"><a href="#36-Define-the-Scope-of-SelfRecovery-in-Advance">36. Define the Scope of Self-Recovery in Advance</a></li>
-    <li class="toc-h2"><a href="#Part-VII--LongRunning-Operation-and-Handoff">Part VII — Long-Running Operation and Handoff</a></li>
-    <li class="toc-h3"><a href="#37-Measure-First-When-the-Scale-of-an-Operation-Is-Unknown">37. Measure First When the Scale of an Operation Is Unknown</a></li>
-    <li class="toc-h3"><a href="#38-Externalize-State-for-LongRunning-Work">38. Externalize State for Long-Running Work</a></li>
-    <li class="toc-h3"><a href="#39-Verify-State-Transitions-in-LongRunning-Work">39. Verify State Transitions in Long-Running Work</a></li>
-    <li class="toc-h3"><a href="#40-Separate-the-Time-Direction-from-the-Work-Direction">40. Separate the Time Direction from the Work Direction</a></li>
-    <li class="toc-h3"><a href="#41-Preserve-Snapshots-by-Date-and-Work-Unit">41. Preserve Snapshots by Date and Work Unit</a></li>
-    <li class="toc-h3"><a href="#42-Perform-Both-EndofWork-Cleanup-and-Human-Retrospective">42. Perform Both End-of-Work Cleanup and Human Retrospective</a></li>
-    <li class="toc-h2"><a href="#Part-VIII--Evolving-the-Operation">Part VIII — Evolving the Operation</a></li>
-    <li class="toc-h3"><a href="#43-Classify-Failure-Before-Changing-the-Operation">43. Classify Failure Before Changing the Operation</a></li>
-    <li class="toc-h3"><a href="#44-Choose-Between-Guide-with-Information-and-Enforce-with-Mechanism">44. Choose Between “Guide with Information” and “Enforce with Mechanism”</a></li>
-    <li class="toc-h3"><a href="#45-If-the-Same-Judgment-Is-Repeated-Every-Time-Ask-Whether-It-Can-Move-into-the-Environment">45. If the Same Judgment Is Repeated Every Time, Ask Whether It Can Move into the Environment</a></li>
-    <li class="toc-h3"><a href="#46-Adapt-Operations-to-the-Environment-and-Let-Design-Learn-from-Operations">46. Adapt Operations to the Environment, and Let Design Learn from Operations</a></li>
-    <li class="toc-h3"><a href="#47-Do-Not-Use-Conversation-as-the-Memory-of-the-Work">47. Do Not Use Conversation as the Memory of the Work</a></li>
-    <li class="toc-h3"><a href="#48-Codex-Can-Fail">48. Codex Can Fail</a></li>
-    <li class="toc-h3"><a href="#49-What-Is-a-Harness">49. What Is a Harness?</a></li>
-    <li class="toc-h2"><a href="#Conclusion">Conclusion</a></li>
-    <li class="toc-h2"><a href="#Appendix-A-References">Appendix A. References</a></li>
-    <li class="toc-h3"><a href="#Sources-of-Quotations-and-Ideas">Sources of Quotations and Ideas</a></li>
-    <li class="toc-h3"><a href="#Current-Specifications">Current Specifications</a></li>
-    <li class="toc-h3"><a href="#Design-Implementation-and-Operations">Design, Implementation, and Operations</a></li>
-    </ul>
-  </nav>
-  <article>
-<blockquote>
+<header class="doc-head">
+<h1 class="doc-title">Codex Workplace Design Guide</h1>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-09 21:40 JST</span><span>Language: English</span></div>
+</header>
+<nav aria-label="Table of contents" class="toc">
+<div class="toc-title">Table of Contents</div>
+<ul><li class="toc-h2"><a href="#Part-I--Overview-and-Design-Principles">Part I — Overview and Design Principles</a></li><li class="toc-h3"><a href="#1-Core-Idea--Design-the-Workplace-Not-the-Prompt">1. Core Idea — Design the Workplace, Not the Prompt</a></li><li class="toc-h3"><a href="#2-Do-Not-Build-a-Large-Operational-Framework-Up-Front">2. Do Not Build a Large Operational Framework Up Front</a></li><li class="toc-h3"><a href="#3-Three-Perspectives">3. Three Perspectives</a></li><li class="toc-h3"><a href="#4-Use-the-Organizational-Metaphor-as-an-Aid-to-Understanding">4. Use the Organizational Metaphor as an Aid to Understanding</a></li><li class="toc-h3"><a href="#5-Minimum-Principles-to-Adopt-at-Present">5. Minimum Principles to Adopt at Present</a></li><li class="toc-h2"><a href="#Part-II--Documents-External-Memory-and-Knowledge-Management">Part II — Documents, External Memory, and Knowledge Management</a></li><li class="toc-h3"><a href="#6-KeepAGENTSmda-Short-Constitution">6. Keep AGENTS.md a Short “Constitution”</a></li><li class="toc-h3"><a href="#7-Separate-the-Roles-ofOPERATIONSmd-analysis-and-spec">7. Separate the Roles of OPERATIONS.md, analysis, and spec</a></li><li class="toc-h3"><a href="#8-Do-Not-Reduce-Information-Delay-Reading-It-Until-Needed">8. Do Not Reduce Information; Delay Reading It Until Needed</a></li><li class="toc-h3"><a href="#9-Useanalysismdspecmdto-Separate-Unconfirmed-and-Confirmed-Knowledge">9. Use analysis.md / spec.md to Separate Unconfirmed and Confirmed Knowledge</a></li><li class="toc-h3"><a href="#10-Analysis-and-Greenfield-Development-Discard-History-Differently">10. Analysis and Greenfield Development Discard History Differently</a></li><li class="toc-h3"><a href="#11-Separate-the-Worker-from-the-Maintainer-of-the-Working-Environment">11. Separate the Worker from the Maintainer of the Working Environment</a></li><li class="toc-h2"><a href="#Part-III--Safety-Boundaries-and-Division-of-Responsibility">Part III — Safety Boundaries and Division of Responsibility</a></li><li class="toc-h3"><a href="#12-Do-Not-Treat-Sandbox-as-One-Thing">12. Do Not Treat Sandbox as One Thing</a></li><li class="toc-h3"><a href="#13-Separate-Work-Rules-Authority-and-Execution-Rules">13. Separate Work Rules, Authority, and Execution Rules</a></li><li class="toc-h3"><a href="#14-Separate-Can-Safe-and-May">14. Separate “Can,” “Safe,” and “May”</a></li><li class="toc-h3"><a href="#15-Think-About-Authority-by-Impact-Not-Operation-Name">15. Think About Authority by Impact, Not Operation Name</a></li><li class="toc-h3"><a href="#16-Approval-Is-a-Division-of-Responsibility-Not-Distrust">16. Approval Is a Division of Responsibility, Not “Distrust”</a></li><li class="toc-h3"><a href="#17-Treat-localhost--MCP-as-Separate-Boundaries-Too">17. Treat localhost / MCP as Separate Boundaries Too</a></li><li class="toc-h3"><a href="#18-Verify-Images-Audio-and-Text-Without-Showing-Their-Contents">18. Verify Images, Audio, and Text Without Showing Their Contents</a></li><li class="toc-h3"><a href="#19-Do-Not-Identify-the-Creative-Work">19. Do Not Identify the Creative Work</a></li><li class="toc-h3"><a href="#20-Treat-External-Search-as-External-Transmission">20. Treat External Search as External Transmission</a></li><li class="toc-h2"><a href="#Part-IV--Execution-Environment-and-Capability-Selection">Part IV — Execution Environment and Capability Selection</a></li><li class="toc-h3"><a href="#21-Preserve-the-Build-Environment-as-Shared-Knowledge">21. Preserve the Build Environment as Shared Knowledge</a></li><li class="toc-h3"><a href="#22-Measure-Sandbox--Approval-with-a-Probe">22. Measure Sandbox / Approval with a Probe</a></li><li class="toc-h3"><a href="#23-Use-Rejection-to-Map-the-Effective-Specification">23. Use Rejection to Map the Effective Specification</a></li><li class="toc-h3"><a href="#24-Provide-the-Necessary-Tools-While-Keeping-Privilege-Narrow">24. Provide the Necessary Tools, While Keeping Privilege Narrow</a></li><li class="toc-h2"><a href="#Part-V--Analysis-and-Verification">Part V — Analysis and Verification</a></li><li class="toc-h3"><a href="#25-When-Something-Fails-Return-to-Primary-Sources-Before-Generating-Many-Alternatives">25. When Something Fails, Return to Primary Sources Before Generating Many Alternatives</a></li><li class="toc-h3"><a href="#26-Move-from-LowLevel-Observation-to-HighLevel-Explanation">26. Move from Low-Level Observation to High-Level Explanation</a></li><li class="toc-h3"><a href="#27-Do-Not-Use-AIGenerated-Artifacts-as-the-AIs-Own-Ground-Truth">27. Do Not Use AI-Generated Artifacts as the AI's Own Ground Truth</a></li><li class="toc-h3"><a href="#28-Humans-Can-Be-Wrong-Too">28. Humans Can Be Wrong Too</a></li><li class="toc-h3"><a href="#29-Do-Not-Treat-Skipping-as-Analysis-Completion">29. Do Not Treat Skipping as Analysis Completion</a></li><li class="toc-h3"><a href="#30-It-Ran-to-the-End-Does-Not-Mean-It-Was-Correct">30. “It Ran to the End” Does Not Mean It Was Correct</a></li><li class="toc-h3"><a href="#31-The-Granularity-of-Observation-Constrains-Understanding">31. The Granularity of Observation Constrains Understanding</a></li><li class="toc-h2"><a href="#Part-VI--Stop-Return-and-SelfRecovery">Part VI — Stop, Return, and Self-Recovery</a></li><li class="toc-h3"><a href="#32-Limit-Autonomy-to-Closed-Work-Loops">32. Limit Autonomy to Closed Work Loops</a></li><li class="toc-h3"><a href="#33-Do-Not-Define-Return-=-Failure">33. Do Not Define “Return = Failure”</a></li><li class="toc-h3"><a href="#34-Humans-Also-Have-a-Responsibility-to-Stop">34. Humans Also Have a Responsibility to Stop</a></li><li class="toc-h3"><a href="#35-Do-Not-Interpret-Dissatisfaction-with-Return-as-a-Demand-for-Forced-Completion">35. Do Not Interpret Dissatisfaction with Return as a Demand for Forced Completion</a></li><li class="toc-h3"><a href="#36-Define-the-Scope-of-SelfRecovery-in-Advance">36. Define the Scope of Self-Recovery in Advance</a></li><li class="toc-h2"><a href="#Part-VII--LongRunning-Operation-and-Handoff">Part VII — Long-Running Operation and Handoff</a></li><li class="toc-h3"><a href="#37-Measure-First-When-the-Scale-of-an-Operation-Is-Unknown">37. Measure First When the Scale of an Operation Is Unknown</a></li><li class="toc-h3"><a href="#38-Externalize-State-for-LongRunning-Work">38. Externalize State for Long-Running Work</a></li><li class="toc-h3"><a href="#39-Verify-State-Transitions-in-LongRunning-Work">39. Verify State Transitions in Long-Running Work</a></li><li class="toc-h3"><a href="#40-Separate-the-Time-Direction-from-the-Work-Direction">40. Separate the Time Direction from the Work Direction</a></li><li class="toc-h3"><a href="#41-Preserve-Snapshots-by-Date-and-Work-Unit">41. Preserve Snapshots by Date and Work Unit</a></li><li class="toc-h3"><a href="#42-Do-Not-Let-Work-State-Accumulate-Across-Date-and-WorkUnit-Boundaries">42. Do Not Let Work State Accumulate Across Date and Work-Unit Boundaries</a></li><li class="toc-h3"><a href="#43-Perform-Both-EndofWork-Cleanup-and-Human-Retrospective">43. Perform Both End-of-Work Cleanup and Human Retrospective</a></li><li class="toc-h2"><a href="#Part-VIII--Evolving-the-Operation">Part VIII — Evolving the Operation</a></li><li class="toc-h3"><a href="#44-Classify-Failure-Before-Changing-the-Operation">44. Classify Failure Before Changing the Operation</a></li><li class="toc-h3"><a href="#45-Choose-Between-Guide-with-Information-and-Enforce-with-Mechanism">45. Choose Between “Guide with Information” and “Enforce with Mechanism”</a></li><li class="toc-h3"><a href="#46-If-the-Same-Judgment-Is-Repeated-Every-Time-Ask-Whether-It-Can-Move-into-the-Environment">46. If the Same Judgment Is Repeated Every Time, Ask Whether It Can Move into the Environment</a></li><li class="toc-h3"><a href="#47-Adapt-Operations-to-the-Environment-and-Let-Design-Learn-from-Operations">47. Adapt Operations to the Environment, and Let Design Learn from Operations</a></li><li class="toc-h3"><a href="#48-Do-Not-Use-Conversation-as-the-Memory-of-the-Work">48. Do Not Use Conversation as the Memory of the Work</a></li><li class="toc-h3"><a href="#49-Codex-Can-Fail">49. Codex Can Fail</a></li><li class="toc-h3"><a href="#50-What-Is-a-Harness">50. What Is a Harness?</a></li><li class="toc-h2"><a href="#Conclusion">Conclusion</a></li><li class="toc-h2"><a href="#Appendix-A-References">Appendix A. References</a></li><li class="toc-h3"><a href="#Sources-of-Quotations-and-Ideas">Sources of Quotations and Ideas</a></li><li class="toc-h3"><a href="#Current-Specifications">Current Specifications</a></li><li class="toc-h3"><a href="#Design-Implementation-and-Operations">Design, Implementation, and Operations</a></li></ul>
+</nav>
+<article>
+<p><strong>Designing Harnesses, Boundaries, Verification, and Recovery</strong></p><blockquote>
 <p>Purpose: To organize the operating philosophy, safety boundaries, verification, stopping conditions, and handoff methods for assigning long-running analysis and implementation work to Codex. The primary target is analysis and implementation performed as a personal hobby.</p>
 <p>This document is not a finished <code>AGENTS.md</code>. It is a design document that preserves lessons learned from actual operation and the reasons behind them. Each project should distill only the necessary items into <code>AGENTS.md</code> and more detailed rules.</p>
 </blockquote>
@@ -710,7 +648,14 @@ Work B ─ File B ─ Runtime state B ─ Observation B
 <p>When the date changes, artifacts required for continuing work may be duplicated across multiple <code>work/MMDD/</code> folders. Treat folders from previous dates as past work states, and perform new work in the current day's <code>work/MMDD/</code>.</p>
 <p>Rather than forcing large regenerable data into Git history, <strong>prioritize being able to reconstruct the work state at that point from the date and work-unit boundaries.</strong></p>
 <hr/>
-<h3 id="42-Perform-Both-EndofWork-Cleanup-and-Human-Retrospective">42. Perform Both End-of-Work Cleanup and Human Retrospective</h3>
+<hr/><p><strong>Cut a boundary at the point where the current result becomes the new baseline for moving forward, and carry forward only the work state needed for continuity.</strong></p><p><code>MMDD</code> and <code>HHMM</code> boundaries are not merely a way to change storage locations.</p><p><strong>The more prototypes remain in the work state, the less clear it becomes which one should be treated as the baseline, increasing noise in reasoning.</strong></p><p>The same problem can occur when switching <code>HHMM</code> work units within a single day.</p><pre><code class="language-text">work/0908/
+  many prototypes
+      ↓
+copy everything
+      ↓
+work/0909/
+  carry the same state forward unchanged
+</code></pre><p>Even if <code>work/MMDD/</code> and <code>work/MMDD/HHMM/</code> are separated, the work state does not shrink if every artifact from the previous working area is carried into the next one.</p><h3 id="42-Do-Not-Let-Work-State-Accumulate-Across-Date-and-WorkUnit-Boundaries">42. Do Not Let Work State Accumulate Across Date and Work-Unit Boundaries</h3><h3 id="43-Perform-Both-EndofWork-Cleanup-and-Human-Retrospective">43. Perform Both End-of-Work Cleanup and Human Retrospective</h3>
 <p>When work ends, Codex should first follow <code>OPERATIONS.md</code> and return after leaving a state from which the next session can resume.</p>
 <p><strong>The desk may become messy during work. Do not hand the next session a messy desk.</strong></p>
 <p>End-of-work cleanup and human retrospective are separate processes.</p>
@@ -720,7 +665,7 @@ Work B ─ File B ─ Runtime state B ─ Observation B
 <p>If an operations document needs to change, that change is made through the ChatGPT-side maintenance path.</p>
 <hr/>
 <h2 id="Part-VIII--Evolving-the-Operation">Part VIII — Evolving the Operation</h2>
-<h3 id="43-Classify-Failure-Before-Changing-the-Operation">43. Classify Failure Before Changing the Operation</h3>
+<h3 id="44-Classify-Failure-Before-Changing-the-Operation">44. Classify Failure Before Changing the Operation</h3>
 <p>When Codex fails, do not immediately add rules or reduce its discretion.</p>
 <p>First check whether Codex could actually use the information, tools, observation, verification, and recovery mechanisms required for the work.</p>
 <p>Examples:</p>
@@ -735,7 +680,7 @@ Work B ─ File B ─ Runtime state B ─ Observation B
 <p><strong>Do not mistake a deficiency in the Harness for a deficiency in rules.</strong></p>
 <p>Then, if recurrence prevention is still necessary, identify what actually needed to be protected before adding prohibitions.</p>
 <hr/>
-<h3 id="44-Choose-Between-Guide-with-Information-and-Enforce-with-Mechanism">44. Choose Between “Guide with Information” and “Enforce with Mechanism”</h3>
+<h3 id="45-Choose-Between-Guide-with-Information-and-Enforce-with-Mechanism">45. Choose Between “Guide with Information” and “Enforce with Mechanism”</h3>
 <p>There are at least two directions for solving the same operational problem.</p>
 <p><strong>Guide with information</strong></p>
 <p>Use Markdown and information structure so the AI can reference the necessary information, principles, and choices while preserving judgment appropriate to the situation.</p>
@@ -758,7 +703,7 @@ Work B ─ File B ─ Runtime state B ─ Observation B
 <p>Enforcing with mechanism is not only for safety.</p>
 <p><strong>It reduces the range that the AI must judge every time.</strong></p>
 <hr/>
-<h3 id="45-If-the-Same-Judgment-Is-Repeated-Every-Time-Ask-Whether-It-Can-Move-into-the-Environment">45. If the Same Judgment Is Repeated Every Time, Ask Whether It Can Move into the Environment</h3>
+<h3 id="46-If-the-Same-Judgment-Is-Repeated-Every-Time-Ask-Whether-It-Can-Move-into-the-Environment">46. If the Same Judgment Is Repeated Every Time, Ask Whether It Can Move into the Environment</h3>
 <p>Do not make “giving the AI freedom” a goal in itself.</p>
 <p>The following kinds of judgment are candidates for <strong>enforcement by mechanism</strong>.</p>
 <ul>
@@ -778,7 +723,7 @@ Work B ─ File B ─ Runtime state B ─ Observation B
 </ul>
 <p><strong>Do not enforce merely because enforcement is possible. Enforce when doing so removes reasoning that does not need to be repeated.</strong></p>
 <hr/>
-<h3 id="46-Adapt-Operations-to-the-Environment-and-Let-Design-Learn-from-Operations">46. Adapt Operations to the Environment, and Let Design Learn from Operations</h3>
+<h3 id="47-Adapt-Operations-to-the-Environment-and-Let-Design-Learn-from-Operations">47. Adapt Operations to the Environment, and Let Design Learn from Operations</h3>
 <p>Models, Sandbox, Approval, MCP, Skills, and other parts of the execution environment change. Therefore, do not treat settings and operating procedures that work well today as permanent assets in their current form.</p>
 <p>In particular, model-specific workaround instructions, product/UI/tool-specific procedures, and prompt tuning should be treated as short-lived artifacts adapted to the current environment.</p>
 <p>By contrast, design reasons such as the following are more likely to survive implementation changes.</p>
@@ -804,7 +749,7 @@ feed back into design philosophy and reasons
 <p><strong>Rules are things to follow, but when they are observed to conflict with reality, they also become objects of inspection.</strong></p>
 <p><strong>Adapt operations to the environment, and let design learn from operations.</strong></p>
 <hr/>
-<h3 id="47-Do-Not-Use-Conversation-as-the-Memory-of-the-Work">47. Do Not Use Conversation as the Memory of the Work</h3>
+<h3 id="48-Do-Not-Use-Conversation-as-the-Memory-of-the-Work">48. Do Not Use Conversation as the Memory of the Work</h3>
 <p>In human work, ambiguous exchanges in speech and chat have often been filled in by shared experience and common knowledge.</p>
 <p>Information such as “what we discussed before,” “the feel of yesterday's work,” or “the exception that applies only here” may be sufficient in the moment, but disappears as time passes or the person responsible changes.</p>
 <p>Bringing Agents into work makes this weakness more visible.</p>
@@ -813,13 +758,13 @@ feed back into design philosophy and reasons
 <p>Move the resulting judgments into forms that can be referenced later—design, specifications, operating procedures, verification conditions, and so on—and return the necessary pieces to Codex.</p>
 <p><strong>A judgment produced in conversation becomes work memory only after it is moved outside the conversation.</strong></p>
 <hr/>
-<h3 id="48-Codex-Can-Fail">48. Codex Can Fail</h3>
+<h3 id="49-Codex-Can-Fail">49. Codex Can Fail</h3>
 <p>Codex can cause serious incidents: selecting the wrong target file, overwriting the wrong file, or damaging a project through an operational mistake.</p>
 <p>These are not exceptional accidents. They occur with some probability because modern agents do not necessarily produce the same judgment or command every time, even when given the same textual instruction. Unfortunately, this can happen even in ways that slip past instructions and prohibitions explicitly written in <code>AGENTS.md</code>.</p>
 <p>Tracing exactly why it failed may often be wasted effort.</p>
 <p><strong>Build an environment in which Codex can fail without the work failing with it.</strong></p>
 <hr/>
-<h3 id="49-What-Is-a-Harness">49. What Is a Harness?</h3>
+<h3 id="50-What-Is-a-Harness">50. What Is a Harness?</h3>
 <p>A Harness is not merely a collection of rules for assigning work to AI.</p>
 <p>It is an environment assembled from the necessary information, authority, observation, verification, rejection, recovery, and return paths so that work can proceed without requiring a human judgment at every step.</p>
 <p>Its purpose is not to make AI autonomous without limit.<br/>
@@ -949,10 +894,9 @@ Ryan Lopopolo — <em>What Does It Mean to Do a Good Job?</em><br/>
 <a href="https://openai.com/index/harness-engineering/">https://openai.com/index/harness-engineering/</a></p>
 </li>
 </ul>
-
-  </article>
-  <a class="backtop" href="#top">↑ Back to top</a>
+</article>
+<a class="backtop" href="#top">↑ Back to top</a>
 </main>
-<footer>Codex Workplace Design — How to Structure Harnesses, Boundaries, Verification, and Recovery / Author: akkera102 / Updated: 2026-09-08 17:58 JST</footer>
+<footer>Codex Workplace Design Guide / Author: akkera102 / Updated: 2026-09-09 21:40 JST</footer>
 </body>
 </html>
