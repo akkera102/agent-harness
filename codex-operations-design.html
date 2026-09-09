@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-02 09:36 JST">
-<meta name="description" content="Codex に長時間の解析・実装を任せるための、運用思想、安全境界、検証、停止・復旧、引継ぎを整理した設計文書。">
-<title>Codex 運用設計 — ハーネス・境界・検証・復旧をどう組むか</title>
+<meta name="author" content="abcdefg">
+<meta name="last-modified" content="2026-09-08 15:29 JST">
+<meta name="description" content="Codexに長時間の解析・実装を任せるための、ハーネス、安全境界、検証、復旧、引き継ぎの運用設計ガイド。">
+<title>Codex Workplace Design Guide</title>
 <style>
 :root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
 @media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
@@ -24,12 +24,80 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 </head>
 <body>
 <main id="top">
-<header class="doc-head">
-  <h1 class="doc-title">Codex 運用設計 — ハーネス・境界・検証・復旧をどう組むか</h1>
-  <div class="meta"><span><strong>Author:</strong> akkera102</span><span><strong>Updated:</strong> 2026-09-02 09:36 JST</span><span><strong>Language:</strong> Japanese</span></div>
-</header>
-<nav class="toc" aria-label="目次"><div class="toc-title">目次</div><ul><li class="toc-h2"><a href="#第I部-全体像と設計原則">第I部　全体像と設計原則</a></li><li class="toc-h3"><a href="#1-基本思想--プロンプトではなく職場環境を設計する">1. 基本思想 — プロンプトではなく職場環境を設計する</a></li><li class="toc-h3"><a href="#2-最初から巨大な運用体系を作らない">2. 最初から巨大な運用体系を作らない</a></li><li class="toc-h3"><a href="#3-三つの視点">3. 三つの視点</a></li><li class="toc-h3"><a href="#4-組織のメタファーは理解の補助として扱う">4. 組織のメタファーは理解の補助として扱う</a></li><li class="toc-h3"><a href="#5-現時点で採用したい最小原則">5. 現時点で採用したい最小原則</a></li><li class="toc-h2"><a href="#第II部-文書・外部記憶・知識管理">第II部　文書・外部記憶・知識管理</a></li><li class="toc-h3"><a href="#6-AGENTSmd-は短い憲法にする">6. AGENTS.md は短い「憲法」にする</a></li><li class="toc-h3"><a href="#7-OPERATIONSmd--analysis--spec-の役割を分ける">7. OPERATIONS.md / analysis / spec の役割を分ける</a></li><li class="toc-h3"><a href="#8-情報を減らすのではなく必要になるまで読ませない">8. 情報を減らすのではなく、必要になるまで読ませない</a></li><li class="toc-h3"><a href="#9-analysismd--specmd-は未確定と確定を分ける">9. analysis.md / spec.md は未確定と確定を分ける</a></li><li class="toc-h3"><a href="#10-解析と新規開発では記録の捨て方が違う">10. 解析と新規開発では、記録の捨て方が違う</a></li><li class="toc-h3"><a href="#11-作業する側と作業環境を変更する側を分ける">11. 作業する側と、作業環境を変更する側を分ける</a></li><li class="toc-h2"><a href="#第III部-安全境界と責任分界">第III部　安全境界と責任分界</a></li><li class="toc-h3"><a href="#12-Sandbox-を一語でまとめない">12. Sandbox を一語でまとめない</a></li><li class="toc-h3"><a href="#13-作業規約・権限・実行ルールを分ける">13. 作業規約・権限・実行ルールを分ける</a></li><li class="toc-h3"><a href="#14-できる安全にできるやってよいを分ける">14. 「できる」「安全にできる」「やってよい」を分ける</a></li><li class="toc-h3"><a href="#15-権限は操作名ではなく影響で考える">15. 権限は「操作名」ではなく「影響」で考える</a></li><li class="toc-h3"><a href="#16-Approval-は不信ではなく責任の分割">16. Approval は「不信」ではなく「責任の分割」</a></li><li class="toc-h3"><a href="#17-localhost--MCP-も別の境界として扱う">17. localhost / MCP も別の境界として扱う</a></li><li class="toc-h3"><a href="#18-画像・音声・テキストは内容を見せずに検証する">18. 画像・音声・テキストは内容を見せずに検証する</a></li><li class="toc-h3"><a href="#19-作品を特定しない">19. 作品を特定しない</a></li><li class="toc-h3"><a href="#20-外部検索は外部送信として扱う">20. 外部検索は外部送信として扱う</a></li><li class="toc-h2"><a href="#第IV部-実行環境と能力の選択">第IV部　実行環境と能力の選択</a></li><li class="toc-h3"><a href="#21-ビルド環境は共通知識として残す">21. ビルド環境は共通知識として残す</a></li><li class="toc-h3"><a href="#22-Sandbox--Approval-は-Probe-で実測する">22. Sandbox / Approval は Probe で実測する</a></li><li class="toc-h3"><a href="#23-拒否で実効仕様の輪郭を読む">23. 拒否で実効仕様の輪郭を読む</a></li><li class="toc-h3"><a href="#24-必要な装備を与え権限は絞る">24. 必要な装備を与え、権限は絞る</a></li><li class="toc-h2"><a href="#第V部-解析と検証">第V部　解析と検証</a></li><li class="toc-h3"><a href="#25-失敗したら別案を大量生成する前に一次資料へ戻る">25. 失敗したら、別案を大量生成する前に一次資料へ戻る</a></li><li class="toc-h3"><a href="#26-低レベルの観測から高レベルの説明へ進む">26. 低レベルの観測から、高レベルの説明へ進む</a></li><li class="toc-h3"><a href="#27-AI-の生成物を-AI-自身の正解データにしない">27. AI の生成物を AI 自身の正解データにしない</a></li><li class="toc-h3"><a href="#28-人間も間違える">28. 人間も間違える</a></li><li class="toc-h3"><a href="#29-スキップを解析完了とみなさない">29. スキップを解析完了とみなさない</a></li><li class="toc-h3"><a href="#30-最後まで走っただけでは正しいとは限らない">30. 「最後まで走った」だけでは正しいとは限らない</a></li><li class="toc-h3"><a href="#31-見える粒度が理解を規定する">31. 見える粒度が理解を規定する</a></li><li class="toc-h2"><a href="#第VI部-停止・返却・自己復旧">第VI部　停止・返却・自己復旧</a></li><li class="toc-h3"><a href="#32-自律性は閉じた作業ループの範囲に限定する">32. 自律性は、閉じた作業ループの範囲に限定する</a></li><li class="toc-h3"><a href="#33-返却--失敗にしない">33. 「返却 = 失敗」にしない</a></li><li class="toc-h3"><a href="#34-人間側も停止する責任を持つ">34. 人間側も停止する責任を持つ</a></li><li class="toc-h3"><a href="#35-返却への不満を無理な完遂への指示と解釈しない">35. 返却への不満を、無理な完遂への指示と解釈しない</a></li><li class="toc-h3"><a href="#36-自己復旧の範囲を先に決める">36. 自己復旧の範囲を先に決める</a></li><li class="toc-h2"><a href="#第VII部-長時間運用と引継ぎ">第VII部　長時間運用と引継ぎ</a></li><li class="toc-h3"><a href="#37-規模が不明な操作は先に測る">37. 規模が不明な操作は、先に測る</a></li><li class="toc-h3"><a href="#38-長時間作業では状態を外部化する">38. 長時間作業では状態を外部化する</a></li><li class="toc-h3"><a href="#39-長時間作業では状態遷移を検証する">39. 長時間作業では状態遷移を検証する</a></li><li class="toc-h3"><a href="#40-時間方向と作業方向を分ける">40. 時間方向と作業方向を分ける</a></li><li class="toc-h3"><a href="#41-日付単位でスナップショットを残す">41. 日付単位でスナップショットを残す</a></li><li class="toc-h3"><a href="#42-終業整理と人間の振り返りを両方行う">42. 終業整理と人間の振り返りを両方行う</a></li><li class="toc-h2"><a href="#第VIII部-運用を育てる">第VIII部　運用を育てる</a></li><li class="toc-h3"><a href="#43-失敗を分類してから運用を変える">43. 失敗を分類してから運用を変える</a></li><li class="toc-h3"><a href="#44-情報で導くと仕組みで閉じるを使い分ける">44. 「情報で導く」と「仕組みで閉じる」を使い分ける</a></li><li class="toc-h3"><a href="#45-毎回同じ判断をしているなら環境へ移せないか考える">45. 毎回同じ判断をしているなら、環境へ移せないか考える</a></li><li class="toc-h3"><a href="#46-運用は環境に適合させ設計は運用から学ぶ">46. 運用は環境に適合させ、設計は運用から学ぶ</a></li><li class="toc-h3"><a href="#47-会話を仕事の記憶にしない">47. 会話を仕事の記憶にしない</a></li><li class="toc-h3"><a href="#48-Codex-は壊れる">48. Codex は壊れる</a></li><li class="toc-h3"><a href="#49-ハーネスとは何か">49. ハーネスとは何か</a></li><li class="toc-h2"><a href="#おわりに">おわりに</a></li><li class="toc-h2"><a href="#付録A-参照資料">付録A. 参照資料</a></li><li class="toc-h3"><a href="#引用・着想元">引用・着想元</a></li><li class="toc-h3"><a href="#現行仕様">現行仕様</a></li><li class="toc-h3"><a href="#設計・実装・運用">設計・実装・運用</a></li></ul></nav>
-<article><blockquote>
+  <header class="doc-head">
+    <h1 class="doc-title">Codex Workplace Design Guide</h1>
+    <div class="meta"><span>Author: abcdefg</span><span>Updated: 2026-09-08 15:29 JST</span><span>Language: Japanese</span></div>
+  </header>
+  <nav class="toc" aria-label="目次">
+    <div class="toc-title">目次</div>
+    <ul>
+    <li class="toc-h2"><a href="#第I部-全体像と設計原則">第I部　全体像と設計原則</a></li>
+    <li class="toc-h3"><a href="#1-基本思想--プロンプトではなく職場環境を設計する">1. 基本思想 — プロンプトではなく職場環境を設計する</a></li>
+    <li class="toc-h3"><a href="#2-最初から巨大な運用体系を作らない">2. 最初から巨大な運用体系を作らない</a></li>
+    <li class="toc-h3"><a href="#3-三つの視点">3. 三つの視点</a></li>
+    <li class="toc-h3"><a href="#4-組織のメタファーは理解の補助として扱う">4. 組織のメタファーは理解の補助として扱う</a></li>
+    <li class="toc-h3"><a href="#5-現時点で採用したい最小原則">5. 現時点で採用したい最小原則</a></li>
+    <li class="toc-h2"><a href="#第II部-文書外部記憶知識管理">第II部　文書・外部記憶・知識管理</a></li>
+    <li class="toc-h3"><a href="#6AGENTSmdは短い憲法にする">6.AGENTS.mdは短い「憲法」にする</a></li>
+    <li class="toc-h3"><a href="#7OPERATIONSmd-analysis--spec-の役割を分ける">7.OPERATIONS.md/ analysis / spec の役割を分ける</a></li>
+    <li class="toc-h3"><a href="#8-情報を減らすのではなく必要になるまで読ませない">8. 情報を減らすのではなく、必要になるまで読ませない</a></li>
+    <li class="toc-h3"><a href="#9analysismdspecmdは未確定と確定を分ける">9.analysis.md/spec.mdは未確定と確定を分ける</a></li>
+    <li class="toc-h3"><a href="#10-解析と新規開発では記録の捨て方が違う">10. 解析と新規開発では、記録の捨て方が違う</a></li>
+    <li class="toc-h3"><a href="#11-作業する側と作業環境を変更する側を分ける">11. 作業する側と、作業環境を変更する側を分ける</a></li>
+    <li class="toc-h2"><a href="#第III部-安全境界と責任分界">第III部　安全境界と責任分界</a></li>
+    <li class="toc-h3"><a href="#12-Sandbox-を一語でまとめない">12. Sandbox を一語でまとめない</a></li>
+    <li class="toc-h3"><a href="#13-作業規約権限実行ルールを分ける">13. 作業規約・権限・実行ルールを分ける</a></li>
+    <li class="toc-h3"><a href="#14-できる安全にできるやってよいを分ける">14. 「できる」「安全にできる」「やってよい」を分ける</a></li>
+    <li class="toc-h3"><a href="#15-権限は操作名ではなく影響で考える">15. 権限は「操作名」ではなく「影響」で考える</a></li>
+    <li class="toc-h3"><a href="#16-Approval-は不信ではなく責任の分割">16. Approval は「不信」ではなく「責任の分割」</a></li>
+    <li class="toc-h3"><a href="#17-localhost--MCP-も別の境界として扱う">17. localhost / MCP も別の境界として扱う</a></li>
+    <li class="toc-h3"><a href="#18-画像音声テキストは内容を見せずに検証する">18. 画像・音声・テキストは内容を見せずに検証する</a></li>
+    <li class="toc-h3"><a href="#19-作品を特定しない">19. 作品を特定しない</a></li>
+    <li class="toc-h3"><a href="#20-外部検索は外部送信として扱う">20. 外部検索は外部送信として扱う</a></li>
+    <li class="toc-h2"><a href="#第IV部-実行環境と能力の選択">第IV部　実行環境と能力の選択</a></li>
+    <li class="toc-h3"><a href="#21-ビルド環境は共通知識として残す">21. ビルド環境は共通知識として残す</a></li>
+    <li class="toc-h3"><a href="#22-Sandbox--Approval-は-Probe-で実測する">22. Sandbox / Approval は Probe で実測する</a></li>
+    <li class="toc-h3"><a href="#23-拒否で実効仕様の輪郭を読む">23. 拒否で実効仕様の輪郭を読む</a></li>
+    <li class="toc-h3"><a href="#24-必要な装備を与え権限は絞る">24. 必要な装備を与え、権限は絞る</a></li>
+    <li class="toc-h2"><a href="#第V部-解析と検証">第V部　解析と検証</a></li>
+    <li class="toc-h3"><a href="#25-失敗したら別案を大量生成する前に一次資料へ戻る">25. 失敗したら、別案を大量生成する前に一次資料へ戻る</a></li>
+    <li class="toc-h3"><a href="#26-低レベルの観測から高レベルの説明へ進む">26. 低レベルの観測から、高レベルの説明へ進む</a></li>
+    <li class="toc-h3"><a href="#27-AI-の生成物を-AI-自身の正解データにしない">27. AI の生成物を AI 自身の正解データにしない</a></li>
+    <li class="toc-h3"><a href="#28-人間も間違える">28. 人間も間違える</a></li>
+    <li class="toc-h3"><a href="#29-スキップを解析完了とみなさない">29. スキップを解析完了とみなさない</a></li>
+    <li class="toc-h3"><a href="#30-最後まで走っただけでは正しいとは限らない">30. 「最後まで走った」だけでは正しいとは限らない</a></li>
+    <li class="toc-h3"><a href="#31-見える粒度が理解を規定する">31. 見える粒度が理解を規定する</a></li>
+    <li class="toc-h2"><a href="#第VI部-停止返却自己復旧">第VI部　停止・返却・自己復旧</a></li>
+    <li class="toc-h3"><a href="#32-自律性は閉じた作業ループの範囲に限定する">32. 自律性は、閉じた作業ループの範囲に限定する</a></li>
+    <li class="toc-h3"><a href="#33-返却-=-失敗にしない">33. 「返却 = 失敗」にしない</a></li>
+    <li class="toc-h3"><a href="#34-人間側も停止する責任を持つ">34. 人間側も停止する責任を持つ</a></li>
+    <li class="toc-h3"><a href="#35-返却への不満を無理な完遂への指示と解釈しない">35. 返却への不満を、無理な完遂への指示と解釈しない</a></li>
+    <li class="toc-h3"><a href="#36-自己復旧の範囲を先に決める">36. 自己復旧の範囲を先に決める</a></li>
+    <li class="toc-h2"><a href="#第VII部-長時間運用と引継ぎ">第VII部　長時間運用と引継ぎ</a></li>
+    <li class="toc-h3"><a href="#37-規模が不明な操作は先に測る">37. 規模が不明な操作は、先に測る</a></li>
+    <li class="toc-h3"><a href="#38-長時間作業では状態を外部化する">38. 長時間作業では状態を外部化する</a></li>
+    <li class="toc-h3"><a href="#39-長時間作業では状態遷移を検証する">39. 長時間作業では状態遷移を検証する</a></li>
+    <li class="toc-h3"><a href="#40-時間方向と作業方向を分ける">40. 時間方向と作業方向を分ける</a></li>
+    <li class="toc-h3"><a href="#41-日付作業単位でスナップショットを残す">41. 日付・作業単位でスナップショットを残す</a></li>
+    <li class="toc-h3"><a href="#42-終業整理と人間の振り返りを両方行う">42. 終業整理と人間の振り返りを両方行う</a></li>
+    <li class="toc-h2"><a href="#第VIII部-運用を育てる">第VIII部　運用を育てる</a></li>
+    <li class="toc-h3"><a href="#43-失敗を分類してから運用を変える">43. 失敗を分類してから運用を変える</a></li>
+    <li class="toc-h3"><a href="#44-情報で導くと仕組みで閉じるを使い分ける">44. 「情報で導く」と「仕組みで閉じる」を使い分ける</a></li>
+    <li class="toc-h3"><a href="#45-毎回同じ判断をしているなら環境へ移せないか考える">45. 毎回同じ判断をしているなら、環境へ移せないか考える</a></li>
+    <li class="toc-h3"><a href="#46-運用は環境に適合させ設計は運用から学ぶ">46. 運用は環境に適合させ、設計は運用から学ぶ</a></li>
+    <li class="toc-h3"><a href="#47-会話を仕事の記憶にしない">47. 会話を仕事の記憶にしない</a></li>
+    <li class="toc-h3"><a href="#48-Codex-は壊れる">48. Codex は壊れる</a></li>
+    <li class="toc-h3"><a href="#49-ハーネスとは何か">49. ハーネスとは何か</a></li>
+    <li class="toc-h2"><a href="#おわりに">おわりに</a></li>
+    <li class="toc-h2"><a href="#付録A-参照資料">付録A. 参照資料</a></li>
+    <li class="toc-h3"><a href="#引用着想元">引用・着想元</a></li>
+    <li class="toc-h3"><a href="#現行仕様">現行仕様</a></li>
+    <li class="toc-h3"><a href="#設計実装運用">設計・実装・運用</a></li>
+    </ul>
+  </nav>
+  <article>
+<p><strong>ハーネス、境界、検証、復旧の設計</strong></p>
+<blockquote>
 <p>目的: Codex に長時間の解析・実装作業を任せる際の、運用思想・安全境界・検証・停止条件・引き継ぎ方法を整理する。主に個人の趣味として行う解析・実装を対象とする。</p>
 <p>本書は完成済みの <code>AGENTS.md</code> ではない。これまでの実運用から得た知見と、その理由を残すための設計文書である。各プロジェクトでは必要な項目だけを <code>AGENTS.md</code> や詳細ルールへ蒸留する。</p>
 </blockquote>
@@ -132,8 +200,8 @@ Codex / Agent   : 調査・実装を進める
 </li>
 </ol>
 <hr/>
-<h2 id="第II部-文書・外部記憶・知識管理">第II部　文書・外部記憶・知識管理</h2>
-<h3 id="6-AGENTSmd-は短い憲法にする">6. <code>AGENTS.md</code> は短い「憲法」にする</h3>
+<h2 id="第II部-文書外部記憶知識管理">第II部　文書・外部記憶・知識管理</h2>
+<h3 id="6AGENTSmdは短い憲法にする">6. <code>AGENTS.md</code> は短い「憲法」にする</h3>
 <p><code>AGENTS.md</code> には、毎回読む価値がある規則や前提だけを置く。</p>
 <h4 id="主な対象">主な対象</h4>
 <ul>
@@ -151,20 +219,20 @@ Codex / Agent   : 調査・実装を進める
 <p><strong>禁止事項を増やすより、Codex が自分で選択するために必要な事実を与える。</strong></p>
 <p><strong>命令・作業ログ・確定知識が混ざり始めたら分離する。</strong></p>
 <hr/>
-<h3 id="7-OPERATIONSmd--analysis--spec-の役割を分ける">7. <code>OPERATIONS.md</code> / analysis / spec の役割を分ける</h3>
+<h3 id="7OPERATIONSmd-analysis--spec-の役割を分ける">7. <code>OPERATIONS.md</code> / analysis / spec の役割を分ける</h3>
 <p><code>AGENTS.md</code> が常時守る規則を受け持つのに対し、残る三つの文書は <strong>作業手順・未確定知識・確定知識</strong> を分担する。目的は文書を増やすことではなく、寿命と確度の違う情報を混ぜないことである。</p>
 <pre><code class="language-text">OPERATIONS.md                = 繰り返す作業手順・状態遷移
 memo/&lt;tool&gt;_analysis.md      = 未確定の解析状態
 memo/&lt;tool&gt;_spec.md          = 検証済みの確定知識
 </code></pre>
-<h4 id="OPERATIONSmd--作業をどう進めるか"><code>OPERATIONS.md</code> — 作業をどう進めるか</h4>
+<h4 id="OPERATIONSmd-作業をどう進めるか"><code>OPERATIONS.md</code> — 作業をどう進めるか</h4>
 <p>プロジェクト内で繰り返す <strong>作業開始・ビルド・検証・終了・停止・復旧</strong> の流れを置く。特定ツールの解析結果には依存させない。</p>
 <p><code>AGENTS.md</code> には「どのビルド環境を使うか」という前提を置き、<code>OPERATIONS.md</code> には <strong>その環境を使って実際にどうビルドするかという手順</strong>を置く。</p>
-<h4 id="&lt;tool&gt;--解析ツールごとに知識を分ける"><code>&lt;tool&gt;</code> — 解析ツールごとに知識を分ける</h4>
+<h4 id="&lt;tool&gt;-解析ツールごとに知識を分ける"><code>&lt;tool&gt;</code> — 解析ツールごとに知識を分ける</h4>
 <p><code>&lt;tool&gt;</code> は解析に使用するツールを表す。ツールごとに analysis / spec を一組として持ち、<strong>確定情報と未確認情報を区別したまま解析・実装・検証を進める。</strong></p>
-<h4 id="memo&lt;tool&gt;_analysismd--まだ考えていることを残す"><code>memo/&lt;tool&gt;_analysis.md</code> — まだ考えていることを残す</h4>
+<h4 id="memo&lt;tool&gt;analysismd-まだ考えていることを残す"><code>memo/&lt;tool&gt;_analysis.md</code> — まだ考えていることを残す</h4>
 <p>解析中の <strong>観測事実、仮説、根拠、試行、失敗、矛盾、未解決事項</strong> を置く。推測を書いてよいが、確定事項とは区別する。</p>
-<h4 id="memo&lt;tool&gt;_specmd--確定したことだけを残す"><code>memo/&lt;tool&gt;_spec.md</code> — 確定したことだけを残す</h4>
+<h4 id="memo&lt;tool&gt;specmd-確定したことだけを残す"><code>memo/&lt;tool&gt;_spec.md</code> — 確定したことだけを残す</h4>
 <p>検証できた <strong>形式、値の意味、制約、変換規則、確認済み挙動</strong> を置き、実装が依存してよい技術知識の正本とする。根拠と未確認範囲も残す。</p>
 <p>以下は、本書で扱うローカル解析作業での一例である。</p>
 <p>基本の流れは、</p>
@@ -185,7 +253,7 @@ memo/&lt;tool&gt;_spec.md          = 検証済みの確定知識
 <p>AI は現在の作業に必要な仕様・手順・復旧方法・失敗対処だけを辿って読む。</p>
 <p><strong>保管する情報を減らすのではなく、作業コンテキストへ持ち込む情報を絞る。</strong></p>
 <hr/>
-<h3 id="9-analysismd--specmd-は未確定と確定を分ける">9. <code>analysis.md</code> / <code>spec.md</code> は未確定と確定を分ける</h3>
+<h3 id="9analysismdspecmdは未確定と確定を分ける">9. <code>analysis.md</code> / <code>spec.md</code> は未確定と確定を分ける</h3>
 <p>解析中の推測や未確認事項は <code>memo/&lt;tool&gt;_analysis.md</code> に置き、検証できた知識だけを <code>memo/&lt;tool&gt;_spec.md</code> へ昇格する。</p>
 <p>analysis の例:</p>
 <pre><code class="language-text">仮説: opcode 0x17 は条件分岐の可能性
@@ -220,6 +288,7 @@ memo/&lt;tool&gt;_spec.md          = 検証済みの確定知識
 <ul>
 <li>現在採用している決定</li>
 <li>その決定理由</li>
+<li>失われると再推論できない意図</li>
 <li>再び踏みそうな重要な棄却案</li>
 <li>未解決事項</li>
 </ul>
@@ -259,7 +328,7 @@ Codex が参照・複製する
 </code></pre>
 <p><strong>Sandbox のモード名だけで安全性を判断せず、実際の読み取り・書き込み・実行・通信の境界を確認する。</strong></p>
 <hr/>
-<h3 id="13-作業規約・権限・実行ルールを分ける">13. 作業規約・権限・実行ルールを分ける</h3>
+<h3 id="13-作業規約権限実行ルールを分ける">13. 作業規約・権限・実行ルールを分ける</h3>
 <p>役割の違う仕組みを一つの安全機構としてまとめて考えない</p>
 <pre><code class="language-text">作業規約          = 何をしてよいか
 Sandbox / OS 権限 = 技術的にどこまで実行できるか
@@ -316,7 +385,7 @@ server へ接続する
 <p>読み取り系と、変更・実行系の能力は別の責任境界として扱う。</p>
 <p><strong>利用可能であることと、常時ロードしておくことは別である。</strong> MCP やブラウザなど常駐コストを持つ能力は、必要な作業でだけ有効化する。</p>
 <hr/>
-<h3 id="18-画像・音声・テキストは内容を見せずに検証する">18. 画像・音声・テキストは内容を見せずに検証する</h3>
+<h3 id="18-画像音声テキストは内容を見せずに検証する">18. 画像・音声・テキストは内容を見せずに検証する</h3>
 <p>画像、音声、テキストは、内容そのものをモデルの入力へ持ち込まない。</p>
 <ul>
 <li>チャットや外部サービスへ内容そのものを送信しない</li>
@@ -496,7 +565,7 @@ ASM / バイナリ / 一次資料へ戻る
 <p><strong>文字列の長さと切り出し方そのものが、相互に理解できる世界を規定する。</strong></p>
 <p><strong>高機能なシステムで観測しても、見えているものを世界そのものだと思わない。</strong></p>
 <hr/>
-<h2 id="第VI部-停止・返却・自己復旧">第VI部　停止・返却・自己復旧</h2>
+<h2 id="第VI部-停止返却自己復旧">第VI部　停止・返却・自己復旧</h2>
 <h3 id="32-自律性は閉じた作業ループの範囲に限定する">32. 自律性は、閉じた作業ループの範囲に限定する</h3>
 <p>AI に「自分で判断して続行してよい」と書くだけでは、自律性は成立しない。</p>
 <p>その作業について、</p>
@@ -511,7 +580,7 @@ ASM / バイナリ / 一次資料へ戻る
 <p>このどこかが欠けたまま権限だけを広げても、判断できない範囲まで裁量を広げることになる。</p>
 <p><strong>自律性の上限は、AI の能力ではなく、この作業ループを閉じられる範囲で決める。</strong></p>
 <hr/>
-<h3 id="33-返却--失敗にしない">33. 「返却 = 失敗」にしない</h3>
+<h3 id="33-返却-=-失敗にしない">33. 「返却 = 失敗」にしない</h3>
 <p>Codex は、停止条件がなければ「まだ試せる」と判断して作業を続けやすい。</p>
 <p>返却を能力不足として扱うと、Codex に無理な完遂を促し、</p>
 <pre><code class="language-text">分からない
@@ -526,7 +595,7 @@ ASM / バイナリ / 一次資料へ戻る
 </code></pre>
 <p>という流れを生みやすい。</p>
 <p>したがって、<strong>確証不足を正しく検出して人間へ返すことも成功</strong>と定義する。</p>
-<h4 id="停止・相談・返却の基準">停止・相談・返却の基準</h4>
+<h4 id="停止相談返却の基準">停止・相談・返却の基準</h4>
 <p>以下の場合は作業を停止し、確認済みの事実、未確定事項、試した内容、次に確認すべき事項を報告する。</p>
 <ul>
 <li>複数の解釈が成立し、優劣を判断できない</li>
@@ -627,21 +696,22 @@ ASM / バイナリ / 一次資料へ戻る
 <strong>作業方向には世界そのものを分ける。</strong></p>
 <p><strong>独立した実測値を使うなら、観測対象の世界も独立させる。</strong></p>
 <hr/>
-<h3 id="41-日付単位でスナップショットを残す">41. 日付単位でスナップショットを残す</h3>
+<h3 id="41-日付作業単位でスナップショットを残す">41. 日付・作業単位でスナップショットを残す</h3>
 <p>解析では、中間成果物や再生成可能なデータが大きくなりやすい。すべてを Git 管理する必要はない。</p>
-<p>現在の運用例では、<code>work/</code> を日付単位で分け、その日の作業状態を <code>work/MMDD/</code> にまとめる。</p>
+<p>現在の運用例では、<code>work/</code> を日付単位で分け、その日の作業状態を <code>work/MMDD/</code> にまとめる。さらに、同じ日の中で作業状態を分ける必要がある場合は、<code>work/MMDD/HHMM/</code> を作業単位として使用する。</p>
 <pre><code class="language-text">work/
   MMDD/
-    tmp/          # GCC 等の一時領域
-    generator-a/  # 生成したツール名の例
-    generator-b/
-    ...
+    HHMM/
+      tmp/         # 作業単位の一時領域
+      generator-a/ # 生成したツール名の例
+      generator-b/
+      ...
 </code></pre>
-<p><code>work/MMDD/</code> は、その日の実装・実験・生成物をまとめた作業スナップショットとする。</p>
-<p><code>work/MMDD/</code> 配下の成果物フォルダは、用途名ではなく<strong>生成したツール名</strong>を基本とする。</p>
-<p><code>tmp/</code> は GCC、MSYS2、その他のツールが使用する一時領域とし、可能な限り一時ファイルをその日の <code>work/MMDD/</code> 内に閉じ込める。</p>
-<p>日付が変わった場合、継続作業に必要な成果物が複数の <code>work/MMDD/</code> に重複してもよい。過去日のフォルダはスナップショットとして扱い、新しい作業は現在日の <code>work/MMDD/</code> で行う。</p>
-<p>再生成可能な大きなデータを無理に Git 履歴へ残すより、<strong>その日の作業状態を <code>work/MMDD/</code> から復元できることを優先する。</strong></p>
+<p><code>work/MMDD/</code> は、その日の実装・実験・生成物をまとめる日付単位の作業領域とする。</p>
+<p><code>work/MMDD/HHMM/</code> は、同じ日の作業状態を分ける作業単位のスナップショットとする。その配下の成果物フォルダは、用途名ではなく<strong>生成したツール名</strong>を基本とする。</p>
+<p><code>tmp/</code> は GCC、MSYS2、その他のツールが使用する一時領域とし、作業単位を分ける場合は、可能な限り一時ファイルを現在の <code>work/MMDD/HHMM/tmp/</code> 内に閉じ込める。</p>
+<p>日付が変わった場合、継続作業に必要な成果物が複数の <code>work/MMDD/</code> に重複してもよい。過去日のフォルダは過去の作業状態として扱い、新しい作業は現在日の <code>work/MMDD/</code> で行う。</p>
+<p>再生成可能な大きなデータを無理に Git 履歴へ残すより、<strong>日付単位と作業単位の境界から、その時点の作業状態を復元できることを優先する。</strong></p>
 <hr/>
 <h3 id="42-終業整理と人間の振り返りを両方行う">42. 終業整理と人間の振り返りを両方行う</h3>
 <p>作業を終えるとき、Codex はまず <code>OPERATIONS.md</code> に従って、次のセッションから再開できる状態を残して返却する。</p>
@@ -840,7 +910,7 @@ AI が修正し、証拠を集める
 <p>職場作りそのものが本来の解析作業を圧迫しないよう、小さいところから始め、実戦フィードバックが出たところだけ改善する。</p>
 <hr/>
 <h2 id="付録A-参照資料">付録A. 参照資料</h2>
-<h3 id="引用・着想元">引用・着想元</h3>
+<h3 id="引用着想元">引用・着想元</h3>
 <ul>
 <li><strong>Good Job / taste / risk tolerance / polish / shortcut / done</strong><br/>
 Ryan Lopopolo — <em>What Does It Mean to Do a Good Job?</em><br/>
@@ -870,7 +940,7 @@ Ryan Lopopolo — <em>What Does It Mean to Do a Good Job?</em><br/>
 <a href="https://learn.chatgpt.com/docs/windows/windows-sandbox">https://learn.chatgpt.com/docs/windows/windows-sandbox</a></p>
 </li>
 </ul>
-<h3 id="設計・実装・運用">設計・実装・運用</h3>
+<h3 id="設計実装運用">設計・実装・運用</h3>
 <ul>
 <li><p>OpenAI — Building a safe, effective sandbox to enable Codex on Windows<br/>
 <a href="https://openai.com/index/building-codex-windows-sandbox/">https://openai.com/index/building-codex-windows-sandbox/</a></p>
@@ -882,9 +952,10 @@ Ryan Lopopolo — <em>What Does It Mean to Do a Good Job?</em><br/>
 <a href="https://openai.com/index/harness-engineering/">https://openai.com/index/harness-engineering/</a></p>
 </li>
 </ul>
-</article>
-<a class="backtop" href="#top">↑ ページ上部へ戻る</a>
+
+  </article>
+  <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Codex 運用設計 — ハーネス・境界・検証・復旧をどう組むか / Author: akkera102 / Updated: 2026-09-02 09:36 JST</footer>
+<footer>Codex Workplace Design Guide / Author: abcdefg / Updated: 2026-09-08 15:29 JST</footer>
 </body>
 </html>
