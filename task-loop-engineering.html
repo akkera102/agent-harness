@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-08 18:45 JST">
+<meta name="last-modified" content="2026-09-09 20:00 JST">
 <meta name="description" content="AgentのTaskとLoopを、Trigger、Goal、Thought、Bound、Verification、Judgmentなどの制御構造から設計するガイド。">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -26,7 +26,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <main id="top">
   <header class="doc-head">
     <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-08 18:45 JST</span><span>Language: Japanese</span></div>
+    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-09 20:00 JST</span><span>Language: Japanese</span></div>
   </header>
   <nav class="toc" aria-label="目次">
     <div class="toc-title">目次</div>
@@ -285,7 +285,7 @@ Bound    上限に達したので終わる
 <p>Loop は、<strong>一つの work cycle が終わったあと、何を条件として次の cycle を起こすかを定める構造</strong>である。</p>
 <pre><code class="language-text">Trigger
    ↓
-work cycle
+work cycle（Task の実行）
    ↓
 状態を確認
    ↓
@@ -298,22 +298,32 @@ work cycle
 <p><strong>Loop は、それらを使って一つの cycle の次に何が起きるかを定める。</strong></p>
 <h3 id="10-Loop-controllerは次のcycleを起こす">10. Loop controllerは次のcycleを起こす</h3>
 <p>Loop controller は、<strong>次の cycle を起こすかどうかを決めるもの</strong>である。</p>
-<pre><code class="language-text">Turn-based
-    ↓
-人間
-
-Goal-based
-    ↓
-Goal の未達成
-
-Time-based
-    ↓
-時間
-
-Proactive
-    ↓
-外部 Event
-</code></pre>
+<table>
+<thead>
+<tr>
+<th>Loop</th>
+<th>Loop controller</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Turn-based</td>
+<td>人間</td>
+</tr>
+<tr>
+<td>Goal-based</td>
+<td>Goal の未達成</td>
+</tr>
+<tr>
+<td>Time-based</td>
+<td>時間</td>
+</tr>
+<tr>
+<td>Proactive</td>
+<td>外部 Event</td>
+</tr>
+</tbody>
+</table>
 <p>どの Loop でも Agent が仕事をすることは変わらない。</p>
 <p>違うのは、<strong>何が次の cycle を起こす判断を担うか</strong>である。</p>
 <p>この違いによって、Loop は Turn-based、Goal-based、Time-based、Proactive に分けて考えられる。</p>
@@ -1192,6 +1202,6 @@ Task を Loop にできる
   </article>
   <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-08 18:45 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-09 20:00 JST</footer>
 </body>
 </html>

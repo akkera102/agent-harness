@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-08 18:54 JST">
+<meta name="last-modified" content="2026-09-09 20:00 JST">
 <meta name="description" content="A guide to engineering Agent Tasks and Loops through control structures including Trigger, Goal, Thought, Bound, Verification, and Judgment.">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -26,7 +26,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <main id="top">
   <header class="doc-head">
     <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-08 18:54 JST</span><span>Language: English</span></div>
+    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-09 20:00 JST</span><span>Language: English</span></div>
   </header>
   <nav class="toc" aria-label="Table of contents">
     <div class="toc-title">Table of Contents</div>
@@ -283,7 +283,7 @@ Exit Bound    End because the time limit has been reached
 <p>A Loop is a structure that defines <strong>what condition causes the next cycle to begin after one work cycle has ended</strong>.</p>
 <pre><code class="language-text">Trigger
    ↓
-work cycle
+work cycle (Task execution)
    ↓
 Check the state
    ↓
@@ -296,22 +296,32 @@ Check the state
 <p><strong>A Loop uses them to determine what happens after one cycle and before the next.</strong></p>
 <h3 id="10-The-Loop-Controller-Initiates-the-Next-Cycle">10. The Loop Controller Initiates the Next Cycle</h3>
 <p>The Loop controller is <strong>what decides whether the next cycle should begin</strong>.</p>
-<pre><code class="language-text">Turn-based
-    ↓
-  Human
-
-Goal-based
-    ↓
-Unachieved Goal
-
-Time-based
-    ↓
-   Time
-
-Proactive
-    ↓
-External Event
-</code></pre>
+<table>
+<thead>
+<tr>
+<th>Loop</th>
+<th>Loop controller</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Turn-based</td>
+<td>Human</td>
+</tr>
+<tr>
+<td>Goal-based</td>
+<td>Unachieved Goal</td>
+</tr>
+<tr>
+<td>Time-based</td>
+<td>Time</td>
+</tr>
+<tr>
+<td>Proactive</td>
+<td>External Event</td>
+</tr>
+</tbody>
+</table>
 <p>In every Loop, the Agent still performs the work.</p>
 <p>What differs is <strong>what is responsible for deciding whether to start the next cycle</strong>.</p>
 <p>This difference lets us think of Loops as Turn-based, Goal-based, Time-based, or Proactive.</p>
@@ -1175,6 +1185,6 @@ Product-specific constraints
   </article>
   <a class="backtop" href="#top">↑ Back to top</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-08 18:54 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-09 20:00 JST</footer>
 </body>
 </html>
