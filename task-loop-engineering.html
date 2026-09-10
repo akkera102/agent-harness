@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-09 20:00 JST">
+<meta name="last-modified" content="2026-09-10 09:19 JST">
 <meta name="description" content="AgentのTaskとLoopを、Trigger、Goal、Thought、Bound、Verification、Judgmentなどの制御構造から設計するガイド。">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -24,72 +24,71 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 </head>
 <body>
 <main id="top">
-  <header class="doc-head">
-    <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-09 20:00 JST</span><span>Language: Japanese</span></div>
-  </header>
-  <nav class="toc" aria-label="目次">
-    <div class="toc-title">目次</div>
-    <ul>
-    <li class="toc-h2"><a href="#第I部-Taskの基本構造">第I部　Taskの基本構造</a></li>
-    <li class="toc-h3"><a href="#1-Taskとは何か">1. Taskとは何か</a></li>
-    <li class="toc-h3"><a href="#2-TriggerはTaskの開始条件を決める">2. TriggerはTaskの開始条件を決める</a></li>
-    <li class="toc-h3"><a href="#3-Taskには終了条件を与える">3. Taskには終了条件を与える</a></li>
-    <li class="toc-h3"><a href="#4-GoalはTaskの到達状態を決める">4. GoalはTaskの到達状態を決める</a></li>
-    <li class="toc-h3"><a href="#5-ThoughtはTaskを考え続ける理由がなくなったら止める">5. ThoughtはTaskを考え続ける理由がなくなったら止める</a></li>
-    <li class="toc-h3"><a href="#6-BoundはTaskの許容範囲を決める">6. BoundはTaskの許容範囲を決める</a></li>
-    <li class="toc-h3"><a href="#7-終了条件は組み合わせられる">7. 終了条件は組み合わせられる</a></li>
-    <li class="toc-h3"><a href="#8-Taskの入口と出口を分ける">8. Taskの入口と出口を分ける</a></li>
-    <li class="toc-h2"><a href="#第II部-Loop-の基本構造">第II部　Loop の基本構造</a></li>
-    <li class="toc-h3"><a href="#9-Loopはcycleをつなぐ">9. Loopはcycleをつなぐ</a></li>
-    <li class="toc-h3"><a href="#10-Loop-controllerは次のcycleを起こす">10. Loop controllerは次のcycleを起こす</a></li>
-    <li class="toc-h3"><a href="#11-Turnbasedでは人間が次を起こす">11. Turn-basedでは人間が次を起こす</a></li>
-    <li class="toc-h3"><a href="#12-GoalbasedではGoalの未達成が次を起こす">12. Goal-basedではGoalの未達成が次を起こす</a></li>
-    <li class="toc-h3"><a href="#13-Timebasedでは時間が次を起こす">13. Time-basedでは時間が次を起こす</a></li>
-    <li class="toc-h3"><a href="#14-Proactiveでは外部世界が次を起こす">14. Proactiveでは外部世界が次を起こす</a></li>
-    <li class="toc-h3"><a href="#15-Loopの種類はcontrolの置き場所の違いである">15. Loopの種類はcontrolの置き場所の違いである</a></li>
-    <li class="toc-h3"><a href="#16-Triggerと終了条件は別々に組み合わせられる">16. Triggerと終了条件は別々に組み合わせられる</a></li>
-    <li class="toc-h3"><a href="#17-自律化はLoop-controlを条件へ移す">17. 自律化はLoop controlを条件へ移す</a></li>
-    <li class="toc-h3"><a href="#18-Loopの長さは本質ではない">18. Loopの長さは本質ではない</a></li>
-    <li class="toc-h3"><a href="#19-何をLoopにするかは次のcycleを誰が起こすかで考える">19. 何をLoopにするかは次のcycleを誰が起こすかで考える</a></li>
-    <li class="toc-h3"><a href="#20-Loopは三つの問いに分けて見る">20. Loopは三つの問いに分けて見る</a></li>
-    <li class="toc-h2"><a href="#第III部-GoalVerificationBound">第III部　Goal・Verification・Bound</a></li>
-    <li class="toc-h3"><a href="#21-Goalは複数のcycleに共通するfinish-lineになる">21. Goalは複数のcycleに共通するfinish lineになる</a></li>
-    <li class="toc-h3"><a href="#22-Goalは判定できる形で書く">22. Goalは判定できる形で書く</a></li>
-    <li class="toc-h3"><a href="#23-BoundはGoalへ向かうLoopの許容範囲を決める">23. BoundはGoalへ向かうLoopの許容範囲を決める</a></li>
-    <li class="toc-h3"><a href="#24-Goalの達成はVerificationで確かめる">24. Goalの達成はVerificationで確かめる</a></li>
-    <li class="toc-h3"><a href="#25-Verificationには層がある">25. Verificationには層がある</a></li>
-    <li class="toc-h3"><a href="#26-Verificationの結果が次の処理を変える">26. Verificationの結果が次の処理を変える</a></li>
-    <li class="toc-h3"><a href="#27-VerificationはGoalを同じ基準で確かめられるほど強い">27. VerificationはGoalを同じ基準で確かめられるほど強い</a></li>
-    <li class="toc-h3"><a href="#28-Verificationの深さで確認できる範囲が変わる">28. Verificationの深さで確認できる範囲が変わる</a></li>
-    <li class="toc-h2"><a href="#第IV部-時間と再観測">第IV部　時間と再観測</a></li>
-    <li class="toc-h3"><a href="#29-Timebased-Loopは状態を時間方向に再観測する">29. Time-based Loopは状態を時間方向に再観測する</a></li>
-    <li class="toc-h3"><a href="#30-仕事は同じで入力だけが変わる">30. 仕事は同じで入力だけが変わる</a></li>
-    <li class="toc-h3"><a href="#31-Time-budgetはBoundの一種である">31. Time budgetはBoundの一種である</a></li>
-    <li class="toc-h2"><a href="#第V部-委譲監視判定">第V部　委譲・監視・判定</a></li>
-    <li class="toc-h3"><a href="#32-委譲はTaskの性質で決める">32. 委譲はTaskの性質で決める</a></li>
-    <li class="toc-h3"><a href="#33-Verificationの強さが委譲できる距離を決める">33. Verificationの強さが委譲できる距離を決める</a></li>
-    <li class="toc-h3"><a href="#34-MakerとCheckerを分ける">34. MakerとCheckerを分ける</a></li>
-    <li class="toc-h3"><a href="#35-Verificationがあっても観測軸が足りないことがある">35. Verificationがあっても観測軸が足りないことがある</a></li>
-    <li class="toc-h3"><a href="#36-Taskを委譲してもJudgmentは別に考える">36. Taskを委譲してもJudgmentは別に考える</a></li>
-    <li class="toc-h3"><a href="#37-三つの判定を混ぜない">37. 三つの判定を混ぜない</a></li>
-    <li class="toc-h2"><a href="#第VI部-Task--Loop-の実践">第VI部　Task / Loop の実践</a></li>
-    <li class="toc-h3"><a href="#38-日常の反復作業は最初のLoop候補">38. 日常の反復作業は最初のLoop候補</a></li>
-    <li class="toc-h3"><a href="#39-LoopとGoalを組み合わせる">39. LoopとGoalを組み合わせる</a></li>
-    <li class="toc-h3"><a href="#40-Progress-conditionは前進を継続条件にする">40. Progress conditionは前進を継続条件にする</a></li>
-    <li class="toc-h3"><a href="#41-Stall-conditionは停滞したLoopを止める">41. Stall conditionは停滞したLoopを止める</a></li>
-    <li class="toc-h3"><a href="#42-文章のルールを判断条件に変える">42. 文章のルールを判断条件に変える</a></li>
-    <li class="toc-h3"><a href="#43-要約は正本ではない">43. 要約は正本ではない</a></li>
-    <li class="toc-h3"><a href="#44-Taskは小さな契約として書ける">44. Taskは小さな契約として書ける</a></li>
-    <li class="toc-h2"><a href="#第VII部-Loop-の限界と停止">第VII部　Loop の限界と停止</a></li>
-    <li class="toc-h3"><a href="#45-Loopは曖昧な判断を解消しない">45. Loopは曖昧な判断を解消しない</a></li>
-    <li class="toc-h2"><a href="#第VIII部-製品固有の制約">第VIII部　製品固有の制約</a></li>
-    <li class="toc-h3"><a href="#46-製品固有の制約は一般原理と分ける">46. 製品固有の制約は一般原理と分ける</a></li>
-    <li class="toc-h2"><a href="#付録A-参照資料">付録A. 参照資料</a></li>
-    <li class="toc-h3"><a href="#引用着想元">引用・着想元</a></li>
-    </ul>
-  </nav>
-  <article>
+<header class="doc-head">
+<h1 class="doc-title">Task / Loop Engineering Guide</h1>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-10 09:19 JST</span><span>Language: Japanese</span></div>
+</header>
+<nav class="toc" aria-label="目次">
+<div class="toc-title">目次</div>
+<ul>
+<li class="toc-h2"><a href="#第I部-Taskの基本構造">第I部　Taskの基本構造</a></li>
+<li class="toc-h3"><a href="#1-Taskとは何か">1. Taskとは何か</a></li>
+<li class="toc-h3"><a href="#2-TriggerはTaskの開始条件を決める">2. TriggerはTaskの開始条件を決める</a></li>
+<li class="toc-h3"><a href="#3-Taskには終了条件を与える">3. Taskには終了条件を与える</a></li>
+<li class="toc-h3"><a href="#4-GoalはTaskの到達状態を決める">4. GoalはTaskの到達状態を決める</a></li>
+<li class="toc-h3"><a href="#5-ThoughtはTaskを考え続ける理由がなくなったら止める">5. ThoughtはTaskを考え続ける理由がなくなったら止める</a></li>
+<li class="toc-h3"><a href="#6-BoundはTaskの許容範囲を決める">6. BoundはTaskの許容範囲を決める</a></li>
+<li class="toc-h3"><a href="#7-終了条件は組み合わせられる">7. 終了条件は組み合わせられる</a></li>
+<li class="toc-h3"><a href="#8-Taskの入口と出口を分ける">8. Taskの入口と出口を分ける</a></li>
+<li class="toc-h2"><a href="#第II部-Loop-の基本構造">第II部　Loop の基本構造</a></li>
+<li class="toc-h3"><a href="#9-Loopはcycleをつなぐ">9. Loopはcycleをつなぐ</a></li>
+<li class="toc-h3"><a href="#10-Loop-controllerは次のcycleを起こす">10. Loop controllerは次のcycleを起こす</a></li>
+<li class="toc-h3"><a href="#11-Turnbasedでは人間が次を起こす">11. Turn-basedでは人間が次を起こす</a></li>
+<li class="toc-h3"><a href="#12-GoalbasedではGoalの未達成が次を起こす">12. Goal-basedではGoalの未達成が次を起こす</a></li>
+<li class="toc-h3"><a href="#13-Timebasedでは時間が次を起こす">13. Time-basedでは時間が次を起こす</a></li>
+<li class="toc-h3"><a href="#14-Proactiveでは外部世界が次を起こす">14. Proactiveでは外部世界が次を起こす</a></li>
+<li class="toc-h3"><a href="#15-Triggerと終了条件は別々に組み合わせられる">15. Triggerと終了条件は別々に組み合わせられる</a></li>
+<li class="toc-h3"><a href="#16-自律化はLoop-controlを条件へ移す">16. 自律化はLoop controlを条件へ移す</a></li>
+<li class="toc-h3"><a href="#17-Loopの長さは本質ではない">17. Loopの長さは本質ではない</a></li>
+<li class="toc-h3"><a href="#18-何をLoopにするかは次のcycleを誰が起こすかで考える">18. 何をLoopにするかは次のcycleを誰が起こすかで考える</a></li>
+<li class="toc-h3"><a href="#19-Loopは三つの問いに分けて見る">19. Loopは三つの問いに分けて見る</a></li>
+<li class="toc-h2"><a href="#第III部-GoalVerificationBound">第III部　Goal・Verification・Bound</a></li>
+<li class="toc-h3"><a href="#20-Goalは複数のcycleに共通するfinish-lineになる">20. Goalは複数のcycleに共通するfinish lineになる</a></li>
+<li class="toc-h3"><a href="#21-Goalは判定できる形で書く">21. Goalは判定できる形で書く</a></li>
+<li class="toc-h3"><a href="#22-BoundはGoalへ向かうLoopの許容範囲を決める">22. BoundはGoalへ向かうLoopの許容範囲を決める</a></li>
+<li class="toc-h3"><a href="#23-Goalの達成はVerificationで確かめる">23. Goalの達成はVerificationで確かめる</a></li>
+<li class="toc-h3"><a href="#24-Verificationには層がある">24. Verificationには層がある</a></li>
+<li class="toc-h3"><a href="#25-Verificationの結果が次の処理を変える">25. Verificationの結果が次の処理を変える</a></li>
+<li class="toc-h3"><a href="#26-VerificationはGoalを同じ基準で確かめられるほど強い">26. VerificationはGoalを同じ基準で確かめられるほど強い</a></li>
+<li class="toc-h3"><a href="#27-Verificationの深さで確認できる範囲が変わる">27. Verificationの深さで確認できる範囲が変わる</a></li>
+<li class="toc-h2"><a href="#第IV部-時間と再観測">第IV部　時間と再観測</a></li>
+<li class="toc-h3"><a href="#28-Timebased-Loopは状態を時間方向に再観測する">28. Time-based Loopは状態を時間方向に再観測する</a></li>
+<li class="toc-h3"><a href="#29-仕事は同じで入力だけが変わる">29. 仕事は同じで入力だけが変わる</a></li>
+<li class="toc-h3"><a href="#30-Time-budgetはBoundの一種である">30. Time budgetはBoundの一種である</a></li>
+<li class="toc-h2"><a href="#第V部-委譲監視判定">第V部　委譲・監視・判定</a></li>
+<li class="toc-h3"><a href="#31-委譲はTaskの性質で決める">31. 委譲はTaskの性質で決める</a></li>
+<li class="toc-h3"><a href="#32-Verificationの強さが委譲できる距離を決める">32. Verificationの強さが委譲できる距離を決める</a></li>
+<li class="toc-h3"><a href="#33-MakerとCheckerを分ける">33. MakerとCheckerを分ける</a></li>
+<li class="toc-h3"><a href="#34-Verificationがあっても観測軸が足りないことがある">34. Verificationがあっても観測軸が足りないことがある</a></li>
+<li class="toc-h3"><a href="#35-Taskを委譲してもJudgmentは別に考える">35. Taskを委譲してもJudgmentは別に考える</a></li>
+<li class="toc-h3"><a href="#36-三つの判定を混ぜない">36. 三つの判定を混ぜない</a></li>
+<li class="toc-h2"><a href="#第VI部-Task--Loop-の実践">第VI部　Task / Loop の実践</a></li>
+<li class="toc-h3"><a href="#37-日常の反復作業は最初のLoop候補">37. 日常の反復作業は最初のLoop候補</a></li>
+<li class="toc-h3"><a href="#38-LoopとGoalを組み合わせる">38. LoopとGoalを組み合わせる</a></li>
+<li class="toc-h3"><a href="#39-Progress-conditionは前進を継続条件にする">39. Progress conditionは前進を継続条件にする</a></li>
+<li class="toc-h3"><a href="#40-Stall-conditionは停滞したLoopを止める">40. Stall conditionは停滞したLoopを止める</a></li>
+<li class="toc-h3"><a href="#41-文章のルールを判断条件に変える">41. 文章のルールを判断条件に変える</a></li>
+<li class="toc-h3"><a href="#42-要約は正本ではない">42. 要約は正本ではない</a></li>
+<li class="toc-h3"><a href="#43-Taskは小さな契約として書ける">43. Taskは小さな契約として書ける</a></li>
+<li class="toc-h2"><a href="#第VII部-Loop-の限界と停止">第VII部　Loop の限界と停止</a></li>
+<li class="toc-h3"><a href="#44-Loopは曖昧な判断を解消しない">44. Loopは曖昧な判断を解消しない</a></li>
+<li class="toc-h2"><a href="#第VIII部-製品固有の制約">第VIII部　製品固有の制約</a></li>
+<li class="toc-h3"><a href="#45-製品固有の制約は一般原理と分ける">45. 製品固有の制約は一般原理と分ける</a></li>
+<li class="toc-h2"><a href="#付録A-参照資料">付録A. 参照資料</a></li>
+<li class="toc-h3"><a href="#引用着想元">引用・着想元</a></li>
+</ul>
+</nav>
+<article>
 <p><strong>Agentの仕事を、どう始め、続け、確かめ、止めるか</strong></p>
 <blockquote>
 <p>目的: Agent の仕事を、何によって始め、続け、確かめ、止めるかを整理する。Task と Loop の制御構造を扱い、特定製品の実装仕様とは分けて考える。</p>
@@ -135,7 +134,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <p><strong>Task の入口として、いつ仕事を始めるかを定める。</strong></p>
 <h3 id="3-Taskには終了条件を与える">3. Taskには終了条件を与える</h3>
 <p>Task を与えるときは、何をするかだけでなく、<strong>何をもってその Task を終えるか</strong>を決める。</p>
-<p>終了条件は、大きく次の3つの軸で考えられる。</p>
+<p>Task を制御する条件は、大きく次の3つの軸で考えられる。</p>
 <pre><code class="language-text">Goal     到達したので終わる
 Thought  判断できるので終わる
 Bound    上限に達したので終わる
@@ -282,10 +281,8 @@ Bound    上限に達したので終わる
 <p><strong>入口と出口の組み合わせによって、Task の輪郭が決まる。</strong></p>
 <h2 id="第II部-Loop-の基本構造">第II部　Loop の基本構造</h2>
 <h3 id="9-Loopはcycleをつなぐ">9. Loopはcycleをつなぐ</h3>
-<p>Loop は、<strong>一つの work cycle が終わったあと、何を条件として次の cycle を起こすかを定める構造</strong>である。</p>
-<pre><code class="language-text">Trigger
-   ↓
-work cycle（Task の実行）
+<p>Loop は、<strong>一つの cycle が終わったあと、何を条件として次の cycle を起こすかを定める構造</strong>である。</p>
+<pre><code class="language-text">cycle
    ↓
 状態を確認
    ↓
@@ -293,8 +290,8 @@ work cycle（Task の実行）
 │
 └─ 終了条件成立 → 終了
 </code></pre>
-<p>したがって Loop を見るときは、何回繰り返すかよりも、<strong>何が次を起こすのか</strong>を見る。</p>
-<p>Task が仕事の単位を定め、Trigger が入口を定め、終了条件が出口を定める。</p>
+<p><strong>cycle は、Task とその制御条件を、時間軸上の一回分として見たものである。</strong></p>
+<p>そのため、Task と cycle の境界は必ずしも一致しない。</p>
 <p><strong>Loop は、それらを使って一つの cycle の次に何が起きるかを定める。</strong></p>
 <h3 id="10-Loop-controllerは次のcycleを起こす">10. Loop controllerは次のcycleを起こす</h3>
 <p>Loop controller は、<strong>次の cycle を起こすかどうかを決めるもの</strong>である。</p>
@@ -357,7 +354,7 @@ Task
 <p><strong>人間が cycle と cycle の間をつないでいる。</strong></p>
 <h3 id="12-GoalbasedではGoalの未達成が次を起こす">12. Goal-basedではGoalの未達成が次を起こす</h3>
 <p>Goal-based は、<strong>Goal が未達成である限り次の cycle を起こし、Goal に到達したら止まる Loop</strong> である。</p>
-<pre><code class="language-text">work cycle
+<pre><code class="language-text">Task の実行
     ↓
 Goal 達成？
  ├─ Yes → 終了
@@ -381,7 +378,7 @@ Goal 達成？
 <p>Goal-based では、<strong>Goal の未達成状態が cycle と cycle の間をつなぐ。</strong></p>
 <h3 id="13-Timebasedでは時間が次を起こす">13. Time-basedでは時間が次を起こす</h3>
 <p>Time-based は、<strong>時間を Trigger として次の cycle を起こす Loop</strong> である。</p>
-<pre><code class="language-text">work cycle
+<pre><code class="language-text">Task の実行
     ↓
 待つ
     ↓
@@ -446,19 +443,7 @@ Time as Bound    30分で終了する
 <p><strong>Task を発生させる仕組みの寿命</strong></p>
 <p>を分けて考える。</p>
 <p>Proactive では、<strong>外部世界の変化が Task と Task の間をつないでいる。</strong></p>
-<h3 id="15-Loopの種類はcontrolの置き場所の違いである">15. Loopの種類はcontrolの置き場所の違いである</h3>
-<p>Turn-based、Goal-based、Time-based、Proactive の違いは、Agent が何をするかではない。</p>
-<p><strong>次の cycle を起こす control を、どこに置くかが違う。</strong></p>
-<p>同じ Task でも、</p>
-<ul>
-<li>人間に control を残す</li>
-<li>Goal の未達成に渡す</li>
-<li>時間に渡す</li>
-<li>外部 Event に渡す</li>
-</ul>
-<p>ことで、Loop の構造は変わる。</p>
-<p><strong>Task が同じでも、control の置き場所を変えれば運用は変わる。</strong></p>
-<h3 id="16-Triggerと終了条件は別々に組み合わせられる">16. Triggerと終了条件は別々に組み合わせられる</h3>
+<h3 id="15-Triggerと終了条件は別々に組み合わせられる">15. Triggerと終了条件は別々に組み合わせられる</h3>
 <p>Task の入口と出口は、別々に選んで組み合わせられる。</p>
 <p>たとえば、時間を Trigger にして Task を起こし、Goal に到達したら閉じることができる。</p>
 <pre><code class="language-text">Time
@@ -483,7 +468,7 @@ Task を閉じる
 <p>つまり、<strong>何が始めるかと、何が閉じるかは独立して設計できる。</strong></p>
 <p>Loop Engineering は、Loop の種類を一つ選ぶことではない。</p>
 <p><strong>Task の入口と出口を組み合わせ、その間をどうつなぐかを設計することである。</strong></p>
-<h3 id="17-自律化はLoop-controlを条件へ移す">17. 自律化はLoop controlを条件へ移す</h3>
+<h3 id="16-自律化はLoop-controlを条件へ移す">16. 自律化はLoop controlを条件へ移す</h3>
 <p>Turn-based では、人間が多くの Loop control を担っている。</p>
 <p>人間は、</p>
 <ul>
@@ -512,7 +497,7 @@ Event   → いつ Task を起こすか
 <p>その結果、人間が毎回判断しなくても Loop をつなげられるようになる。</p>
 <p>これは、Agent を突然賢くすることとは違う。</p>
 <p><strong>人間が担っていた Loop control の一部を、明示的な条件へ移していくことが自律化である。</strong></p>
-<h3 id="18-Loopの長さは本質ではない">18. Loopの長さは本質ではない</h3>
+<h3 id="17-Loopの長さは本質ではない">17. Loopの長さは本質ではない</h3>
 <p>反復する仕事の設計では、Agent をどれだけ長く動かすかではなく、<strong>仕事を何によって始め、続け、止めるか</strong>を考える。</p>
 <pre><code class="language-text">開始    何が仕事を始めるか
 継続    何が次の cycle を起こすか
@@ -527,7 +512,7 @@ Event   → いつ Task を起こすか
 </ul>
 <p>いずれも Loop として扱える。</p>
 <p>ここで設計するのは、<strong>反復する仕事の制御条件である。</strong></p>
-<h3 id="19-何をLoopにするかは次のcycleを誰が起こすかで考える">19. 何をLoopにするかは次のcycleを誰が起こすかで考える</h3>
+<h3 id="18-何をLoopにするかは次のcycleを誰が起こすかで考える">18. 何をLoopにするかは次のcycleを誰が起こすかで考える</h3>
 <p>何を Loop にするかは、単に <strong>その Task を繰り返せるか</strong>では決まらない。</p>
 <p>次の cycle を、誰が、あるいは何が起こすべきかを考える。</p>
 <pre><code class="language-text">人間の判断が必要
@@ -549,7 +534,7 @@ Proactive
 <p>すべての control を人間から外す必要はない。</p>
 <p>判断条件が曖昧であったり、人間の判断そのものに価値があるなら、Turn-based のままでよい。</p>
 <p><strong>人間を controller として残すことも、Loop の設計である。</strong></p>
-<h3 id="20-Loopは三つの問いに分けて見る">20. Loopは三つの問いに分けて見る</h3>
+<h3 id="19-Loopは三つの問いに分けて見る">19. Loopは三つの問いに分けて見る</h3>
 <p>Loop を考えるときは、仕事全体を一つの「自律性」として見るのではなく、三つの問いに分ける。</p>
 <pre><code class="language-text">開始    何が Task を起こすか
 反復    何が次の cycle を起こすか
@@ -561,7 +546,7 @@ Proactive
 <p>これらを分ければ、人間が担う判断と、条件に任せられる判断を個別に考えられる。</p>
 <p><strong>Task がどう始まり、どうつながり、どう終わるかを分けて見る。</strong></p>
 <h2 id="第III部-GoalVerificationBound">第III部　Goal・Verification・Bound</h2>
-<h3 id="21-Goalは複数のcycleに共通するfinish-lineになる">21. Goalは複数のcycleに共通するfinish lineになる</h3>
+<h3 id="20-Goalは複数のcycleに共通するfinish-lineになる">20. Goalは複数のcycleに共通するfinish lineになる</h3>
 <p>Goal-based Loop では、<strong>Goal が複数の cycle に共通する finish line になる。</strong></p>
 <pre><code class="language-text">やりたいこと
     ↓
@@ -591,7 +576,7 @@ cycle
 Goal 達成 → Task 終了
 </code></pre>
 <p><strong>Goal は、それぞれの cycle が目指す共通の finish line を与える。</strong></p>
-<h3 id="22-Goalは判定できる形で書く">22. Goalは判定できる形で書く</h3>
+<h3 id="21-Goalは判定できる形で書く">21. Goalは判定できる形で書く</h3>
 <p>Goal は、<strong>到達したかどうかを判定できる状態で書く。</strong></p>
 <p>たとえば、</p>
 <pre><code class="language-text">品質を改善する
@@ -612,7 +597,7 @@ exit code = 0
 Verification で確かめる
 </code></pre>
 <p><strong>Goal が到達条件を定め、Verification がその成立を確かめる。</strong></p>
-<h3 id="23-BoundはGoalへ向かうLoopの許容範囲を決める">23. BoundはGoalへ向かうLoopの許容範囲を決める</h3>
+<h3 id="22-BoundはGoalへ向かうLoopの許容範囲を決める">22. BoundはGoalへ向かうLoopの許容範囲を決める</h3>
 <p>Bound は、<strong>Goal を目指す Loop で、どこまで試してよいかを決める境界</strong>である。</p>
 <p>Goal とは別物である。</p>
 <pre><code class="language-text">Goal
@@ -650,7 +635,7 @@ Bound  最大5回
 <p>時間、試行回数、コストのような Bound は、<strong>上限に達したら Loop を止める。</strong></p>
 <p>Scope や Risk のような Bound は、<strong>その範囲を越えずに進める。</strong></p>
 <p><strong>Goal が「どこまで行けば成功か」を決め、Bound が「成功を目指してどこまで許容するか」を決める。</strong></p>
-<h3 id="24-Goalの達成はVerificationで確かめる">24. Goalの達成はVerificationで確かめる</h3>
+<h3 id="23-Goalの達成はVerificationで確かめる">23. Goalの達成はVerificationで確かめる</h3>
 <p>Goal を置いただけでは、その Goal が成立したことにはならない。</p>
 <p>たとえば、</p>
 <pre><code class="language-text">Goal
@@ -666,7 +651,7 @@ Verification
 成立を確認
 </code></pre>
 <p><strong>Goal が成立したかは、Verification で確かめる。</strong></p>
-<h3 id="25-Verificationには層がある">25. Verificationには層がある</h3>
+<h3 id="24-Verificationには層がある">24. Verificationには層がある</h3>
 <p>Verification は、一つの確認だけで完結するとは限らない。</p>
 <p>確認する対象によって、いくつかの層に分けられる。</p>
 <table>
@@ -713,7 +698,7 @@ Behavior
 <p>Build できても、test が通るとは限らない。</p>
 <p>Test が通っても、実際に期待した動作をするとは限らない。</p>
 <p><strong>下へ行くほど、実際の成果に近いものを確認する。</strong></p>
-<h3 id="26-Verificationの結果が次の処理を変える">26. Verificationの結果が次の処理を変える</h3>
+<h3 id="25-Verificationの結果が次の処理を変える">25. Verificationの結果が次の処理を変える</h3>
 <p>Verification は、<strong>結果を確認し、次に何をするかを判断するための材料を与える</strong>。</p>
 <pre><code class="language-text">Act
  ↓
@@ -723,7 +708,7 @@ Verify
 │
 └─ Fail → Act
 </code></pre>
-<p>Pass なら、Goal が成立したことを確認して Task を閉じる。</p>
+<p>ここでの Pass は、Goal の成立を確認できたことを指し、その場合は Task を閉じる。</p>
 <p>Fail なら、その結果をもとに修正し、もう一度 Verification を行う。</p>
 <pre><code class="language-text">作る
  ↓
@@ -737,7 +722,7 @@ Verify
 </code></pre>
 <p>Verification がなければ、Loop は同じ作業を繰り返すだけになりやすい。</p>
 <p><strong>Verification があることで、Loop は結果を見ながら次の処理を変えられる。</strong></p>
-<h3 id="27-VerificationはGoalを同じ基準で確かめられるほど強い">27. VerificationはGoalを同じ基準で確かめられるほど強い</h3>
+<h3 id="26-VerificationはGoalを同じ基準で確かめられるほど強い">26. VerificationはGoalを同じ基準で確かめられるほど強い</h3>
 <p>Verification は、<strong>Goal が成立したかを同じ基準で確かめられるほど強い</strong>。</p>
 <pre><code class="language-text">tests passed
 score &gt;= N
@@ -760,7 +745,7 @@ Verification が強い
 Verification が弱い
 </code></pre>
 <p><strong>Verification の強さは、Goal が成立したかをどれだけ一貫した基準で確かめられるかによって決まる。</strong></p>
-<h3 id="28-Verificationの深さで確認できる範囲が変わる">28. Verificationの深さで確認できる範囲が変わる</h3>
+<h3 id="27-Verificationの深さで確認できる範囲が変わる">27. Verificationの深さで確認できる範囲が変わる</h3>
 <p>Verification の<strong>強さ</strong>が「同じ基準で確かめられるか」を表すのに対して、<strong>深さ</strong>は「どこまで実際の成果に近づいて確かめるか」を表す。</p>
 <pre><code class="language-text">強さ  同じ基準で確かめられるか
 深さ  どこまで実際の成果に近づいて確かめるか
@@ -778,6 +763,15 @@ Runtime    実際に実行できる
 Behavior   期待した動作をする
 </code></pre>
 <p>では、確認しているものが異なる。</p>
+<p><strong>Verification の深さを見るときは、観測したものが Goal の成立そのものにどれだけ近いかを見る。</strong></p>
+<pre><code class="language-text">前段階・代理的な条件を確認する
+            ↓
+    Verification が浅い
+
+Goal の成立に近い結果を確認する
+            ↓
+    Verification が深い
+</code></pre>
 <pre><code class="language-text">同じ Goal
    ↓
 Verification の深さ
@@ -787,7 +781,7 @@ Verification の深さ
 <p>Goal は同じでも、Build まで確認した状態と、Behavior まで確認した状態では、<strong>Goal について確認できた範囲が異なる。</strong></p>
 <p><strong>Verification の深さによって、その Task でどこまで確かめられたかが変わる。</strong></p>
 <h2 id="第IV部-時間と再観測">第IV部　時間と再観測</h2>
-<h3 id="29-Timebased-Loopは状態を時間方向に再観測する">29. Time-based Loopは状態を時間方向に再観測する</h3>
+<h3 id="28-Timebased-Loopは状態を時間方向に再観測する">28. Time-based Loopは状態を時間方向に再観測する</h3>
 <p>Time-based Loop は、<strong>時間を Trigger として、外部の状態をもう一度観測する機会を作る。</strong></p>
 <pre><code class="language-text">10:00  観測
 11:00  観測
@@ -810,7 +804,7 @@ Verification の深さ
 </code></pre>
 <p>観測した変化によって、次の判断や別の Task、Goal が必要になることもある。</p>
 <p><strong>Time-based Loop は、時間方向に再観測の機会をつなぐ。</strong></p>
-<h3 id="30-仕事は同じで入力だけが変わる">30. 仕事は同じで入力だけが変わる</h3>
+<h3 id="29-仕事は同じで入力だけが変わる">29. 仕事は同じで入力だけが変わる</h3>
 <p>Time-based Loop に向くのは、<strong>仕事の形が変わらず、入力だけが時間とともに変化する仕事</strong>である。</p>
 <pre><code class="language-text">同じ Task
     ↓
@@ -828,7 +822,7 @@ Verification の深さ
 <p>同じ Task を、変化した状態に対してもう一度行う。</p>
 <p>逆に、毎回仕事そのものを決め直す必要があるものは、単純な Loop には向きにくい。</p>
 <p><strong>Task は同じでも、観測する世界は変わる。</strong></p>
-<h3 id="31-Time-budgetはBoundの一種である">31. Time budgetはBoundの一種である</h3>
+<h3 id="30-Time-budgetはBoundの一種である">30. Time budgetはBoundの一種である</h3>
 <p>Time budget は、<strong>Task に使ってよい時間の上限を決める Bound</strong> である。</p>
 <p>時間は、使われる場所によって役割が違う。</p>
 <pre><code class="language-text">Time-based Loop  = Trigger
@@ -837,7 +831,7 @@ Time budget      = Bound
 <p>Time-based Loop の Time は、<strong>時間が来たので始める</strong>。</p>
 <p>Time budget の Time は、<strong>時間を使い切ったので止める</strong>。</p>
 <h2 id="第V部-委譲監視判定">第V部　委譲・監視・判定</h2>
-<h3 id="32-委譲はTaskの性質で決める">32. 委譲はTaskの性質で決める</h3>
+<h3 id="31-委譲はTaskの性質で決める">31. 委譲はTaskの性質で決める</h3>
 <p>委譲は、<strong>Task が簡単か難しいかだけでは決めない。</strong></p>
 <pre><code class="language-text">Task
  │
@@ -857,7 +851,7 @@ Verification が弱い
 <p>簡単な Task でも、間違えたときの影響が大きければ近くで見る必要がある。</p>
 <p>難しい Task でも、結果を強く Verification できれば任せられる範囲は広がる。</p>
 <p><strong>委譲は、Agent の能力ではなく、Task の性質から考える。</strong></p>
-<h3 id="33-Verificationの強さが委譲できる距離を決める">33. Verificationの強さが委譲できる距離を決める</h3>
+<h3 id="32-Verificationの強さが委譲できる距離を決める">32. Verificationの強さが委譲できる距離を決める</h3>
 <p>Agent にどこまで Loop を任せられるかは、Agent の能力だけでは決まらない。</p>
 <p><strong>何を Verification できるか</strong>にも強く依存する。</p>
 <pre><code class="language-text">Verification が弱い
@@ -872,7 +866,7 @@ Agent に任せられる範囲が広がる
 <p>結果を強く Verification できれば、途中の判断を Agent に任せ、人間は Task から離れやすくなる。</p>
 <p>この距離を <strong>監視距離</strong> と考える。</p>
 <p><strong>Verification の強さが、Agent にどこまで任せ、人間がどこまで離れてよいかを決める。</strong></p>
-<h3 id="34-MakerとCheckerを分ける">34. MakerとCheckerを分ける</h3>
+<h3 id="33-MakerとCheckerを分ける">33. MakerとCheckerを分ける</h3>
 <p>Maker は、<strong>成果物を作る役割</strong>である。</p>
 <p>Checker は、<strong>その成果物を確かめる役割</strong>である。</p>
 <pre><code class="language-text">Maker
@@ -887,7 +881,7 @@ Checker
 <p>そのため、同じ視点のままでは誤りに気づきにくいことがある。</p>
 <p>Checker を分ければ、成果物を別の context、別の視点から Verification できる。</p>
 <p><strong>作ることと、確かめることを分ける。</strong></p>
-<h3 id="35-Verificationがあっても観測軸が足りないことがある">35. Verificationがあっても観測軸が足りないことがある</h3>
+<h3 id="34-Verificationがあっても観測軸が足りないことがある">34. Verificationがあっても観測軸が足りないことがある</h3>
 <p>Verification が正しくても、<strong>観測する対象が足りないことがある。</strong></p>
 <pre><code class="language-text">正しく測れている
        ≠
@@ -905,7 +899,7 @@ Checker
 見るべきものを見ているか
 </code></pre>
 <p><strong>Verification の強さだけでなく、何を Verification するかも設計する。</strong></p>
-<h3 id="36-Taskを委譲してもJudgmentは別に考える">36. Taskを委譲してもJudgmentは別に考える</h3>
+<h3 id="35-Taskを委譲してもJudgmentは別に考える">35. Taskを委譲してもJudgmentは別に考える</h3>
 <p>Goal は、<strong>Task の到達条件</strong>を定める。</p>
 <p>しかし、Goal が明確でも、その進め方や結果を採用してよいかまでは決まらない。</p>
 <pre><code class="language-text">Goal
@@ -936,7 +930,7 @@ Judgment
 </code></pre>
 <p>Agent が問題を解けることと、その解決を採用すべきことは同じではない。</p>
 <p><strong>仕事を任せることと、それでよいかを判断することは分けて考える。</strong></p>
-<h3 id="37-三つの判定を混ぜない">37. 三つの判定を混ぜない</h3>
+<h3 id="36-三つの判定を混ぜない">36. 三つの判定を混ぜない</h3>
 <p>Task の結果には、<strong>異なる三つの判定</strong>がある。</p>
 <pre><code class="language-text">Goal Evaluator
 「条件を満たしたか？」
@@ -958,7 +952,7 @@ Human Judgment      = Worth doing
 <p>成果物が正しくても、それを採用すべきとは限らない。</p>
 <p><strong>Done / Correct / Worth doing は別である。</strong></p>
 <h2 id="第VI部-Task--Loop-の実践">第VI部　Task / Loop の実践</h2>
-<h3 id="38-日常の反復作業は最初のLoop候補">38. 日常の反復作業は最初のLoop候補</h3>
+<h3 id="37-日常の反復作業は最初のLoop候補">37. 日常の反復作業は最初のLoop候補</h3>
 <p>Loop の候補を、新しく発明する必要はない。</p>
 <p><strong>人間がすでに繰り返している仕事を見る。</strong></p>
 <pre><code class="language-text">人間が繰り返している仕事
@@ -978,7 +972,7 @@ Loop 候補
 <p>といった仕事である。</p>
 <p>仕事の形が同じで、観測する Input だけが変わるなら、Loop にしやすい。</p>
 <p><strong>繰り返している仕事は、すでに Loop の形を持っている。</strong></p>
-<h3 id="39-LoopとGoalを組み合わせる">39. LoopとGoalを組み合わせる</h3>
+<h3 id="38-LoopとGoalを組み合わせる">38. LoopとGoalを組み合わせる</h3>
 <p>Loop と Goal は、競合するものではない。</p>
 <p><strong>異なる役割を組み合わせて使う。</strong></p>
 <pre><code class="language-text">Loop
@@ -1008,7 +1002,7 @@ Goal = Finish line
 </code></pre>
 <p>である。</p>
 <p><strong>この例では、Loop が仕事を見つけ、Goal がその仕事の到達点を定める。</strong></p>
-<h3 id="40-Progress-conditionは前進を継続条件にする">40. Progress conditionは前進を継続条件にする</h3>
+<h3 id="39-Progress-conditionは前進を継続条件にする">39. Progress conditionは前進を継続条件にする</h3>
 <p>Progress condition は、<strong>Loop が前進しているかを判定する条件</strong>である。</p>
 <pre><code class="language-text">cycle
   ↓
@@ -1028,7 +1022,7 @@ Goal = Finish line
 </code></pre>
 <p>のように、前進そのものを条件にできる。</p>
 <p><strong>Progress condition は、Loop が動いているかではなく、進んでいるかを見る。</strong></p>
-<h3 id="41-Stall-conditionは停滞したLoopを止める">41. Stall conditionは停滞したLoopを止める</h3>
+<h3 id="40-Stall-conditionは停滞したLoopを止める">40. Stall conditionは停滞したLoopを止める</h3>
 <p>Stall condition は、<strong>Loop が前進しなくなったことを判定する条件</strong>である。</p>
 <pre><code class="language-text">cycle
   ↓
@@ -1050,7 +1044,7 @@ Stall → Loop を止める
 <p>Progress condition が <strong>進んでいるか</strong>を見るのに対して、Stall condition は <strong>進まなくなったか</strong>を見る。</p>
 <p>Stall condition は、Goal / Thought / Bound に並ぶ Task の終了軸ではなく、<strong>Loop の継続を打ち切るための条件</strong>である。</p>
 <p><strong>Stall condition は、動き続けるだけの Loop を止める。</strong></p>
-<h3 id="42-文章のルールを判断条件に変える">42. 文章のルールを判断条件に変える</h3>
+<h3 id="41-文章のルールを判断条件に変える">41. 文章のルールを判断条件に変える</h3>
 <p>人間向けに書かれたルールは、そのままでは Loop の判断に使いにくいことがある。</p>
 <p>そこで、文章の意味を<strong>判定できる条件</strong>へ変える。</p>
 <pre><code class="language-text">文章のルール
@@ -1079,7 +1073,7 @@ No  → 通常の確認を続ける
 実行できる判断
 </code></pre>
 <p><strong>ルールを読めるだけの情報から、判断に使える条件へ変える。</strong></p>
-<h3 id="43-要約は正本ではない">43. 要約は正本ではない</h3>
+<h3 id="42-要約は正本ではない">42. 要約は正本ではない</h3>
 <p>長い Task や Loop では、現在地を短く伝えるために要約を使うことがある。</p>
 <p>要約は Context を小さくするためには有効だが、元のルールや Goal、Bound を置き換えるものではない。</p>
 <p>たとえば、</p>
@@ -1105,7 +1099,7 @@ No  → 通常の確認を続ける
 </code></pre>
 <p>そのため、要約は現在状態を伝えるための派生情報として使い、判断の基準になる元の情報は必要に応じて正本へ戻って確認する。</p>
 <p><strong>要約がいつの間にか正本を置き換えないようにする。</strong></p>
-<h3 id="44-Taskは小さな契約として書ける">44. Taskは小さな契約として書ける</h3>
+<h3 id="43-Taskは小さな契約として書ける">43. Taskは小さな契約として書ける</h3>
 <p>実践では、Task に<strong>複数の制御条件を組み合わせて持たせる</strong>ことができる。</p>
 <pre><code class="language-text">Task
  │
@@ -1145,7 +1139,7 @@ Bound
 <li><strong>metric</strong>：測定値や評価指標の総称。この例では Lighthouse score や LCP などを指す。</li>
 </ul>
 <h2 id="第VII部-Loop-の限界と停止">第VII部　Loop の限界と停止</h2>
-<h3 id="45-Loopは曖昧な判断を解消しない">45. Loopは曖昧な判断を解消しない</h3>
+<h3 id="44-Loopは曖昧な判断を解消しない">44. Loopは曖昧な判断を解消しない</h3>
 <p>Loop は、<strong>曖昧な判断基準を明確にしてくれる仕組みではない。</strong></p>
 <p>たとえば、</p>
 <pre><code class="language-text">「この UI が良くなるまで続ける」
@@ -1166,7 +1160,7 @@ Task を Loop にできる
 <p>Agent が仕事を進められることと、その仕事の継続と終了を条件化できることは別である。</p>
 <p><strong>Loop は曖昧さを消さない。終了を条件として書ける仕事ほど Loop に向く。</strong></p>
 <h2 id="第VIII部-製品固有の制約">第VIII部　製品固有の制約</h2>
-<h3 id="46-製品固有の制約は一般原理と分ける">46. 製品固有の制約は一般原理と分ける</h3>
+<h3 id="45-製品固有の制約は一般原理と分ける">45. 製品固有の制約は一般原理と分ける</h3>
 <p>Loop の一般原理と、製品ごとの実装上の制約は分けて考える。</p>
 <pre><code class="language-text">一般原理
   │
@@ -1198,10 +1192,9 @@ Task を Loop にできる
 <li>Addy Osmani — <em>Practical Loop Engineering</em><br/>
 <a href="https://addyosmani.com/blog/practical-loop-engineering/">https://addyosmani.com/blog/practical-loop-engineering/</a></li>
 </ul>
-
-  </article>
-  <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
+</article>
+<a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-09 20:00 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-10 09:19 JST</footer>
 </body>
 </html>

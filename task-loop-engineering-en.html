@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-09 20:00 JST">
+<meta name="last-modified" content="2026-09-10 09:33 JST">
 <meta name="description" content="A guide to engineering Agent Tasks and Loops through control structures including Trigger, Goal, Thought, Bound, Verification, and Judgment.">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -24,72 +24,71 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 </head>
 <body>
 <main id="top">
-  <header class="doc-head">
-    <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-09 20:00 JST</span><span>Language: English</span></div>
-  </header>
-  <nav class="toc" aria-label="Table of contents">
-    <div class="toc-title">Table of Contents</div>
-    <ul>
-    <li class="toc-h2"><a href="#Part-I--Basic-Structure-of-a-Task">Part I — Basic Structure of a Task</a></li>
-    <li class="toc-h3"><a href="#1-What-Is-a-Task">1. What Is a Task?</a></li>
-    <li class="toc-h3"><a href="#2-A-Trigger-Defines-the-Start-Condition-of-a-Task">2. A Trigger Defines the Start Condition of a Task</a></li>
-    <li class="toc-h3"><a href="#3-Give-a-Task-an-End-Condition">3. Give a Task an End Condition</a></li>
-    <li class="toc-h3"><a href="#4-A-Goal-Defines-the-Target-State-of-a-Task">4. A Goal Defines the Target State of a Task</a></li>
-    <li class="toc-h3"><a href="#5-Thought-Stops-When-There-Is-No-Longer-a-Reason-to-Keep-Thinking-About-the-Task">5. Thought Stops When There Is No Longer a Reason to Keep Thinking About the Task</a></li>
-    <li class="toc-h3"><a href="#6-A-Bound-Defines-the-Permitted-Range-of-a-Task">6. A Bound Defines the Permitted Range of a Task</a></li>
-    <li class="toc-h3"><a href="#7-End-Conditions-Can-Be-Combined">7. End Conditions Can Be Combined</a></li>
-    <li class="toc-h3"><a href="#8-Separate-the-Entry-and-Exit-of-a-Task">8. Separate the Entry and Exit of a Task</a></li>
-    <li class="toc-h2"><a href="#Part-II--Basic-Structure-of-a-Loop">Part II — Basic Structure of a Loop</a></li>
-    <li class="toc-h3"><a href="#9-A-Loop-Connects-Cycles">9. A Loop Connects Cycles</a></li>
-    <li class="toc-h3"><a href="#10-The-Loop-Controller-Initiates-the-Next-Cycle">10. The Loop Controller Initiates the Next Cycle</a></li>
-    <li class="toc-h3"><a href="#11-In-TurnBased-Loops-the-Human-Initiates-the-Next-Cycle">11. In Turn-Based Loops, the Human Initiates the Next Cycle</a></li>
-    <li class="toc-h3"><a href="#12-In-GoalBased-Loops-an-Unachieved-Goal-Initiates-the-Next-Cycle">12. In Goal-Based Loops, an Unachieved Goal Initiates the Next Cycle</a></li>
-    <li class="toc-h3"><a href="#13-In-TimeBased-Loops-Time-Initiates-the-Next-Cycle">13. In Time-Based Loops, Time Initiates the Next Cycle</a></li>
-    <li class="toc-h3"><a href="#14-In-Proactive-Loops-the-External-World-Initiates-the-Next-Cycle">14. In Proactive Loops, the External World Initiates the Next Cycle</a></li>
-    <li class="toc-h3"><a href="#15-Loop-Types-Differ-by-Where-Control-Is-Placed">15. Loop Types Differ by Where Control Is Placed</a></li>
-    <li class="toc-h3"><a href="#16-Triggers-and-End-Conditions-Can-Be-Combined-Independently">16. Triggers and End Conditions Can Be Combined Independently</a></li>
-    <li class="toc-h3"><a href="#17-Making-a-Loop-More-Autonomous-Moves-Loop-Control-into-Conditions">17. Making a Loop More Autonomous Moves Loop Control into Conditions</a></li>
-    <li class="toc-h3"><a href="#18-Loop-Length-Is-Not-the-Essential-Point">18. Loop Length Is Not the Essential Point</a></li>
-    <li class="toc-h3"><a href="#19-Decide-What-Should-Be-a-Loop-by-Asking-Who-or-What-Should-Initiate-the-Next-Cycle">19. Decide What Should Be a Loop by Asking Who or What Should Initiate the Next Cycle</a></li>
-    <li class="toc-h3"><a href="#20-View-a-Loop-as-Three-Questions">20. View a Loop as Three Questions</a></li>
-    <li class="toc-h2"><a href="#Part-III--Goal-Verification-and-Bound">Part III — Goal, Verification, and Bound</a></li>
-    <li class="toc-h3"><a href="#21-A-Goal-Becomes-the-Finish-Line-Shared-Across-Multiple-Cycles">21. A Goal Becomes the Finish Line Shared Across Multiple Cycles</a></li>
-    <li class="toc-h3"><a href="#22-Write-a-Goal-in-a-Form-That-Can-Be-Judged">22. Write a Goal in a Form That Can Be Judged</a></li>
-    <li class="toc-h3"><a href="#23-A-Bound-Defines-the-Permitted-Range-of-a-Loop-Pursuing-a-Goal">23. A Bound Defines the Permitted Range of a Loop Pursuing a Goal</a></li>
-    <li class="toc-h3"><a href="#24-Verify-Goal-Attainment-with-Verification">24. Verify Goal Attainment with Verification</a></li>
-    <li class="toc-h3"><a href="#25-Verification-Has-Layers">25. Verification Has Layers</a></li>
-    <li class="toc-h3"><a href="#26-Verification-Results-Change-What-Happens-Next">26. Verification Results Change What Happens Next</a></li>
-    <li class="toc-h3"><a href="#27-Verification-Is-Stronger-When-It-Can-Check-the-Goal-Against-a-Consistent-Criterion">27. Verification Is Stronger When It Can Check the Goal Against a Consistent Criterion</a></li>
-    <li class="toc-h3"><a href="#28-Verification-Depth-Changes-What-Can-Be-Confirmed">28. Verification Depth Changes What Can Be Confirmed</a></li>
-    <li class="toc-h2"><a href="#Part-IV--Time-and-ReObservation">Part IV — Time and Re-Observation</a></li>
-    <li class="toc-h3"><a href="#29-A-TimeBased-Loop-ReObserves-State-Along-the-Time-Axis">29. A Time-Based Loop Re-Observes State Along the Time Axis</a></li>
-    <li class="toc-h3"><a href="#30-The-Work-Stays-the-Same-While-Only-the-Input-Changes">30. The Work Stays the Same While Only the Input Changes</a></li>
-    <li class="toc-h3"><a href="#31-A-Time-Budget-Is-a-Type-of-Bound">31. A Time Budget Is a Type of Bound</a></li>
-    <li class="toc-h2"><a href="#Part-V--Delegation-Supervision-and-Judgment">Part V — Delegation, Supervision, and Judgment</a></li>
-    <li class="toc-h3"><a href="#32-Decide-Delegation-by-the-Nature-of-the-Task">32. Decide Delegation by the Nature of the Task</a></li>
-    <li class="toc-h3"><a href="#33-The-Strength-of-Verification-Determines-the-Delegation-Distance">33. The Strength of Verification Determines the Delegation Distance</a></li>
-    <li class="toc-h3"><a href="#34-Separate-the-Maker-and-the-Checker">34. Separate the Maker and the Checker</a></li>
-    <li class="toc-h3"><a href="#35-Even-with-Verification-the-Observation-Axes-May-Be-Insufficient">35. Even with Verification, the Observation Axes May Be Insufficient</a></li>
-    <li class="toc-h3"><a href="#36-Treat-Judgment-Separately-Even-When-the-Task-Is-Delegated">36. Treat Judgment Separately Even When the Task Is Delegated</a></li>
-    <li class="toc-h3"><a href="#37-Do-Not-Mix-Three-Different-Evaluations">37. Do Not Mix Three Different Evaluations</a></li>
-    <li class="toc-h2"><a href="#Part-VI--Task--Loop-in-Practice">Part VI — Task / Loop in Practice</a></li>
-    <li class="toc-h3"><a href="#38-Everyday-Repeated-Work-Is-the-First-Place-to-Look-for-Loop-Candidates">38. Everyday Repeated Work Is the First Place to Look for Loop Candidates</a></li>
-    <li class="toc-h3"><a href="#39-Combine-Loops-and-Goals">39. Combine Loops and Goals</a></li>
-    <li class="toc-h3"><a href="#40-A-Progress-Condition-Makes-Forward-Movement-a-Condition-for-Continuing">40. A Progress Condition Makes Forward Movement a Condition for Continuing</a></li>
-    <li class="toc-h3"><a href="#41-A-Stall-Condition-Stops-a-Loop-That-Has-Stopped-Making-Progress">41. A Stall Condition Stops a Loop That Has Stopped Making Progress</a></li>
-    <li class="toc-h3"><a href="#42-Turn-Written-Rules-into-Decision-Conditions">42. Turn Written Rules into Decision Conditions</a></li>
-    <li class="toc-h3"><a href="#43-A-Summary-Is-Not-the-Source-of-Truth">43. A Summary Is Not the Source of Truth</a></li>
-    <li class="toc-h3"><a href="#44-A-Task-Can-Be-Written-as-a-Small-Contract">44. A Task Can Be Written as a Small Contract</a></li>
-    <li class="toc-h2"><a href="#Part-VII--Limits-and-Stopping-of-Loops">Part VII — Limits and Stopping of Loops</a></li>
-    <li class="toc-h3"><a href="#45-A-Loop-Does-Not-Resolve-Ambiguous-Judgment">45. A Loop Does Not Resolve Ambiguous Judgment</a></li>
-    <li class="toc-h2"><a href="#Part-VIII--ProductSpecific-Constraints">Part VIII — Product-Specific Constraints</a></li>
-    <li class="toc-h3"><a href="#46-Separate-ProductSpecific-Constraints-from-General-Principles">46. Separate Product-Specific Constraints from General Principles</a></li>
-    <li class="toc-h2"><a href="#Appendix-A-References">Appendix A. References</a></li>
-    <li class="toc-h3"><a href="#Sources-of-Quotations-and-Ideas">Sources of Quotations and Ideas</a></li>
-    </ul>
-  </nav>
-  <article>
+<header class="doc-head">
+<h1 class="doc-title">Task / Loop Engineering Guide</h1>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-10 09:33 JST</span><span>Language: English</span></div>
+</header>
+<nav class="toc" aria-label="Table of contents">
+<div class="toc-title">Table of Contents</div>
+<ul>
+<li class="toc-h2"><a href="#Part-I--Basic-Structure-of-a-Task">Part I — Basic Structure of a Task</a></li>
+<li class="toc-h3"><a href="#1-What-Is-a-Task">1. What Is a Task?</a></li>
+<li class="toc-h3"><a href="#2-A-Trigger-Defines-the-Start-Condition-of-a-Task">2. A Trigger Defines the Start Condition of a Task</a></li>
+<li class="toc-h3"><a href="#3-Give-a-Task-an-End-Condition">3. Give a Task an End Condition</a></li>
+<li class="toc-h3"><a href="#4-A-Goal-Defines-the-Target-State-of-a-Task">4. A Goal Defines the Target State of a Task</a></li>
+<li class="toc-h3"><a href="#5-Thought-Stops-When-There-Is-No-Longer-a-Reason-to-Keep-Thinking-About-the-Task">5. Thought Stops When There Is No Longer a Reason to Keep Thinking About the Task</a></li>
+<li class="toc-h3"><a href="#6-A-Bound-Defines-the-Permitted-Range-of-a-Task">6. A Bound Defines the Permitted Range of a Task</a></li>
+<li class="toc-h3"><a href="#7-End-Conditions-Can-Be-Combined">7. End Conditions Can Be Combined</a></li>
+<li class="toc-h3"><a href="#8-Separate-the-Entry-and-Exit-of-a-Task">8. Separate the Entry and Exit of a Task</a></li>
+<li class="toc-h2"><a href="#Part-II--Basic-Structure-of-a-Loop">Part II — Basic Structure of a Loop</a></li>
+<li class="toc-h3"><a href="#9-A-Loop-Connects-Cycles">9. A Loop Connects Cycles</a></li>
+<li class="toc-h3"><a href="#10-The-Loop-Controller-Initiates-the-Next-Cycle">10. The Loop Controller Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#11-In-TurnBased-Loops-the-Human-Initiates-the-Next-Cycle">11. In Turn-Based Loops, the Human Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#12-In-GoalBased-Loops-an-Unachieved-Goal-Initiates-the-Next-Cycle">12. In Goal-Based Loops, an Unachieved Goal Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#13-In-TimeBased-Loops-Time-Initiates-the-Next-Cycle">13. In Time-Based Loops, Time Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#14-In-Proactive-Loops-the-External-World-Initiates-the-Next-Cycle">14. In Proactive Loops, the External World Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#15-Triggers-and-End-Conditions-Can-Be-Combined-Independently">15. Triggers and End Conditions Can Be Combined Independently</a></li>
+<li class="toc-h3"><a href="#16-Making-a-Loop-More-Autonomous-Moves-Loop-Control-into-Conditions">16. Making a Loop More Autonomous Moves Loop Control into Conditions</a></li>
+<li class="toc-h3"><a href="#17-Loop-Length-Is-Not-the-Essential-Point">17. Loop Length Is Not the Essential Point</a></li>
+<li class="toc-h3"><a href="#18-Decide-What-Should-Be-a-Loop-by-Asking-Who-or-What-Should-Initiate-the-Next-Cycle">18. Decide What Should Be a Loop by Asking Who or What Should Initiate the Next Cycle</a></li>
+<li class="toc-h3"><a href="#19-View-a-Loop-as-Three-Questions">19. View a Loop as Three Questions</a></li>
+<li class="toc-h2"><a href="#Part-III--Goal-Verification-and-Bound">Part III — Goal, Verification, and Bound</a></li>
+<li class="toc-h3"><a href="#20-A-Goal-Becomes-the-Finish-Line-Shared-Across-Multiple-Cycles">20. A Goal Becomes the Finish Line Shared Across Multiple Cycles</a></li>
+<li class="toc-h3"><a href="#21-Write-a-Goal-in-a-Form-That-Can-Be-Judged">21. Write a Goal in a Form That Can Be Judged</a></li>
+<li class="toc-h3"><a href="#22-A-Bound-Defines-the-Permitted-Range-of-a-Loop-Pursuing-a-Goal">22. A Bound Defines the Permitted Range of a Loop Pursuing a Goal</a></li>
+<li class="toc-h3"><a href="#23-Verify-Goal-Attainment-with-Verification">23. Verify Goal Attainment with Verification</a></li>
+<li class="toc-h3"><a href="#24-Verification-Has-Layers">24. Verification Has Layers</a></li>
+<li class="toc-h3"><a href="#25-Verification-Results-Change-What-Happens-Next">25. Verification Results Change What Happens Next</a></li>
+<li class="toc-h3"><a href="#26-Verification-Is-Stronger-When-It-Can-Check-the-Goal-Against-a-Consistent-Criterion">26. Verification Is Stronger When It Can Check the Goal Against a Consistent Criterion</a></li>
+<li class="toc-h3"><a href="#27-Verification-Depth-Changes-What-Can-Be-Confirmed">27. Verification Depth Changes What Can Be Confirmed</a></li>
+<li class="toc-h2"><a href="#Part-IV--Time-and-ReObservation">Part IV — Time and Re-Observation</a></li>
+<li class="toc-h3"><a href="#28-A-TimeBased-Loop-ReObserves-State-Along-the-Time-Axis">28. A Time-Based Loop Re-Observes State Along the Time Axis</a></li>
+<li class="toc-h3"><a href="#29-The-Work-Stays-the-Same-While-Only-the-Input-Changes">29. The Work Stays the Same While Only the Input Changes</a></li>
+<li class="toc-h3"><a href="#30-A-Time-Budget-Is-a-Type-of-Bound">30. A Time Budget Is a Type of Bound</a></li>
+<li class="toc-h2"><a href="#Part-V--Delegation-Supervision-and-Judgment">Part V — Delegation, Supervision, and Judgment</a></li>
+<li class="toc-h3"><a href="#31-Decide-Delegation-by-the-Nature-of-the-Task">31. Decide Delegation by the Nature of the Task</a></li>
+<li class="toc-h3"><a href="#32-The-Strength-of-Verification-Determines-the-Delegation-Distance">32. The Strength of Verification Determines the Delegation Distance</a></li>
+<li class="toc-h3"><a href="#33-Separate-the-Maker-and-the-Checker">33. Separate the Maker and the Checker</a></li>
+<li class="toc-h3"><a href="#34-Even-with-Verification-the-Observation-Axes-May-Be-Insufficient">34. Even with Verification, the Observation Axes May Be Insufficient</a></li>
+<li class="toc-h3"><a href="#35-Treat-Judgment-Separately-Even-When-the-Task-Is-Delegated">35. Treat Judgment Separately Even When the Task Is Delegated</a></li>
+<li class="toc-h3"><a href="#36-Do-Not-Mix-Three-Different-Evaluations">36. Do Not Mix Three Different Evaluations</a></li>
+<li class="toc-h2"><a href="#Part-VI--Task--Loop-in-Practice">Part VI — Task / Loop in Practice</a></li>
+<li class="toc-h3"><a href="#37-Everyday-Repeated-Work-Is-the-First-Place-to-Look-for-Loop-Candidates">37. Everyday Repeated Work Is the First Place to Look for Loop Candidates</a></li>
+<li class="toc-h3"><a href="#38-Combine-Loops-and-Goals">38. Combine Loops and Goals</a></li>
+<li class="toc-h3"><a href="#39-A-Progress-Condition-Makes-Forward-Movement-a-Condition-for-Continuing">39. A Progress Condition Makes Forward Movement a Condition for Continuing</a></li>
+<li class="toc-h3"><a href="#40-A-Stall-Condition-Stops-a-Loop-That-Has-Stopped-Making-Progress">40. A Stall Condition Stops a Loop That Has Stopped Making Progress</a></li>
+<li class="toc-h3"><a href="#41-Turn-Written-Rules-into-Decision-Conditions">41. Turn Written Rules into Decision Conditions</a></li>
+<li class="toc-h3"><a href="#42-A-Summary-Is-Not-the-Source-of-Truth">42. A Summary Is Not the Source of Truth</a></li>
+<li class="toc-h3"><a href="#43-A-Task-Can-Be-Written-as-a-Small-Contract">43. A Task Can Be Written as a Small Contract</a></li>
+<li class="toc-h2"><a href="#Part-VII--Limits-and-Stopping-of-Loops">Part VII — Limits and Stopping of Loops</a></li>
+<li class="toc-h3"><a href="#44-A-Loop-Does-Not-Resolve-Ambiguous-Judgment">44. A Loop Does Not Resolve Ambiguous Judgment</a></li>
+<li class="toc-h2"><a href="#Part-VIII--ProductSpecific-Constraints">Part VIII — Product-Specific Constraints</a></li>
+<li class="toc-h3"><a href="#45-Separate-ProductSpecific-Constraints-from-General-Principles">45. Separate Product-Specific Constraints from General Principles</a></li>
+<li class="toc-h2"><a href="#Appendix-A-References">Appendix A. References</a></li>
+<li class="toc-h3"><a href="#Sources-of-Quotations-and-Ideas">Sources of Quotations and Ideas</a></li>
+</ul>
+</nav>
+<article>
 <p><strong>How to start, continue, verify, and stop an Agent's work</strong></p>
 <blockquote>
 <p>Purpose: To organize what starts, continues, verifies, and stops an Agent's work. This guide focuses on the control structures of Tasks and Loops and treats them separately from product-specific implementation details.</p>
@@ -135,7 +134,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <p><strong>As the entry point of the Task, it defines when the work begins.</strong></p>
 <h3 id="3-Give-a-Task-an-End-Condition">3. Give a Task an End Condition</h3>
 <p>When defining a Task, decide not only what it does, but also <strong>what will count as the end of that Task</strong>.</p>
-<p>End conditions can be considered along three main axes.</p>
+<p>The conditions that control a Task can be considered along three main axes.</p>
 <pre><code class="language-text">Goal     End because the target state was reached
 Thought  End because a judgment can be made
 Bound    End because a limit was reached
@@ -280,10 +279,8 @@ Exit Bound    End because the time limit has been reached
 <p><strong>The combination of entry and exit defines the shape of the Task.</strong></p>
 <h2 id="Part-II--Basic-Structure-of-a-Loop">Part II — Basic Structure of a Loop</h2>
 <h3 id="9-A-Loop-Connects-Cycles">9. A Loop Connects Cycles</h3>
-<p>A Loop is a structure that defines <strong>what condition causes the next cycle to begin after one work cycle has ended</strong>.</p>
-<pre><code class="language-text">Trigger
-   ↓
-work cycle (Task execution)
+<p>A Loop is a structure that defines <strong>what condition causes the next cycle to begin after one cycle has ended</strong>.</p>
+<pre><code class="language-text">cycle
    ↓
 Check the state
    ↓
@@ -291,9 +288,9 @@ Check the state
 │
 └─ End condition satisfied → End
 </code></pre>
-<p>Therefore, when examining a Loop, look not primarily at how many times it repeats, but at <strong>what causes the next cycle to begin</strong>.</p>
-<p>A Task defines the unit of work, a Trigger defines the entry point, and end conditions define the exit point.</p>
-<p><strong>A Loop uses them to determine what happens after one cycle and before the next.</strong></p>
+<p><strong>A cycle is the Task together with its control conditions, viewed as one interval along the time axis.</strong></p>
+<p>For that reason, the boundaries of a Task and a cycle do not necessarily coincide.</p>
+<p><strong>A Loop uses them to determine what happens after one cycle.</strong></p>
 <h3 id="10-The-Loop-Controller-Initiates-the-Next-Cycle">10. The Loop Controller Initiates the Next Cycle</h3>
 <p>The Loop controller is <strong>what decides whether the next cycle should begin</strong>.</p>
 <table>
@@ -354,7 +351,7 @@ Next Task
 <p><strong>The human connects one cycle to the next.</strong></p>
 <h3 id="12-In-GoalBased-Loops-an-Unachieved-Goal-Initiates-the-Next-Cycle">12. In Goal-Based Loops, an Unachieved Goal Initiates the Next Cycle</h3>
 <p>Goal-based is a Loop that <strong>initiates the next cycle while the Goal remains unachieved, and stops once the Goal is reached</strong>.</p>
-<pre><code class="language-text">work cycle
+<pre><code class="language-text">Task execution
     ↓
 Goal achieved?
  ├─ Yes → End
@@ -377,7 +374,7 @@ Goal achieved?
 <p>In a Goal-based Loop, <strong>the unachieved state of the Goal connects one cycle to the next</strong>.</p>
 <h3 id="13-In-TimeBased-Loops-Time-Initiates-the-Next-Cycle">13. In Time-Based Loops, Time Initiates the Next Cycle</h3>
 <p>Time-based is a Loop that <strong>uses time as the Trigger for starting the next cycle</strong>.</p>
-<pre><code class="language-text">work cycle
+<pre><code class="language-text">Task execution
     ↓
   Wait
     ↓
@@ -439,18 +436,7 @@ Time as Bound    End after 30 minutes
 <p>and</p>
 <p><strong>the lifetime of the mechanism that generates Tasks</strong>.</p>
 <p>In a Proactive Loop, <strong>changes in the external world connect one Task to the next</strong>.</p>
-<h3 id="15-Loop-Types-Differ-by-Where-Control-Is-Placed">15. Loop Types Differ by Where Control Is Placed</h3>
-<p>The difference among Turn-based, Goal-based, Time-based, and Proactive Loops is not what the Agent does.</p>
-<p><strong>The difference is where control for initiating the next cycle is placed.</strong></p>
-<p>Even with the same Task, the Loop structure changes depending on whether control is:</p>
-<ul>
-<li>kept with the human</li>
-<li>handed to the unachieved state of the Goal</li>
-<li>handed to time</li>
-<li>handed to an external Event</li>
-</ul>
-<p><strong>Even when the Task is the same, changing where control is placed changes the operation.</strong></p>
-<h3 id="16-Triggers-and-End-Conditions-Can-Be-Combined-Independently">16. Triggers and End Conditions Can Be Combined Independently</h3>
+<h3 id="15-Triggers-and-End-Conditions-Can-Be-Combined-Independently">15. Triggers and End Conditions Can Be Combined Independently</h3>
 <p>The entry and exit of a Task can be selected and combined independently.</p>
 <p>For example, time can be used as the Trigger that initiates a Task, and the Task can close once the Goal is reached.</p>
 <pre><code class="language-text">Time
@@ -475,7 +461,7 @@ Close the Task
 <p>In other words, <strong>what starts the Task and what closes it can be designed independently</strong>.</p>
 <p>Loop Engineering is not about choosing one Loop type.</p>
 <p><strong>It is about combining the entry and exit of a Task and designing how the space between them is connected.</strong></p>
-<h3 id="17-Making-a-Loop-More-Autonomous-Moves-Loop-Control-into-Conditions">17. Making a Loop More Autonomous Moves Loop Control into Conditions</h3>
+<h3 id="16-Making-a-Loop-More-Autonomous-Moves-Loop-Control-into-Conditions">16. Making a Loop More Autonomous Moves Loop Control into Conditions</h3>
 <p>In a Turn-based Loop, the human carries much of the Loop control.</p>
 <p>The human:</p>
 <ul>
@@ -503,7 +489,7 @@ Event   → when to initiate a Task
 <p>As a result, the Loop can continue from one cycle to the next without requiring a human judgment every time.</p>
 <p>This is different from suddenly making the Agent smarter.</p>
 <p><strong>Making a Loop more autonomous means moving part of the Loop control previously carried by the human into explicit conditions.</strong></p>
-<h3 id="18-Loop-Length-Is-Not-the-Essential-Point">18. Loop Length Is Not the Essential Point</h3>
+<h3 id="17-Loop-Length-Is-Not-the-Essential-Point">17. Loop Length Is Not the Essential Point</h3>
 <p>When designing repeated work, think not about how long to keep the Agent running, but about <strong>what starts, continues, and stops the work</strong>.</p>
 <pre><code class="language-text">Start      What starts the work
 Continue   What initiates the next cycle
@@ -518,7 +504,7 @@ End        What stops the work
 </ul>
 <p>All of these can be treated as Loops.</p>
 <p>What is being designed here is <strong>the control conditions for repeated work</strong>.</p>
-<h3 id="19-Decide-What-Should-Be-a-Loop-by-Asking-Who-or-What-Should-Initiate-the-Next-Cycle">19. Decide What Should Be a Loop by Asking Who or What Should Initiate the Next Cycle</h3>
+<h3 id="18-Decide-What-Should-Be-a-Loop-by-Asking-Who-or-What-Should-Initiate-the-Next-Cycle">18. Decide What Should Be a Loop by Asking Who or What Should Initiate the Next Cycle</h3>
 <p>Whether something should be a Loop is not determined simply by <strong>whether the Task can be repeated</strong>.</p>
 <p>Ask who or what should initiate the next cycle.</p>
 <pre><code class="language-text">Human judgment is required
@@ -540,7 +526,7 @@ Proactive
 <p>There is no need to move all control away from the human.</p>
 <p>If the judgment conditions are ambiguous, or if human judgment itself has value, leaving the Loop Turn-based is appropriate.</p>
 <p><strong>Keeping the human as the controller is also a Loop design.</strong></p>
-<h3 id="20-View-a-Loop-as-Three-Questions">20. View a Loop as Three Questions</h3>
+<h3 id="19-View-a-Loop-as-Three-Questions">19. View a Loop as Three Questions</h3>
 <p>When thinking about a Loop, do not treat the entire work process as one undifferentiated concept of “autonomy.” Separate it into three questions.</p>
 <pre><code class="language-text">Start       What initiates the Task
 Repeat      What initiates the next cycle
@@ -552,7 +538,7 @@ End         What stops the Task
 <p>Separating them lets you consider individually which judgments remain with the human and which can be entrusted to conditions.</p>
 <p><strong>Look separately at how the Task begins, how it connects to what follows, and how it ends.</strong></p>
 <h2 id="Part-III--Goal-Verification-and-Bound">Part III — Goal, Verification, and Bound</h2>
-<h3 id="21-A-Goal-Becomes-the-Finish-Line-Shared-Across-Multiple-Cycles">21. A Goal Becomes the Finish Line Shared Across Multiple Cycles</h3>
+<h3 id="20-A-Goal-Becomes-the-Finish-Line-Shared-Across-Multiple-Cycles">20. A Goal Becomes the Finish Line Shared Across Multiple Cycles</h3>
 <p>In a Goal-based Loop, <strong>the Goal becomes the finish line shared across multiple cycles</strong>.</p>
 <pre><code class="language-text">What you want to do
     ↓
@@ -583,7 +569,7 @@ cycle
 Goal achieved → Task ends
 </code></pre>
 <p><strong>A Goal gives every cycle a common finish line to aim for.</strong></p>
-<h3 id="22-Write-a-Goal-in-a-Form-That-Can-Be-Judged">22. Write a Goal in a Form That Can Be Judged</h3>
+<h3 id="21-Write-a-Goal-in-a-Form-That-Can-Be-Judged">21. Write a Goal in a Form That Can Be Judged</h3>
 <p>A Goal should be written as <strong>a state for which it is possible to judge whether it has been reached</strong>.</p>
 <p>For example:</p>
 <pre><code class="language-text">Improve quality
@@ -603,7 +589,7 @@ Does it hold?
 Check with Verification
 </code></pre>
 <p><strong>The Goal defines the attainment condition, and Verification checks whether it holds.</strong></p>
-<h3 id="23-A-Bound-Defines-the-Permitted-Range-of-a-Loop-Pursuing-a-Goal">23. A Bound Defines the Permitted Range of a Loop Pursuing a Goal</h3>
+<h3 id="22-A-Bound-Defines-the-Permitted-Range-of-a-Loop-Pursuing-a-Goal">22. A Bound Defines the Permitted Range of a Loop Pursuing a Goal</h3>
 <p>A Bound is <strong>the boundary that determines how far a Loop may proceed while pursuing a Goal</strong>.</p>
 <p>It is different from the Goal.</p>
 <pre><code class="language-text">Goal
@@ -640,7 +626,7 @@ Bound  At most 5 attempts
 <p>A Bound such as Time, Iteration, or Cost <strong>stops the Loop when the upper limit is reached</strong>.</p>
 <p>A Bound such as Scope or Risk lets the Loop <strong>proceed without crossing that range</strong>.</p>
 <p><strong>The Goal determines “how far we must go for success,” while the Bound determines “how far we are allowed to go in pursuit of success.”</strong></p>
-<h3 id="24-Verify-Goal-Attainment-with-Verification">24. Verify Goal Attainment with Verification</h3>
+<h3 id="23-Verify-Goal-Attainment-with-Verification">23. Verify Goal Attainment with Verification</h3>
 <p>Merely defining a Goal does not mean that the Goal has been achieved.</p>
 <p>For example, even if the Goal is defined as:</p>
 <pre><code class="language-text">Goal
@@ -656,7 +642,7 @@ Verification
 Confirm that it holds
 </code></pre>
 <p><strong>Whether the Goal holds is checked through Verification.</strong></p>
-<h3 id="25-Verification-Has-Layers">25. Verification Has Layers</h3>
+<h3 id="24-Verification-Has-Layers">24. Verification Has Layers</h3>
 <p>Verification does not necessarily end with a single check.</p>
 <p>It can be divided into several layers depending on what is being checked.</p>
 <table>
@@ -703,7 +689,7 @@ Behavior
 <p>A successful build does not guarantee that the tests will pass.</p>
 <p>Passing tests do not guarantee that the result will actually behave as expected.</p>
 <p><strong>The farther down you go, the closer the check is to the actual outcome.</strong></p>
-<h3 id="26-Verification-Results-Change-What-Happens-Next">26. Verification Results Change What Happens Next</h3>
+<h3 id="25-Verification-Results-Change-What-Happens-Next">25. Verification Results Change What Happens Next</h3>
 <p>Verification <strong>checks the result and provides information for deciding what to do next</strong>.</p>
 <pre><code class="language-text">Act
  ↓
@@ -713,7 +699,7 @@ Verify
 │
 └─ Fail → Act
 </code></pre>
-<p>On Pass, confirm that the Goal holds and close the Task.</p>
+<p>Here, Pass means that the Goal has been confirmed as satisfied; in that case, close the Task.</p>
 <p>On Fail, make a correction based on that result and perform Verification again.</p>
 <pre><code class="language-text">Create
  ↓
@@ -727,7 +713,7 @@ Check again
 </code></pre>
 <p>Without Verification, a Loop can easily become repeated execution of the same work.</p>
 <p><strong>Verification lets the Loop change its next action in response to the result.</strong></p>
-<h3 id="27-Verification-Is-Stronger-When-It-Can-Check-the-Goal-Against-a-Consistent-Criterion">27. Verification Is Stronger When It Can Check the Goal Against a Consistent Criterion</h3>
+<h3 id="26-Verification-Is-Stronger-When-It-Can-Check-the-Goal-Against-a-Consistent-Criterion">26. Verification Is Stronger When It Can Check the Goal Against a Consistent Criterion</h3>
 <p>Verification is stronger when <strong>whether the Goal holds can be checked against the same criterion each time</strong>.</p>
 <pre><code class="language-text">tests passed
 score &gt;= N
@@ -750,7 +736,7 @@ Judgment is required
 Verification is weak
 </code></pre>
 <p><strong>The strength of Verification is determined by how consistently it can check whether the Goal has been achieved.</strong></p>
-<h3 id="28-Verification-Depth-Changes-What-Can-Be-Confirmed">28. Verification Depth Changes What Can Be Confirmed</h3>
+<h3 id="27-Verification-Depth-Changes-What-Can-Be-Confirmed">27. Verification Depth Changes What Can Be Confirmed</h3>
 <p>Where the <strong>strength</strong> of Verification describes “whether it can be checked against the same criterion,” its <strong>depth</strong> describes “how close the check gets to the actual outcome.”</p>
 <pre><code class="language-text">Strength  Can it be checked against the same criterion?
 Depth     How close does the check get to the actual outcome?
@@ -767,6 +753,15 @@ Test       the tests pass
 Runtime    it can actually be executed
 Behavior   it behaves as expected
 </code></pre>
+<p><strong>When considering Verification depth, look at how close what was observed is to the Goal itself being satisfied.</strong></p>
+<pre><code class="language-text">Check a preceding or proxy condition
+            ↓
+    Shallow Verification
+
+Check a result close to Goal attainment
+            ↓
+    Deep Verification
+</code></pre>
 <pre><code class="language-text">Same Goal
    ↓
 Depth of Verification
@@ -776,7 +771,7 @@ Range that has been confirmed
 <p>Even though the Goal is the same, confirming only through Build and confirming through Behavior establish <strong>different ranges of what has actually been confirmed about the Goal</strong>.</p>
 <p><strong>The depth of Verification changes how much has actually been confirmed in that Task.</strong></p>
 <h2 id="Part-IV--Time-and-ReObservation">Part IV — Time and Re-Observation</h2>
-<h3 id="29-A-TimeBased-Loop-ReObserves-State-Along-the-Time-Axis">29. A Time-Based Loop Re-Observes State Along the Time Axis</h3>
+<h3 id="28-A-TimeBased-Loop-ReObserves-State-Along-the-Time-Axis">28. A Time-Based Loop Re-Observes State Along the Time Axis</h3>
 <p>A Time-based Loop <strong>uses time as a Trigger to create another opportunity to observe external state</strong>.</p>
 <pre><code class="language-text">10:00  Observe
 11:00  Observe
@@ -799,7 +794,7 @@ Difference
 </code></pre>
 <p>Observed changes may create the need for a new judgment, another Task, or a Goal.</p>
 <p><strong>A Time-based Loop connects opportunities for re-observation along the time axis.</strong></p>
-<h3 id="30-The-Work-Stays-the-Same-While-Only-the-Input-Changes">30. The Work Stays the Same While Only the Input Changes</h3>
+<h3 id="29-The-Work-Stays-the-Same-While-Only-the-Input-Changes">29. The Work Stays the Same While Only the Input Changes</h3>
 <p>A Time-based Loop is well suited to work where <strong>the shape of the work remains the same and only the input changes over time</strong>.</p>
 <pre><code class="language-text">Same Task
     ↓
@@ -817,7 +812,7 @@ Different current state
 <p>Perform the same Task again against the changed state.</p>
 <p>By contrast, work that requires deciding the nature of the work itself from scratch each time is less suited to a simple Loop.</p>
 <p><strong>The Task may remain the same while the world being observed changes.</strong></p>
-<h3 id="31-A-Time-Budget-Is-a-Type-of-Bound">31. A Time Budget Is a Type of Bound</h3>
+<h3 id="30-A-Time-Budget-Is-a-Type-of-Bound">30. A Time Budget Is a Type of Bound</h3>
 <p>A Time budget is <strong>a Bound that sets the maximum amount of time that may be spent on a Task</strong>.</p>
 <p>Time has different roles depending on where it is used.</p>
 <pre><code class="language-text">Time-based Loop  = Trigger
@@ -826,7 +821,7 @@ Time budget      = Bound
 <p>The Time in a Time-based Loop means <strong>start because the time has arrived</strong>.</p>
 <p>The Time in a Time budget means <strong>stop because the allotted time has been used up</strong>.</p>
 <h2 id="Part-V--Delegation-Supervision-and-Judgment">Part V — Delegation, Supervision, and Judgment</h2>
-<h3 id="32-Decide-Delegation-by-the-Nature-of-the-Task">32. Decide Delegation by the Nature of the Task</h3>
+<h3 id="31-Decide-Delegation-by-the-Nature-of-the-Task">31. Decide Delegation by the Nature of the Task</h3>
 <p>Delegation should <strong>not be decided only by whether the Task is easy or difficult</strong>.</p>
 <pre><code class="language-text">Task
  │
@@ -846,7 +841,7 @@ Keep the human close
 <p>Even a simple Task may need close human supervision if an error would have a large impact.</p>
 <p>Even a difficult Task can be entrusted more broadly when its result can be strongly verified.</p>
 <p><strong>Think about delegation from the nature of the Task, not from the capability of the Agent.</strong></p>
-<h3 id="33-The-Strength-of-Verification-Determines-the-Delegation-Distance">33. The Strength of Verification Determines the Delegation Distance</h3>
+<h3 id="32-The-Strength-of-Verification-Determines-the-Delegation-Distance">32. The Strength of Verification Determines the Delegation Distance</h3>
 <p>How much of a Loop can be entrusted to an Agent is not determined only by the Agent's capability.</p>
 <p>It also depends strongly on <strong>what can be verified</strong>.</p>
 <pre><code class="language-text">Verification is weak
@@ -861,7 +856,7 @@ The range entrusted to the Agent expands
 <p>If the result can be strongly verified, more intermediate judgments can be left to the Agent and the human can move farther away from the Task.</p>
 <p>Think of this distance as <strong>supervision distance</strong>.</p>
 <p><strong>The strength of Verification determines how much can be entrusted to the Agent and how far the human can step away.</strong></p>
-<h3 id="34-Separate-the-Maker-and-the-Checker">34. Separate the Maker and the Checker</h3>
+<h3 id="33-Separate-the-Maker-and-the-Checker">33. Separate the Maker and the Checker</h3>
 <p>The Maker is <strong>the role that creates the artifact</strong>.</p>
 <p>The Checker is <strong>the role that checks that artifact</strong>.</p>
 <pre><code class="language-text">Maker
@@ -876,7 +871,7 @@ Assessment
 <p>For that reason, staying within the same perspective can make some errors harder to notice.</p>
 <p>Separating the Checker makes it possible to verify the artifact from a different context and a different perspective.</p>
 <p><strong>Separate making from checking.</strong></p>
-<h3 id="35-Even-with-Verification-the-Observation-Axes-May-Be-Insufficient">35. Even with Verification, the Observation Axes May Be Insufficient</h3>
+<h3 id="34-Even-with-Verification-the-Observation-Axes-May-Be-Insufficient">34. Even with Verification, the Observation Axes May Be Insufficient</h3>
 <p>Even when Verification is correct, <strong>the set of things being observed can still be insufficient</strong>.</p>
 <pre><code class="language-text">Measuring correctly
        ≠
@@ -894,7 +889,7 @@ Observation axes
 Are we looking at what should be observed?
 </code></pre>
 <p><strong>Design not only the strength of Verification, but also what is being verified.</strong></p>
-<h3 id="36-Treat-Judgment-Separately-Even-When-the-Task-Is-Delegated">36. Treat Judgment Separately Even When the Task Is Delegated</h3>
+<h3 id="35-Treat-Judgment-Separately-Even-When-the-Task-Is-Delegated">35. Treat Judgment Separately Even When the Task Is Delegated</h3>
 <p>A Goal defines <strong>the attainment condition of the Task</strong>.</p>
 <p>But even with a clear Goal, that does not decide whether the way the work was carried out or the resulting artifact should be accepted.</p>
 <pre><code class="language-text">Goal
@@ -924,7 +919,7 @@ Remains with the human
 </code></pre>
 <p>The fact that an Agent can solve a problem does not mean that its solution should be adopted.</p>
 <p><strong>Separate entrusting the work from deciding whether the result is acceptable.</strong></p>
-<h3 id="37-Do-Not-Mix-Three-Different-Evaluations">37. Do Not Mix Three Different Evaluations</h3>
+<h3 id="36-Do-Not-Mix-Three-Different-Evaluations">36. Do Not Mix Three Different Evaluations</h3>
 <p>A Task result involves <strong>three different evaluations</strong>.</p>
 <pre><code class="language-text">Goal Evaluator
 “Was the condition satisfied?”
@@ -946,7 +941,7 @@ Human Judgment       = Worth doing
 <p>Even a correct artifact does not necessarily mean that it should be adopted.</p>
 <p><strong>Done / Correct / Worth doing are distinct.</strong></p>
 <h2 id="Part-VI--Task--Loop-in-Practice">Part VI — Task / Loop in Practice</h2>
-<h3 id="38-Everyday-Repeated-Work-Is-the-First-Place-to-Look-for-Loop-Candidates">38. Everyday Repeated Work Is the First Place to Look for Loop Candidates</h3>
+<h3 id="37-Everyday-Repeated-Work-Is-the-First-Place-to-Look-for-Loop-Candidates">37. Everyday Repeated Work Is the First Place to Look for Loop Candidates</h3>
 <p>There is no need to invent new Loop candidates from scratch.</p>
 <p><strong>Look at work that humans are already repeating.</strong></p>
 <pre><code class="language-text">Work already repeated by humans
@@ -965,7 +960,7 @@ Loop candidate
 </ul>
 <p>If the shape of the work remains the same and only the observed Input changes, it is easy to turn the work into a Loop.</p>
 <p><strong>Repeated work already has the shape of a Loop.</strong></p>
-<h3 id="39-Combine-Loops-and-Goals">39. Combine Loops and Goals</h3>
+<h3 id="38-Combine-Loops-and-Goals">38. Combine Loops and Goals</h3>
 <p>Loops and Goals do not compete with one another.</p>
 <p><strong>They have different roles and can be combined.</strong></p>
 <pre><code class="language-text">Loop
@@ -994,7 +989,7 @@ Goal achieved
 Goal = Finish line
 </code></pre>
 <p><strong>In this example, the Loop finds the work, and the Goal defines that work's destination.</strong></p>
-<h3 id="40-A-Progress-Condition-Makes-Forward-Movement-a-Condition-for-Continuing">40. A Progress Condition Makes Forward Movement a Condition for Continuing</h3>
+<h3 id="39-A-Progress-Condition-Makes-Forward-Movement-a-Condition-for-Continuing">39. A Progress Condition Makes Forward Movement a Condition for Continuing</h3>
 <p>A Progress condition is <strong>a condition that determines whether the Loop is making progress</strong>.</p>
 <pre><code class="language-text">cycle
   ↓
@@ -1013,7 +1008,7 @@ Make progress for 10 cycles
 improve at least 1 metric
 </code></pre>
 <p><strong>A Progress condition checks not whether the Loop is moving, but whether it is moving forward.</strong></p>
-<h3 id="41-A-Stall-Condition-Stops-a-Loop-That-Has-Stopped-Making-Progress">41. A Stall Condition Stops a Loop That Has Stopped Making Progress</h3>
+<h3 id="40-A-Stall-Condition-Stops-a-Loop-That-Has-Stopped-Making-Progress">40. A Stall Condition Stops a Loop That Has Stopped Making Progress</h3>
 <p>A Stall condition is <strong>a condition that determines that the Loop is no longer making progress</strong>.</p>
 <pre><code class="language-text">cycle
   ↓
@@ -1034,7 +1029,7 @@ End
 <p>Where a Progress condition asks <strong>whether progress is being made</strong>, a Stall condition asks <strong>whether progress has stopped</strong>.</p>
 <p>A Stall condition is not another Task-ending axis alongside Goal / Thought / Bound. It is <strong>a condition for stopping the Loop from continuing</strong>.</p>
 <p><strong>A Stall condition stops a Loop that would otherwise only keep moving without making progress.</strong></p>
-<h3 id="42-Turn-Written-Rules-into-Decision-Conditions">42. Turn Written Rules into Decision Conditions</h3>
+<h3 id="41-Turn-Written-Rules-into-Decision-Conditions">41. Turn Written Rules into Decision Conditions</h3>
 <p>Rules written for humans can be difficult to use directly for Loop decisions.</p>
 <p>So transform the meaning of the prose into <strong>conditions that can be evaluated</strong>.</p>
 <pre><code class="language-text">Written rule
@@ -1062,7 +1057,7 @@ Evaluable condition
 Actionable decision
 </code></pre>
 <p><strong>Turn information that can merely be read as a rule into a condition that can be used for decision-making.</strong></p>
-<h3 id="43-A-Summary-Is-Not-the-Source-of-Truth">43. A Summary Is Not the Source of Truth</h3>
+<h3 id="42-A-Summary-Is-Not-the-Source-of-Truth">42. A Summary Is Not the Source of Truth</h3>
 <p>Long Tasks and Loops sometimes use summaries to communicate the current position briefly.</p>
 <p>A summary is useful for reducing Context, but it does not replace the original rules, Goal, or Bound.</p>
 <p>For example:</p>
@@ -1088,7 +1083,7 @@ Meaning drifts
 </code></pre>
 <p>Therefore, use summaries as derived information for communicating the current state, and return to the source of truth when necessary to check the original information that serves as the basis for judgment.</p>
 <p><strong>Do not let a summary quietly replace the source of truth.</strong></p>
-<h3 id="44-A-Task-Can-Be-Written-as-a-Small-Contract">44. A Task Can Be Written as a Small Contract</h3>
+<h3 id="43-A-Task-Can-Be-Written-as-a-Small-Contract">43. A Task Can Be Written as a Small Contract</h3>
 <p>In practice, a Task can <strong>combine multiple control conditions</strong>.</p>
 <pre><code class="language-text">Task
  │
@@ -1128,7 +1123,7 @@ Bound
 <li><strong>metric</strong>: A general term for a measured value or evaluation indicator. In this example, it includes values such as Lighthouse score and LCP.</li>
 </ul>
 <h2 id="Part-VII--Limits-and-Stopping-of-Loops">Part VII — Limits and Stopping of Loops</h2>
-<h3 id="45-A-Loop-Does-Not-Resolve-Ambiguous-Judgment">45. A Loop Does Not Resolve Ambiguous Judgment</h3>
+<h3 id="44-A-Loop-Does-Not-Resolve-Ambiguous-Judgment">44. A Loop Does Not Resolve Ambiguous Judgment</h3>
 <p>A Loop is <strong>not a mechanism that makes ambiguous judgment criteria clear</strong>.</p>
 <p>For example:</p>
 <pre><code class="language-text">“Continue until this UI becomes good.”
@@ -1149,7 +1144,7 @@ Can turn the Task into a Loop
 <p>The fact that an Agent can perform the work is different from being able to express the continuation and ending of that work as conditions.</p>
 <p><strong>A Loop does not remove ambiguity. Work is better suited to a Loop when its ending can be written as conditions.</strong></p>
 <h2 id="Part-VIII--ProductSpecific-Constraints">Part VIII — Product-Specific Constraints</h2>
-<h3 id="46-Separate-ProductSpecific-Constraints-from-General-Principles">46. Separate Product-Specific Constraints from General Principles</h3>
+<h3 id="45-Separate-ProductSpecific-Constraints-from-General-Principles">45. Separate Product-Specific Constraints from General Principles</h3>
 <p>General principles of Loops should be considered separately from implementation constraints specific to a product.</p>
 <pre><code class="language-text">General principles
   │
@@ -1181,10 +1176,9 @@ Product-specific constraints
 <li>Addy Osmani — <em>Practical Loop Engineering</em><br/>
 <a href="https://addyosmani.com/blog/practical-loop-engineering/">https://addyosmani.com/blog/practical-loop-engineering/</a></li>
 </ul>
-
-  </article>
-  <a class="backtop" href="#top">↑ Back to top</a>
+</article>
+<a class="backtop" href="#top">↑ Back to top</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-09 20:00 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-10 09:33 JST</footer>
 </body>
 </html>
