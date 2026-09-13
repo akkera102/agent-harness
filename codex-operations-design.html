@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-09 21:25 JST">
+<meta name="last-modified" content="2026-09-12 21:51 JST">
 <meta name="description" content="Codexに長時間の解析・実装を任せるための、ハーネス、安全境界、検証、復旧、引き継ぎの運用設計ガイド。">
 <title>Codex Workplace Design Guide</title>
 <style>
@@ -24,13 +24,13 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 </head>
 <body>
 <main id="top">
-  <header class="doc-head">
-    <h1 class="doc-title">Codex Workplace Design Guide</h1>
-    <div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-09 21:25 JST</span><span>Language: Japanese</span></div>
-  </header>
-  <nav class="toc" aria-label="目次">
-    <div class="toc-title">目次</div>
-    <ul>
+<header class="doc-head">
+<h1 class="doc-title">Codex Workplace Design Guide</h1>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-12 21:51 JST</span><span>Language: Japanese</span></div>
+</header>
+<nav class="toc" aria-label="目次">
+<div class="toc-title">目次</div>
+<ul>
 <li class="toc-h2"><a href="#第I部-全体像と設計原則">第I部　全体像と設計原則</a></li>
 <li class="toc-h3"><a href="#1-基本思想--プロンプトではなく職場環境を設計する">1. 基本思想 — プロンプトではなく職場環境を設計する</a></li>
 <li class="toc-h3"><a href="#2-最初から巨大な運用体系を作らない">2. 最初から巨大な運用体系を作らない</a></li>
@@ -94,9 +94,9 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h3"><a href="#引用着想元">引用・着想元</a></li>
 <li class="toc-h3"><a href="#現行仕様">現行仕様</a></li>
 <li class="toc-h3"><a href="#設計実装運用">設計・実装・運用</a></li>
-    </ul>
-  </nav>
-  <article>
+</ul>
+</nav>
+<article>
 <p><strong>ハーネス、境界、検証、復旧の設計</strong></p>
 <blockquote>
 <p>目的: Codex に長時間の解析・実装作業を任せる際の、運用思想・安全境界・検証・停止条件・引き継ぎ方法を整理する。主に個人の趣味として行う解析・実装を対象とする。</p>
@@ -164,37 +164,44 @@ Codex / Agent   : 調査・実装を進める
 <h3 id="5-現時点で採用したい最小原則">5. 現時点で採用したい最小原則</h3>
 <p>最初からすべてを実装しなくても、次を守る。</p>
 <ol>
-<li><p><strong>Approval をクリック儀式にしない。</strong></p>
+<li>
+<p><strong>Approval をクリック儀式にしない。</strong></p>
 <ul>
 <li>定常作業は適切に自動化し、本当に重要な境界で人間へ返す。</li>
 </ul>
 </li>
-<li><p><strong>Sandbox を一語で扱わない。</strong></p>
+<li>
+<p><strong>Sandbox を一語で扱わない。</strong></p>
 <ul>
 <li>各境界を分けて捉え、実際の挙動で確かめる。</li>
 </ul>
 </li>
-<li><p><strong>正解判定を AI 自身に閉じない。</strong></p>
+<li>
+<p><strong>正解判定を AI 自身に閉じない。</strong></p>
 <ul>
 <li>AI の判断ではない独立した実測値を使う。</li>
 </ul>
 </li>
-<li><p><strong>人間の推測も仮説である。</strong></p>
+<li>
+<p><strong>人間の推測も仮説である。</strong></p>
 <ul>
 <li>観測と推測を分ける。</li>
 </ul>
 </li>
-<li><p><strong>失敗したら一次資料へ戻る。</strong></p>
+<li>
+<p><strong>失敗したら一次資料へ戻る。</strong></p>
 <ul>
 <li>別案の大量生成より一次資料を優先する。</li>
 </ul>
 </li>
-<li><p><strong>失敗は正常な終了経路である。</strong></p>
+<li>
+<p><strong>失敗は正常な終了経路である。</strong></p>
 <ul>
 <li>不確かなまま完遂するより、必要な地点で人間へ返す。</li>
 </ul>
 </li>
-<li><p><strong>外へ出さない。</strong></p>
+<li>
+<p><strong>外へ出さない。</strong></p>
 <ul>
 <li>解析情報は外部送信しない。</li>
 </ul>
@@ -293,7 +300,7 @@ memo/&lt;tool&gt;_spec.md          = 検証済みの確定知識
 <li>再び踏みそうな重要な棄却案</li>
 <li>未解決事項</li>
 </ul>
-<p>つまり、<strong>解析は「消さずに積む」、新規開発は「現在の決定へ圧縮する」</strong>と考える。</p>
+<p>つまり、**解析は「消さずに積む」、新規開発は「現在の決定へ圧縮する」**と考える。</p>
 <hr />
 <h3 id="11-作業する側と作業環境を変更する側を分ける">11. 作業する側と、作業環境を変更する側を分ける</h3>
 <p><code>AGENTS.md</code>、<code>OPERATIONS.md</code>、本書など、Codex の作業環境そのものを定義する文書は、通常の解析・実装とは別の管理系統でメンテナンスする。</p>
@@ -699,7 +706,7 @@ ASM / バイナリ / 一次資料へ戻る
 <hr />
 <h3 id="41-日付作業単位でスナップショットを残す">41. 日付・作業単位でスナップショットを残す</h3>
 <p>解析では、中間成果物や再生成可能なデータが大きくなりやすい。すべてを Git 管理する必要はない。</p>
-<p>現在の運用例では、<code>work/</code> を日付単位で分け、その日の作業状態を <code>work/MMDD/</code> にまとめる。さらに、同じ日の中で作業状態を分ける必要がある場合は、<code>work/MMDD/HHMM/</code> を作業単位として使用する。</p>
+<p>現在の運用では、<code>work/</code> を日付単位で分け、その下に <code>work/MMDD/HHMM/</code> を作業単位として作成する。</p>
 <pre><code class="language-text">work/
   MMDD/
     HHMM/
@@ -708,10 +715,10 @@ ASM / バイナリ / 一次資料へ戻る
       generator-b/
       ...
 </code></pre>
-<p><code>work/MMDD/</code> は、その日の実装・実験・生成物をまとめる日付単位の作業領域とする。</p>
-<p><code>work/MMDD/HHMM/</code> は、同じ日の作業状態を分ける作業単位のスナップショットとする。その配下の成果物フォルダは、用途名ではなく<strong>生成したツール名</strong>を基本とする。</p>
-<p><code>tmp/</code> は GCC、MSYS2、その他のツールが使用する一時領域とし、作業単位を分ける場合は、可能な限り一時ファイルを現在の <code>work/MMDD/HHMM/tmp/</code> 内に閉じ込める。</p>
-<p>日付が変わった場合、継続作業に必要な成果物が複数の <code>work/MMDD/</code> に重複してもよい。過去日のフォルダは過去の作業状態として扱い、新しい作業は現在日の <code>work/MMDD/</code> で行う。</p>
+<p><code>work/MMDD/</code> は、その日の作業単位をまとめる日付単位の領域とする。</p>
+<p><code>work/MMDD/HHMM/</code> は、一つの作業状態を保持する作業単位のスナップショットとする。その配下の成果物フォルダは、用途名ではなく<strong>生成したツール名</strong>を基本とする。</p>
+<p><code>tmp/</code> は GCC、MSYS2、その他のツールが使用する一時領域とし、一時ファイルは可能な限り現在の <code>work/MMDD/HHMM/tmp/</code> 内に閉じ込める。</p>
+<p>日付が変わった場合、継続作業に必要な成果物が複数の <code>work/MMDD/</code> に重複してもよい。過去日のフォルダは過去の作業状態として扱い、新しい作業は現在日の新しい <code>work/MMDD/HHMM/</code> で行う。</p>
 <p>再生成可能な大きなデータを無理に Git 履歴へ残すより、<strong>日付単位と作業単位の境界から、その時点の作業状態を復元できることを優先する。</strong></p>
 <hr />
 <h3 id="42-日付作業単位をまたいで作業状態を増やさない">42. 日付・作業単位をまたいで作業状態を増やさない</h3>
@@ -866,17 +873,21 @@ work/0909/
 <h4 id="人間側に残る判断">人間側に残る判断</h4>
 <p>人間側には、少なくとも次の判断が残る。</p>
 <ul>
-<li><p><strong>何を Good Job とするか。</strong><br />
+<li>
+<p><strong>何を Good Job とするか。</strong><br />
 その仕事がどちらへ進むべきかを決める。<br />
 <code>taste</code>、<code>risk tolerance</code>、<code>polish</code>、<code>shortcut</code>、<code>done</code> は、この方向を構成する。</p>
 </li>
-<li><p><strong>何を不変条件とするか。</strong><br />
+<li>
+<p><strong>何を不変条件とするか。</strong><br />
 その方向へ進む途中でも、何が常に守られなければならないかを決める。</p>
 </li>
-<li><p><strong>何を証拠とするか。</strong><br />
+<li>
+<p><strong>何を証拠とするか。</strong><br />
 何を観測すれば、不変条件や必要な性質を検証できるかを決める。</p>
 </li>
-<li><p><strong>証拠が十分かを判断する。</strong><br />
+<li>
+<p><strong>証拠が十分かを判断する。</strong><br />
 得られた観測から、その仕事を成立したものとして受け入れ、ここで止めてよいかを決める。</p>
 </li>
 </ul>
@@ -934,43 +945,53 @@ Ryan Lopopolo — <em>What Does It Mean to Do a Good Job?</em><br />
 </ul>
 <h3 id="現行仕様">現行仕様</h3>
 <ul>
-<li><p>OpenAI Developers<br />
+<li>
+<p>OpenAI Developers<br />
 <a href="https://developers.openai.com/">https://developers.openai.com/</a></p>
 </li>
-<li><p>Codex Permissions<br />
+<li>
+<p>Codex Permissions<br />
 <a href="https://learn.chatgpt.com/docs/permissions">https://learn.chatgpt.com/docs/permissions</a></p>
 </li>
-<li><p>Codex Sandboxing<br />
+<li>
+<p>Codex Sandboxing<br />
 <a href="https://learn.chatgpt.com/docs/sandboxing">https://learn.chatgpt.com/docs/sandboxing</a></p>
 </li>
-<li><p>Agent approvals &amp; security<br />
+<li>
+<p>Agent approvals &amp; security<br />
 <a href="https://learn.chatgpt.com/docs/agent-approvals-security">https://learn.chatgpt.com/docs/agent-approvals-security</a></p>
 </li>
-<li><p>Codex Config Basics<br />
+<li>
+<p>Codex Config Basics<br />
 <a href="https://learn.chatgpt.com/docs/config-file/config-basic">https://learn.chatgpt.com/docs/config-file/config-basic</a></p>
 </li>
-<li><p>Codex Rules<br />
+<li>
+<p>Codex Rules<br />
 <a href="https://learn.chatgpt.com/docs/agent-configuration/rules">https://learn.chatgpt.com/docs/agent-configuration/rules</a></p>
 </li>
-<li><p>Codex Windows Sandbox<br />
+<li>
+<p>Codex Windows Sandbox<br />
 <a href="https://learn.chatgpt.com/docs/windows/windows-sandbox">https://learn.chatgpt.com/docs/windows/windows-sandbox</a></p>
 </li>
 </ul>
 <h3 id="設計実装運用">設計・実装・運用</h3>
 <ul>
-<li><p>OpenAI — Building a safe, effective sandbox to enable Codex on Windows<br />
+<li>
+<p>OpenAI — Building a safe, effective sandbox to enable Codex on Windows<br />
 <a href="https://openai.com/index/building-codex-windows-sandbox/">https://openai.com/index/building-codex-windows-sandbox/</a></p>
 </li>
-<li><p>OpenAI — Running Codex safely at OpenAI<br />
+<li>
+<p>OpenAI — Running Codex safely at OpenAI<br />
 <a href="https://openai.com/index/running-codex-safely/">https://openai.com/index/running-codex-safely/</a></p>
 </li>
-<li><p>OpenAI — Harness engineering: leveraging Codex in an agent-first world<br />
+<li>
+<p>OpenAI — Harness engineering: leveraging Codex in an agent-first world<br />
 <a href="https://openai.com/index/harness-engineering/">https://openai.com/index/harness-engineering/</a></p>
 </li>
 </ul>
-  </article>
-  <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
+</article>
+<a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Codex Workplace Design Guide / Author: akkera102 / Updated: 2026-09-09 21:25 JST</footer>
+<footer>Codex Workplace Design Guide / Author: akkera102 / Updated: 2026-09-12 21:51 JST</footer>
 </body>
 </html>

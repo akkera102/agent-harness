@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="akkera102">
+<meta name="last-modified" content="2026-09-13 07:16 JST">
+<meta name="description" content="A guide to observing exploration, evidence, human burden, mechanisms, judgment, and knowledge flow in Agent-assisted exploration, implementation, and verification.">
+<title>Agent Observation Guide</title>
+<style>
+:root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
+@media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;line-height:1.82;font-size:16px}
+main{max-width:var(--max);margin:0 auto;padding:56px 34px 96px}.doc-head{border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:30px}.doc-title{font-size:2.15rem;line-height:1.35;margin:0 0 12px;font-weight:760;letter-spacing:.01em}.meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.toc{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:18px 22px;margin:28px 0 40px}.toc-title{font-weight:700;margin-bottom:8px}.toc ul{list-style:none;margin:0;padding:0}.toc li{margin:.18em 0}.toc-h3{padding-left:1.3em;font-size:.94em}.toc a{text-decoration:none;color:var(--fg)}.toc a:hover{text-decoration:underline;color:var(--link)}
+h1,h2,h3,h4{line-height:1.42;letter-spacing:.01em;scroll-margin-top:18px}h2{font-size:1.52rem;margin:2.35em 0 .65em;border-bottom:1px solid var(--line);padding-bottom:.28em}h3{font-size:1.25rem;margin:2em 0 .55em}h4{font-size:1.08rem;margin:1.8em 0 .45em}
+p,ul,ol,pre,blockquote,table{margin:.78em 0 1.15em}ul,ol{padding-left:1.55em}li+li{margin-top:.18em}a{color:var(--link)}strong{font-weight:750}hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:var(--code);padding:.12em .32em;border-radius:4px;font-size:.93em}pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow:auto;line-height:1.58}pre code{background:transparent;padding:0;border-radius:0}blockquote{margin-left:0;padding:.72em 1em;background:var(--quote);border-left:4px solid var(--line);color:var(--muted)}
+table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}th,td{border:1px solid var(--line);padding:.55em .72em;text-align:left;vertical-align:top}th{background:var(--soft)}
+footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted);font-size:.85rem}.backtop{display:inline-block;margin-top:2em}
+@media(max-width:700px){body{font-size:15px}main{padding:30px 18px 70px}.doc-title{font-size:1.72rem}.meta{display:block}.meta span{display:block;margin:.2em 0}.toc{padding:15px 16px}h2{font-size:1.34rem}h3{font-size:1.15rem}footer{padding:0 18px 36px}}
+@media print{body{background:#fff;color:#000;font-size:11pt}main{max-width:none;padding:0}.doc-head{margin-top:0}.toc{break-after:page;background:#fff}.toc a{color:#000}.backtop{display:none}a{color:#000;text-decoration:none}pre,blockquote,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main id="top">
+<header class="doc-head">
+<h1 class="doc-title">Agent Observation Guide</h1>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-13 07:16 JST</span><span>Language: English</span></div>
+</header>
+<nav class="toc" aria-label="Table of contents">
+<div class="toc-title">Table of Contents</div>
+<ul>
+<li class="toc-h2"><a href="#I-Move-Exploration-Forward">I. Move Exploration Forward</a></li>
+<li class="toc-h3"><a href="#1-Look-at-the-Granularity-of-What-You-Are-Checking">1. Look at the Granularity of What You Are Checking</a></li>
+<li class="toc-h3"><a href="#2-Look-at-Changes-in-the-Candidate-Set">2. Look at Changes in the Candidate Set</a></li>
+<li class="toc-h3"><a href="#3-Control-Exploration-with-the-Decision-Gap">3. Control Exploration with the Decision Gap</a></li>
+<li class="toc-h3"><a href="#4-Make-Hypotheses-Observable">4. Make Hypotheses Observable</a></li>
+<li class="toc-h2"><a href="#II-Determine-What-Holds-and-What-Counts-as-Evidence">II. Determine What Holds and What Counts as Evidence</a></li>
+<li class="toc-h3"><a href="#5-Do-Not-Mistake-an-Artifact-for-an-Outcome">5. Do Not Mistake an Artifact for an Outcome</a></li>
+<li class="toc-h3"><a href="#6-Verify-a-Change-by-Reintroducing-the-Failure">6. Verify a Change by Reintroducing the Failure</a></li>
+<li class="toc-h3"><a href="#7-Passing-Is-Promotion-Not-Completion">7. Passing Is Promotion, Not Completion</a></li>
+<li class="toc-h3"><a href="#8-Look-at-the-Inference-from-Evidence-to-Claim">8. Look at the Inference from Evidence to Claim</a></li>
+<li class="toc-h3"><a href="#9-Distinguish-the-Strength-of-Evidence">9. Distinguish the Strength of Evidence</a></li>
+<li class="toc-h3"><a href="#10-Look-at-Where-Proof-Becomes-Sufficient">10. Look at Where Proof Becomes Sufficient</a></li>
+<li class="toc-h3"><a href="#11-Green-Does-Not-Mean-There-Is-No-Problem">11. Green Does Not Mean There Is No Problem</a></li>
+<li class="toc-h3"><a href="#12-Design-Observation-Around-the-Information-Needed-for-Judgment">12. Design Observation Around the Information Needed for Judgment</a></li>
+<li class="toc-h3"><a href="#13-Checking-the-Inspection-Needs-an-Endpoint">13. Checking the Inspection Needs an Endpoint</a></li>
+<li class="toc-h2"><a href="#III-Look-at-the-Burden-That-Remains-with-Humans">III. Look at the Burden That Remains with Humans</a></li>
+<li class="toc-h3"><a href="#14-Do-Not-Describe-Work-Time-as-One-Single-Time">14. Do Not Describe Work Time as One Single Time</a></li>
+<li class="toc-h3"><a href="#15-Divide-the-Human-Burden-into-Three-Parts">15. Divide the Human Burden into Three Parts</a></li>
+<li class="toc-h3"><a href="#16-If-Human-Cognitive-Load-Is-High-Question-the-Mechanism">16. If Human Cognitive Load Is High, Question the Mechanism</a></li>
+<li class="toc-h2"><a href="#IV-Design-Mechanisms-and-Intervention-Points">IV. Design Mechanisms and Intervention Points</a></li>
+<li class="toc-h3"><a href="#17-Conditions-for-Adding-a-Mechanism">17. Conditions for Adding a Mechanism</a></li>
+<li class="toc-h3"><a href="#18-Choose-Intervention-Points-by-Cost">18. Choose Intervention Points by Cost</a></li>
+<li class="toc-h3"><a href="#19-Put-a-Gate-at-the-Intervention-Point">19. Put a Gate at the Intervention Point</a></li>
+<li class="toc-h2"><a href="#V-Update-Boundaries-and-Mechanisms">V. Update Boundaries and Mechanisms</a></li>
+<li class="toc-h3"><a href="#20-Agents-Change-the-Cost-of-Leaving-Architecture-Undecided">20. Agents Change the Cost of Leaving Architecture Undecided</a></li>
+<li class="toc-h3"><a href="#21-Decide-First-the-Architectural-Boundaries-That-Are-Hard-to-Change-Later">21. Decide First the Architectural Boundaries That Are Hard to Change Later</a></li>
+<li class="toc-h3"><a href="#22-The-Boundary-Between-Humans-and-Mechanisms-Moves-Over-Time">22. The Boundary Between Humans and Mechanisms Moves Over Time</a></li>
+<li class="toc-h3"><a href="#23-A-Judgment-Moved-into-a-Mechanism-Is-Not-Necessarily-Correct-Forever">23. A Judgment Moved into a Mechanism Is Not Necessarily Correct Forever</a></li>
+<li class="toc-h3"><a href="#24-Reevaluation-Includes-Removal-Not-Only-Addition">24. Reevaluation Includes Removal, Not Only Addition</a></li>
+<li class="toc-h3"><a href="#25-Rebuilding-Can-Be-Cheaper-Than-Migration">25. Rebuilding Can Be Cheaper Than Migration</a></li>
+<li class="toc-h3"><a href="#26-Keep-a-Control-Path-Separate-from-the-Target-of-Change">26. Keep a Control Path Separate from the Target of Change</a></li>
+<li class="toc-h2"><a href="#VI-Separate-Judgment-and-Responsibility">VI. Separate Judgment and Responsibility</a></li>
+<li class="toc-h3"><a href="#27-Taking-Implementation-Work-Off-the-Human-Exposes-the-Production-of-Judgment">27. Taking Implementation Work Off the Human Exposes the Production of Judgment</a></li>
+<li class="toc-h3"><a href="#28-Treat-Role-and-Actor-Separately">28. Treat Role and Actor Separately</a></li>
+<li class="toc-h3"><a href="#29-Look-at-the-Cost-of-Adding-Actors">29. Look at the Cost of Adding Actors</a></li>
+<li class="toc-h3"><a href="#30-Separate-Responsibility-by-Time">30. Separate Responsibility by Time</a></li>
+<li class="toc-h2"><a href="#VII-Pass-Knowledge-and-Work-Forward">VII. Pass Knowledge and Work Forward</a></li>
+<li class="toc-h3"><a href="#31-A-Repository-Is-a-Prompt-Surface">31. A Repository Is a Prompt Surface</a></li>
+<li class="toc-h3"><a href="#32-Preserve-the-Access-Path-to-Knowledge">32. Preserve the Access Path to Knowledge</a></li>
+<li class="toc-h3"><a href="#33-Close-Work-in-Units-That-Can-Be-Resumed">33. Close Work in Units That Can Be Resumed</a></li>
+<li class="toc-h3"><a href="#34-Reflect-Separately-on-Failure-Success-and-Luck">34. Reflect Separately on Failure, Success, and Luck</a></li>
+</ul>
+</nav>
+<article>
+<p><strong>Observe the flow of exploration, evidence, burden, mechanisms, judgment, and knowledge</strong></p>
+<blockquote>
+<p>Purpose: Organize perspectives for observing, across exploration, implementation, and verification with Agents, what is progressing, what has been established, what burdens and judgments remain with humans, and how mechanisms and knowledge are functioning.</p>
+<p>This guide does not prescribe a particular operating procedure or method of autonomy. It is an observation guide for looking separately at the flow of exploration, evidence, burden, mechanisms, judgment, and knowledge, so that you can determine where the problem lies and what should change next.</p>
+</blockquote>
+<h2 id="I-Move-Exploration-Forward">I. Move Exploration Forward</h2>
+<h3 id="1-Look-at-the-Granularity-of-What-You-Are-Checking">1. Look at the Granularity of What You Are Checking</h3>
+<p>When exploration stalls, ask whether the item being checked can be divided into units that can be used for the next judgment.</p>
+<p>For example:</p>
+<ul>
+<li>one candidate has been eliminated</li>
+<li>the next place to inspect has been identified</li>
+<li>part of a hypothesis has been rejected</li>
+<li>the next question to check has been found</li>
+</ul>
+<p>If a check produces a change like this, it can be used in the next judgment.</p>
+<p><strong>Ask whether the granularity can change the next judgment.</strong></p>
+<h3 id="2-Look-at-Changes-in-the-Candidate-Set">2. Look at Changes in the Candidate Set</h3>
+<p>Given a candidate list:</p>
+<pre><code class="language-text">A
+B
+C
+</code></pre>
+<p>if you learn that <code>B is not the answer</code>, the problem changes to:</p>
+<pre><code class="language-text">A
+C
+</code></pre>
+<p>When dealing with something that cannot be inspected directly, construct candidates from observed facts.</p>
+<p>Therefore, the correct answer is not guaranteed to be in the candidate list. <code>A</code>, <code>B</code>, and <code>C</code> may all be wrong.</p>
+<p>Finding a previously unknown <code>D</code> and increasing the number of candidates is also progress, because it reveals that the previous candidate set was incomplete.</p>
+<p><strong>Greater understanding does not necessarily mean greater confidence.</strong></p>
+<p><strong>If the shape of the problem changes, that is progress.</strong></p>
+<h3 id="3-Control-Exploration-with-the-Decision-Gap">3. Control Exploration with the Decision Gap</h3>
+<p>A question provides an entry point into exploration.</p>
+<p>When multiple candidate judgments remain, however, think of the information still needed to distinguish between them as the <code>decision gap</code>—the information missing to distinguish one candidate judgment from another.</p>
+<p>For example, if the candidate causes have been narrowed to <code>A</code> and <code>B</code>, look for one observation that can distinguish <code>A</code> from <code>B</code>.</p>
+<p>Early in exploration, broad reading may be necessary. Once candidates begin to emerge, narrow the next observation target according to the decision gap.</p>
+<p><strong>Choose where to explore not by how closely related it is, but by whether it can change the judgment.</strong></p>
+<h3 id="4-Make-Hypotheses-Observable">4. Make Hypotheses Observable</h3>
+<p>Rather than continuing to discuss a hypothesis or design judgment in the abstract, it may be faster to turn it into something observable through a minimal prototype or experiment.</p>
+<p>Compare the time spent on discussion, the time spent on prototyping or experimentation, and the knowledge gained from each.</p>
+<p><strong>If observation can answer the question faster than discussion, move to observation.</strong></p>
+<h2 id="II-Determine-What-Holds-and-What-Counts-as-Evidence">II. Determine What Holds and What Counts as Evidence</h2>
+<h3 id="5-Do-Not-Mistake-an-Artifact-for-an-Outcome">5. Do Not Mistake an Artifact for an Outcome</h3>
+<p>Code, documents, tools, reports, inspection results, and other artifacts produced by an Agent are not finished products merely because they were created.</p>
+<p>Treat all of them as prototypes first.</p>
+<p>What matters is what the prototype allows you to confirm and whether the intended state actually holds.</p>
+<p><strong>Treat an Agent-produced artifact as a prototype until it has been confirmed that the intended state holds.</strong></p>
+<h3 id="6-Verify-a-Change-by-Reintroducing-the-Failure">6. Verify a Change by Reintroducing the Failure</h3>
+<p>A change is not an improvement merely because it was written.<br />
+Even after implementation, it may still not be an improvement.</p>
+<p>This does not mean every change requires a large-scale test.<br />
+Vary the strength of reproduction according to <strong>the impact if the change fails, not the size of the change</strong>.</p>
+<p><code>Rule → counterexample</code><br />
+<code>procedure → failure scenario</code><br />
+<code>Harness → boundary reached</code><br />
+<code>recovery process → interruption and resume</code></p>
+<p>If the same counterexample breaks a Rule repeatedly, that Rule may be too weak to enforce through text alone.<br />
+In that case, instead of adding more text, ask whether it can be moved into the Harness or another structural mechanism.</p>
+<p><strong>A change intended to fix a failure is confirmed only when it changes the earlier failure.</strong></p>
+<h3 id="7-Passing-Is-Promotion-Not-Completion">7. Passing Is Promotion, Not Completion</h3>
+<p>Check the assumptions, observation range, and evidence behind a prototype.</p>
+<p>Passing here does not mean that it is permanently correct.</p>
+<p>It means that, under the current assumptions, observation range, and evidence, it may be used as a basis for the next judgment or the next piece of work.</p>
+<p><strong>Passing is not completion. It is promotion to a state that can be used next.</strong></p>
+<h3 id="8-Look-at-the-Inference-from-Evidence-to-Claim">8. Look at the Inference from Evidence to Claim</h3>
+<p>There is an inference between Evidence and a Claim.</p>
+<p>At minimum, there are three different ways to question it.</p>
+<pre><code class="language-text">Question the conclusion
+    Could the Claim itself be wrong?
+
+Question the evidence
+    Can the Evidence itself be trusted?
+
+Question the inference
+    Does the inference from Evidence to Claim hold?
+</code></pre>
+<p>In particular, “question the inference” remains relevant even when the observation itself is correct.</p>
+<p>For example:</p>
+<pre><code class="language-text">Evidence
+    Changing value X changes output Y
+
+Claim
+    X directly controls Y
+</code></pre>
+<p>The observation may be correct, but if another state or transformation exists in between, the Claim may be too strong.</p>
+<p>The same problem can occur with reproduction results.</p>
+<pre><code class="language-text">Evidence
+    A certain configuration reproduces the same output as the actual hardware
+
+Claim
+    The original implementation uses the same mechanism
+</code></pre>
+<p>The first can hold without proving the second.</p>
+<p><strong>Check whether correct Evidence is being used to jump to a Claim that is too strong.</strong></p>
+<h3 id="9-Distinguish-the-Strength-of-Evidence">9. Distinguish the Strength of Evidence</h3>
+<p>Evidence differs in strength.</p>
+<p>Evidence that includes intervention or reproduction can support stronger causal Claims than observation or correlation alone.</p>
+<p>Finding the same tendency across multiple data points strengthens the observed relationship, but it still does not by itself show that the original behavior can be reconstructed.</p>
+<p><strong>Do not treat having more evidence as the same thing as having established causality.</strong></p>
+<h3 id="10-Look-at-Where-Proof-Becomes-Sufficient">10. Look at Where Proof Becomes Sufficient</h3>
+<p>Proof (confirmation that something holds) does not necessarily require eliminating every uncertainty.</p>
+<p>Review the Evidence, the Claim, and the remaining uncertainty, then judge how much certainty is sufficient for the current purpose.</p>
+<p>Think of this judgment as <code>Sufficiency</code>.</p>
+<p>If adding more evidence no longer changes the judgment, the value of additional checking decreases.</p>
+<p><strong>When considering Proof, ask not only what is certain, but also where certainty becomes sufficient.</strong></p>
+<h3 id="11-Green-Does-Not-Mean-There-Is-No-Problem">11. Green Does Not Mean There Is No Problem</h3>
+<p>When tests, lint, validators, or monitoring report no problem, <code>green</code> has two possible meanings.</p>
+<p>There may be no problem, or there may be a problem that the inspection cannot detect.</p>
+<p><strong>Green is not an observation that “there is no problem.” It is an observation that the inspection detected no problem.</strong></p>
+<p>Inspections also have coverage and blind spots, so inspect the inspection itself when necessary.</p>
+<h3 id="12-Design-Observation-Around-the-Information-Needed-for-Judgment">12. Design Observation Around the Information Needed for Judgment</h3>
+<p>When a large number of operations all succeed, listing one success log per item adds very little information needed for judgment.</p>
+<pre><code class="language-text">file_001 OK
+file_002 OK
+file_003 OK
+...
+</code></pre>
+<p>In that case, aggregate the result:</p>
+<pre><code class="language-text">Checked: 128442
+Succeeded: 128442
+Failed: 0
+</code></pre>
+<p>When something fails, however, a count alone may be insufficient for the next judgment.</p>
+<p>Then expand:</p>
+<ul>
+<li>what failed</li>
+<li>how the expected and actual values differ</li>
+<li>where it failed</li>
+<li>where the details can be traced from</li>
+</ul>
+<pre><code class="language-text">Success
+    → aggregate
+
+Failure
+    → expand the differences needed for judgment
+    → refer to the raw log if necessary
+</code></pre>
+<p>Keeping a raw log is different from making the Agent read the raw log as-is.</p>
+<p><strong>Design observation around the amount of information needed for the next judgment, not around how many facts can be output.</strong></p>
+<h3 id="13-Checking-the-Inspection-Needs-an-Endpoint">13. Checking the Inspection Needs an Endpoint</h3>
+<p>If an inspection has blind spots, it is natural to want another inspection to check it.</p>
+<p>But that inspection also has blind spots, so yet another inspection can be added.</p>
+<p>This chain cannot be ended completely.</p>
+<p>At some point, judge:</p>
+<ul>
+<li>what can be detected</li>
+<li>what still cannot be detected</li>
+<li>how much is necessary for the current purpose</li>
+</ul>
+<p>Think of this judgment as <code>Sufficiency</code>.</p>
+<p><strong>Do not keep adding inspections indefinitely. Decide where inspection is sufficient for the current purpose.</strong></p>
+<h2 id="III-Look-at-the-Burden-That-Remains-with-Humans">III. Look at the Burden That Remains with Humans</h2>
+<h3 id="14-Do-Not-Describe-Work-Time-as-One-Single-Time">14. Do Not Describe Work Time as One Single Time</h3>
+<p>Whether something is “fast” or “slow” cannot be determined from one measure of time alone.</p>
+<p>For example, these are different:</p>
+<ul>
+<li>the time until the Agent finishes its work</li>
+<li>the time until the result can be checked</li>
+<li>the time a human spends giving instructions or making judgments</li>
+<li>the time from delegation until all required results are available</li>
+</ul>
+<p>Even if the Agent takes time to execute, the burden can be small if the human is not forced to wait.</p>
+<p>Conversely, even if the Agent is fast, the overall work has not become faster if human checking and correction increase.</p>
+<p>If the Agent produces more than a human can review, unreviewed artifacts accumulate.</p>
+<p><strong>When looking at speed, separate whose time you are measuring and which time it is.</strong></p>
+<h3 id="15-Divide-the-Human-Burden-into-Three-Parts">15. Divide the Human Burden into Three Parts</h3>
+<p>Here, divide human burden into three parts.</p>
+<pre><code class="language-text">Human Observation Time
+    Time a human must spend
+    before understanding the result
+
+Human Judgment Count
+    Number of times
+    judgment is returned to the human during the work
+
+Human Judgment Width
+    Range a human must handle
+    for a single judgment
+</code></pre>
+<p>Even if an Agent performs a large amount of research or verification, Human Observation Time can remain small if the result is organized and the human can understand the current state quickly.</p>
+<p>In an operation that repeatedly returns small judgments to the human, each judgment may be simple while Human Judgment Count grows.</p>
+<p>Even when the number of judgments is one, Human Judgment Width differs between choosing from a small number of options with an organized basis and rereading many artifacts and unresolved matters in order to construct the policy itself.</p>
+<p><strong>Look not at how much work the Agent did, but at what remains for the human.</strong></p>
+<h3 id="16-If-Human-Cognitive-Load-Is-High-Question-the-Mechanism">16. If Human Cognitive Load Is High, Question the Mechanism</h3>
+<p>If correct work requires humans to remember many conditions, track exceptions, and remain continuously vigilant, do not try to absorb that burden solely through human capability.</p>
+<p>Some complex work genuinely requires thinking.</p>
+<p>But if safe execution of the same work requires too much attention or memory, look for the source of the burden in the mechanisms that support the work: procedures, boundaries, placement, presentation, tools, and similar structures.</p>
+<p>When returning a judgment to a human, also look at <strong>ownership of cognitive work</strong>.</p>
+<p>If the human must reconstruct the situation every time a judgment is needed, not only the judgment but the cognitive work from situational understanding through decision has been returned to the human.</p>
+<p><strong>Any place that works only because a human keeps compensating for it is a candidate for redesigning the mechanism.</strong></p>
+<h2 id="IV-Design-Mechanisms-and-Intervention-Points">IV. Design Mechanisms and Intervention Points</h2>
+<h3 id="17-Conditions-for-Adding-a-Mechanism">17. Conditions for Adding a Mechanism</h3>
+<p>A new mechanism needs both a reason to add it and a reason to keep maintaining it.</p>
+<p>Candidates for addition include cases where:</p>
+<ul>
+<li>the same failure repeats</li>
+<li>the impact of leaving it unaddressed is large</li>
+<li>the condition worth protecting is clear</li>
+<li>a human repeatedly performs the same check or correction</li>
+<li>a mismatch can be detected mechanically</li>
+</ul>
+<p><strong>Look not only at the reason to add a mechanism, but also at the reason to keep maintaining it.</strong></p>
+<h3 id="18-Choose-Intervention-Points-by-Cost">18. Choose Intervention Points by Cost</h3>
+<p>Even for the same failure, there is more than one point at which intervention is possible.</p>
+<p>You can prevent it before execution, detect it immediately after execution, or inspect it collectively later and correct or regenerate as needed.</p>
+<p>Do not optimize only for early intervention.</p>
+<p>Earlier intervention can reduce propagation of failure, but it may also increase waiting and coordination.</p>
+<p>Later intervention, on the other hand, can increase the burden of repairing the failure afterward.</p>
+<p><strong>Choose an intervention point by comparing the burden of intervening early with the burden of repairing the failure later.</strong></p>
+<h3 id="19-Put-a-Gate-at-the-Intervention-Point">19. Put a Gate at the Intervention Point</h3>
+<p>First decide where to intervene in the failure.</p>
+<p>A Gate is one mechanism placed at that intervention point.</p>
+<p>Do not begin by asking whether the Gate should be stronger.</p>
+<p>First ask:</p>
+<pre><code class="language-text">For this failure,
+how far can it travel before it becomes expensive?
+where can it be found cheaply?
+where can it be repaired cheaply?
+</code></pre>
+<p>For small artifacts that can be regenerated cheaply, it may be less expensive to verify strongly later and discard and regenerate on failure than to stop them repeatedly at an early stage.</p>
+<p>For irreversible operations or changes that propagate elsewhere, intervention before execution has greater value.</p>
+<p><strong>Choose the intervention point first, then place the necessary mechanism there.</strong></p>
+<h2 id="V-Update-Boundaries-and-Mechanisms">V. Update Boundaries and Mechanisms</h2>
+<h3 id="20-Agents-Change-the-Cost-of-Leaving-Architecture-Undecided">20. Agents Change the Cost of Leaving Architecture Undecided</h3>
+<p>Architecture has a cost whether it is decided early or late.</p>
+<p>Fixing it early can create the wrong boundaries while understanding is still incomplete.</p>
+<p>Delaying the decision preserves freedom to explore, but local patterns can multiply as precedents in the meantime.</p>
+<pre><code class="language-text">local pattern
+    ↓
+appears in the Repository
+    ↓
+Agent refers to it as precedent
+    ↓
+expands it into similar places
+    ↓
+becomes even stronger precedent
+</code></pre>
+<p>In an environment where Agents can implement quickly, this multiplication also happens quickly.</p>
+<p>Therefore, the timing of Architecture decisions becomes a comparison between the cost of fixing a boundary early and the cost of precedents multiplying while the decision is delayed.</p>
+<p>In the Agent era, <strong>the cost of delaying a decision can grow much more quickly than before.</strong></p>
+<h3 id="21-Decide-First-the-Architectural-Boundaries-That-Are-Hard-to-Change-Later">21. Decide First the Architectural Boundaries That Are Hard to Change Later</h3>
+<p>As patterns multiply without an architectural decision, changing the boundary later also becomes more expensive.</p>
+<p>The work may require not only changing code, but also:</p>
+<ul>
+<li>defining the migration scope</li>
+<li>retiring the old pattern</li>
+<li>reorganizing the information Agents refer to</li>
+<li>paying down inference debt</li>
+<li>repeating verification</li>
+</ul>
+<p>This does not mean that everything should be decided up front.</p>
+<p>For areas where observation is still insufficient, or for local implementations that are easy to rebuild, deferring the decision may be cheaper.</p>
+<p>Other boundaries become difficult to change after many implementations depend on them.</p>
+<p>Examples include:</p>
+<ul>
+<li>location of the source of truth</li>
+<li>ownership</li>
+<li>dependency direction</li>
+<li>ownership of state</li>
+<li>public interfaces</li>
+<li>placement of file types</li>
+</ul>
+<p>The boundaries most worth considering early are <strong>those that become expensive to change after dependent implementations multiply</strong>.</p>
+<h3 id="22-The-Boundary-Between-Humans-and-Mechanisms-Moves-Over-Time">22. The Boundary Between Humans and Mechanisms Moves Over Time</h3>
+<p>Some judgments can initially be made only by humans.</p>
+<p>For example:</p>
+<ul>
+<li>how much polish is enough</li>
+<li>which shortcuts are acceptable</li>
+<li>whether a structure is a future risk</li>
+<li>how much checking is enough for completion</li>
+<li>whether a sense that something is off should become a correction target</li>
+</ul>
+<p><strong>Stable judgments can move into mechanisms. Judgments that still cannot be generalized remain with humans. The boundary between humans and mechanisms moves as this process repeats.</strong></p>
+<h3 id="23-A-Judgment-Moved-into-a-Mechanism-Is-Not-Necessarily-Correct-Forever">23. A Judgment Moved into a Mechanism Is Not Necessarily Correct Forever</h3>
+<p>If the environment, model, Repository, goals, or cost structure change, a rule that was previously effective may begin to obstruct new work.</p>
+<pre><code class="language-text">Judgment
+    ↓
+Stabilizes
+    ↓
+Mechanism
+    ↓
+Environment changes
+    ↓
+Reevaluation
+    ↓
+Keep / revise / remove / return to judgment
+</code></pre>
+<p>Moving a judgment into a mechanism is therefore not the end of judgment.</p>
+<p><strong>A judgment moved into a mechanism may return to human judgment when the environment changes.</strong></p>
+<h3 id="24-Reevaluation-Includes-Removal-Not-Only-Addition">24. Reevaluation Includes Removal, Not Only Addition</h3>
+<p>A mechanism assumes the problem and constraints that existed when it was created.</p>
+<p>What matters is not whether the mechanism still exists, but whether the reason for adding it still exists.</p>
+<p>When reevaluating it, ask:</p>
+<ul>
+<li>what was it added to prevent?</li>
+<li>does the problem or constraint still exist?</li>
+<li>can the necessary state be maintained without it?</li>
+<li>does keeping it create new burden or inconsistency?</li>
+</ul>
+<p><strong>Reevaluation includes removal, not only addition.</strong></p>
+<h3 id="25-Rebuilding-Can-Be-Cheaper-Than-Migration">25. Rebuilding Can Be Cheaper Than Migration</h3>
+<p>When moving an existing implementation to a new design, gradual migration is not always safer.</p>
+<p>Especially for small, regenerable tools, modifying the old implementation little by little can instead leave the old world and the new world coexisting for a long time.</p>
+<pre><code class="language-text">old approach
+    +
+new approach
+    ↓
+both remain in the Repository
+    ↓
+both become inference candidates
+    ↓
+comparison, exceptions, and migration handling increase
+</code></pre>
+<p>This increases not only implementation complexity but also inference debt.</p>
+<p>For small, regenerable tools, <code>scrap-and-build</code> may be an option.</p>
+<h3 id="26-Keep-a-Control-Path-Separate-from-the-Target-of-Change">26. Keep a Control Path Separate from the Target of Change</h3>
+<p>When changing the control path currently in use, do not depend on that path alone for recovery.</p>
+<p><strong>Do not send the command to cut a wire through the wire you are about to cut.</strong></p>
+<p>Establish another control path before the change, and confirm that the target can be observed through that path.</p>
+<h2 id="VI-Separate-Judgment-and-Responsibility">VI. Separate Judgment and Responsibility</h2>
+<h3 id="27-Taking-Implementation-Work-Off-the-Human-Exposes-the-Production-of-Judgment">27. Taking Implementation Work Off the Human Exposes the Production of Judgment</h3>
+<p>As Agents generate code, tests, documentation, CI, tools, and review artifacts, the amount of implementation work performed by humans decreases.</p>
+<p>But that alone does not make human work disappear.</p>
+<pre><code class="language-text">What should be done?
+What counts as good?
+What should be a boundary?
+Why did the work fail to close?
+</code></pre>
+<p>These have not automatically become Agent judgments.</p>
+<p>When implementation work is taken off the human, other work that had been buried inside implementation becomes easier to see.</p>
+<p>Separate who generated the artifact from who produced the judgments that make the work valid.</p>
+<pre><code class="language-text">agent-generated
+        ≠
+agent-decided
+</code></pre>
+<p>Therefore, when evaluating Agent-based work, look not only at how much implementation has been automated, but at <strong>which judgments are being produced, by whom, and where</strong>.</p>
+<h3 id="28-Treat-Role-and-Actor-Separately">28. Treat Role and Actor Separately</h3>
+<p>Different roles in the work do not necessarily require different Agents.</p>
+<p>Suppose the work contains roles such as:</p>
+<ul>
+<li>implementation</li>
+<li>checking</li>
+<li>organization</li>
+<li>cleanup</li>
+<li>maintenance</li>
+</ul>
+<p>There is no need to map them directly like this:</p>
+<pre><code class="language-text">Implementation Role
+    → Implementation Agent
+
+Checking Role
+    → Checking Agent
+
+Organization Role
+    → Organization Agent
+</code></pre>
+<p>A Role represents what responsibility is held. An Actor represents who carries that responsibility.</p>
+<pre><code class="language-text">Different Role
+    ≠
+Different Actor
+</code></pre>
+<p>One Actor can take on multiple Roles in sequence.</p>
+<p>Conversely, one Role can be shared across multiple Actors.</p>
+<p><strong>Do not increase the number of Agents based only on the idea that different roles require different Agents.</strong></p>
+<h3 id="29-Look-at-the-Cost-of-Adding-Actors">29. Look at the Cost of Adding Actors</h3>
+<p>Adding Agents creates other costs, including:</p>
+<ul>
+<li>context handoff</li>
+<li>coordination</li>
+<li>state sharing</li>
+<li>partitioning permissions</li>
+<li>result integration</li>
+</ul>
+<p>For example, needing someone to review the Repository after finishing the work does not necessarily justify creating a new <code>Organization Agent</code>.</p>
+<p>The same Agent may switch from the Implementation Role to the Organization Role after finishing implementation.</p>
+<p>What matters is not the number of Actors, but that <strong>the required responsibilities are explicit and are executed without being mixed together</strong>.</p>
+<p><strong>Role is a unit of responsibility, and Actor is the entity that carries that responsibility. Separating Roles and adding Actors are different design decisions.</strong></p>
+<h3 id="30-Separate-Responsibility-by-Time">30. Separate Responsibility by Time</h3>
+<p>Something being necessary does not mean it should be done now.</p>
+<p>If it is not a current responsibility, do not expand the work on the spot; defer it to a later time.</p>
+<p>This is not abandoning responsibility.</p>
+<p><strong>It is placing responsibility at the time when it should be executed.</strong></p>
+<p>During the work, focus on the current objective. After the work or during periodic review, look at what this work left for future work.</p>
+<p><strong>Responsibilities do not have to be carried simultaneously. They can be executed at different times.</strong></p>
+<h2 id="VII-Pass-Knowledge-and-Work-Forward">VII. Pass Knowledge and Work Forward</h2>
+<h3 id="31-A-Repository-Is-a-Prompt-Surface">31. A Repository Is a Prompt Surface</h3>
+<p>A Prompt for an Agent is not limited to instructions in chat or similar interfaces.</p>
+<p>Anything the Agent can see also becomes material for inference, including:</p>
+<ul>
+<li>code</li>
+<li>tests</li>
+<li>comments</li>
+<li>file names</li>
+<li>directory structure</li>
+<li>old implementations</li>
+<li>workarounds</li>
+<li>documentation</li>
+<li>generated artifacts</li>
+</ul>
+<p>In other words:</p>
+<pre><code class="language-text">What the Agent can see
+    ↓
+becomes an inference candidate
+    ↓
+acts as instruction
+</code></pre>
+<p>In this sense, a Repository is not merely code storage. It is a <strong>Prompt Surface</strong>.</p>
+<p>The important point is that items in the Repository are not checked for current correctness before they become visible to the Agent.</p>
+<p><strong>What you say to the Agent is not the only Prompt. What you show the Agent is also Prompt.</strong></p>
+<h3 id="32-Preserve-the-Access-Path-to-Knowledge">32. Preserve the Access Path to Knowledge</h3>
+<p>When knowledge is organized, the answer may remain while the path that led to it disappears.</p>
+<p>A record can preserve not only the knowledge itself but the access path to that knowledge:</p>
+<pre><code class="language-text">Had a problem
+  ↓
+looked here
+  ↓
+learned this
+  ↓
+look here next
+</code></pre>
+<p>With this path, a person or Agent facing a similar problem later can reuse not only the answer, but also the route from the symptom to the relevant information.</p>
+<p><strong>Preserve not only the answer, but the path used to reach it.</strong></p>
+<h3 id="33-Close-Work-in-Units-That-Can-Be-Resumed">33. Close Work in Units That Can Be Resumed</h3>
+<p>Even if the result of a change is preserved, restarting later requires new exploration when the materials needed for resumption are scattered.</p>
+<p>Design documents, code, verification results, generated artifacts needed for execution, and other outputs from the same work should be preserved together as one work unit whenever possible.</p>
+<p>Keeping them together does not necessarily mean placing them in the same folder.</p>
+<p>The relationships and locations should be traceable, and it should be clear which item is the source of truth.</p>
+<p><strong>Close the work not only with the outcome, but with the set of materials needed to resume it.</strong></p>
+<h3 id="34-Reflect-Separately-on-Failure-Success-and-Luck">34. Reflect Separately on Failure, Success, and Luck</h3>
+<p>If retrospectives focus only on failure, they tend to bias the response toward adding changes, prohibitions, and restrictions.</p>
+<p>Instead, divide results into at least three categories.</p>
+<pre><code class="language-text">Failed
+    → What should change?
+
+Worked well
+    → What should remain?
+
+Got lucky
+    → What should become a mechanism?
+</code></pre>
+<p>Something working well is not the same as getting lucky.</p>
+<p>If the result was produced by an intentional design or mechanism, it is a candidate to preserve.</p>
+<p>If it succeeded because of accidental human intervention, spare capacity that happened to exist, or a path that happened to remain open, that success should not be assumed to be reproducible as-is.</p>
+<p>Do not judge only from the fact that the outcome was good. <strong>Look at why that outcome occurred.</strong></p>
+<p><strong>From failure, identify what to change. From success, identify what to keep. From luck, identify what to turn into a mechanism.</strong></p>
+</article>
+<a class="backtop" href="#top">↑ Back to top</a>
+</main>
+<footer>Agent Observation Guide / Author: akkera102 / Updated: 2026-09-13 07:16 JST</footer>
+</body>
+</html>

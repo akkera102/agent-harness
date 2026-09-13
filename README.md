@@ -1,6 +1,6 @@
 # Agent Harness Notes
 
-Design guides for operating long-running AI agents safely and reliably.
+Guides for designing, operating, and observing long-running AI agent workflows.
 
 The guides cover topics such as:
 
@@ -26,6 +26,11 @@ The documents were developed from practical Codex usage, but many of the ideas a
 
 - Japanese: `task-loop-engineering.html`
 - English: `task-loop-engineering-en.html`
+
+### Agent Observation
+
+- Japanese: `agent-observation.html`
+- English: `agent-observation-en.html`
 
 This repository is intentionally small.  
 The HTML files are the published documents.
