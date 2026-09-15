@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-12 21:51 JST">
+<meta name="last-modified" content="2026-09-15 04:30 JST">
 <meta name="description" content="AgentのTaskとLoopを、Trigger、Goal、Thought、Bound、Verification、判定などの制御構造から設計するガイド。">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -26,7 +26,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <main id="top">
 <header class="doc-head">
 <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-12 21:51 JST</span><span>Language: Japanese</span></div>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-15 04:30 JST</span><span>Language: Japanese</span></div>
 </header>
 <nav class="toc" aria-label="目次">
 <div class="toc-title">目次</div>
@@ -43,9 +43,9 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h2"><a href="#第II部-Loop-の基本構造">第II部　Loop の基本構造</a></li>
 <li class="toc-h3"><a href="#9-Loopはcycleをつなぐ">9. Loopはcycleをつなぐ</a></li>
 <li class="toc-h3"><a href="#10-Loop-controllerは次のcycleを起こす">10. Loop controllerは次のcycleを起こす</a></li>
-<li class="toc-h3"><a href="#11-Turnbasedでは人間が次を起こす">11. Turn-basedでは人間が次を起こす</a></li>
-<li class="toc-h3"><a href="#12-GoalbasedではGoalの未達成が次を起こす">12. Goal-basedではGoalの未達成が次を起こす</a></li>
-<li class="toc-h3"><a href="#13-Timebasedでは時間が次を起こす">13. Time-basedでは時間が次を起こす</a></li>
+<li class="toc-h3"><a href="#11-Turn-basedでは人間が次を起こす">11. Turn-basedでは人間が次を起こす</a></li>
+<li class="toc-h3"><a href="#12-Goal-basedではGoalの未達成が次を起こす">12. Goal-basedではGoalの未達成が次を起こす</a></li>
+<li class="toc-h3"><a href="#13-Time-basedでは時間が次を起こす">13. Time-basedでは時間が次を起こす</a></li>
 <li class="toc-h3"><a href="#14-Proactiveでは外部世界が次を起こす">14. Proactiveでは外部世界が次を起こす</a></li>
 <li class="toc-h3"><a href="#15-Triggerと終了条件は別々に組み合わせられる">15. Triggerと終了条件は別々に組み合わせられる</a></li>
 <li class="toc-h3"><a href="#16-自律化はLoop-controlを条件へ移す">16. 自律化はLoop controlを条件へ移す</a></li>
@@ -63,7 +63,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h3"><a href="#27-VerificationはGoalを同じ基準で確かめられるほど強い">27. VerificationはGoalを同じ基準で確かめられるほど強い</a></li>
 <li class="toc-h3"><a href="#28-Verificationの深さで確認できる範囲が変わる">28. Verificationの深さで確認できる範囲が変わる</a></li>
 <li class="toc-h2"><a href="#第IV部-時間と再観測">第IV部　時間と再観測</a></li>
-<li class="toc-h3"><a href="#29-Timebased-Loopは状態を時間方向に再観測する">29. Time-based Loopは状態を時間方向に再観測する</a></li>
+<li class="toc-h3"><a href="#29-Time-based-Loopは状態を時間方向に再観測する">29. Time-based Loopは状態を時間方向に再観測する</a></li>
 <li class="toc-h3"><a href="#30-仕事は同じで入力だけが変わる">30. 仕事は同じで入力だけが変わる</a></li>
 <li class="toc-h3"><a href="#31-Time-budgetはBoundの一種である">31. Time budgetはBoundの一種である</a></li>
 <li class="toc-h2"><a href="#第V部-委譲監視判定">第V部　委譲・監視・判定</a></li>
@@ -329,7 +329,7 @@ Bound    上限に達したので終わる
 <p>違うのは、<strong>何が次の cycle を起こす判断を担うか</strong>である。</p>
 <p>この違いによって、Loop は Turn-based、Goal-based、Time-based、Proactive に分けて考えられる。</p>
 <p><strong>Loop の種類は、何が Loop controller になるかによって決まる。</strong></p>
-<h3 id="11-Turnbasedでは人間が次を起こす">11. Turn-basedでは人間が次を起こす</h3>
+<h3 id="11-Turn-basedでは人間が次を起こす">11. Turn-basedでは人間が次を起こす</h3>
 <p>Turn-based は、<strong>人間が結果を確認し、次の Prompt を与えることで次の cycle を起こす Loop</strong> である。</p>
 <pre><code class="language-text">Prompt
   ↓
@@ -356,7 +356,7 @@ Task
 <p>そして、<strong>その Prompt を与えるかどうかを決めている人間が Loop controller である。</strong></p>
 <p>Turn-based では、Agent が自分で次へ進むのではない。</p>
 <p><strong>人間が cycle と cycle の間をつないでいる。</strong></p>
-<h3 id="12-GoalbasedではGoalの未達成が次を起こす">12. Goal-basedではGoalの未達成が次を起こす</h3>
+<h3 id="12-Goal-basedではGoalの未達成が次を起こす">12. Goal-basedではGoalの未達成が次を起こす</h3>
 <p>Goal-based は、<strong>Goal が未達成である限り次の cycle を起こし、Goal に到達したら止まる Loop</strong> である。</p>
 <pre><code class="language-text">Task の実行
     ↓
@@ -380,7 +380,7 @@ Goal 達成？
 <p><strong>Goal の達成状態を判定し、未達成なら次の cycle へつなぐ。</strong></p>
 <p>Turn-based では人間が cycle をつなぐ。</p>
 <p>Goal-based では、<strong>Goal の未達成状態が cycle と cycle の間をつなぐ。</strong></p>
-<h3 id="13-Timebasedでは時間が次を起こす">13. Time-basedでは時間が次を起こす</h3>
+<h3 id="13-Time-basedでは時間が次を起こす">13. Time-basedでは時間が次を起こす</h3>
 <p>Time-based は、<strong>時間を Trigger として次の cycle を起こす Loop</strong> である。</p>
 <pre><code class="language-text">Task の実行
     ↓
@@ -808,7 +808,7 @@ Verification の深さ
 <p>Goal は同じでも、Build まで確認した状態と、Behavior まで確認した状態では、<strong>Goal について確認できた範囲が異なる。</strong></p>
 <p><strong>Verification の深さによって、その Task でどこまで確かめられたかが変わる。</strong></p>
 <h2 id="第IV部-時間と再観測">第IV部　時間と再観測</h2>
-<h3 id="29-Timebased-Loopは状態を時間方向に再観測する">29. Time-based Loopは状態を時間方向に再観測する</h3>
+<h3 id="29-Time-based-Loopは状態を時間方向に再観測する">29. Time-based Loopは状態を時間方向に再観測する</h3>
 <p>Time-based Loop は、<strong>時間を Trigger として、外部の状態をもう一度観測する機会を作る。</strong></p>
 <pre><code class="language-text">10:00  観測
 11:00  観測
@@ -1209,15 +1209,17 @@ Task を Loop にできる
   ↓
 状態語
   ↓
+Loop controller
+  ↓
 次の制御
 </code></pre>
 <p>観測値は判断材料であり、判断そのものではない。</p>
 <p>判断材料と判断基準も、別のものである。</p>
 <p>確定できる基準は外に出し、残りだけを推論に残す。</p>
-<p>推論条件ごとに出力空間を狭めれば、Agent が自由に制御を作る範囲を減らせる。</p>
+<p>推論条件ごとに出力空間を狭めれば、推論判定の自由度を減らせる。</p>
 <p>推論条件ごとに、出力空間を狭める状態語を設計する。</p>
 <h3 id="48-判定と状態変更を分ける">48. 判定と状態変更を分ける</h3>
-<p>推論判定では、判定する処理と、対象の状態を変更する処理を分ける。</p>
+<p>判定では、判定する処理と、対象の状態を変更する処理を分ける。</p>
 <p>判定の途中で対象を修正すると、判定対象そのものが変わる。</p>
 <pre><code class="language-text">観測
   ↓
@@ -1247,7 +1249,7 @@ Task を Loop にできる
 <p><strong>判定と状態変更を分ければ、何を判定したのかを残せる。</strong></p>
 <h2 id="第VIII部-製品固有の制約">第VIII部　製品固有の制約</h2>
 <h3 id="49-製品固有の制約は一般原理と分ける">49. 製品固有の制約は一般原理と分ける</h3>
-<p>Loop の一般原理と、製品ごとの実装上の制約は分けて考える。</p>
+<p>Task / Loop の一般原理と、製品ごとの実装上の制約は分けて考える。</p>
 <pre><code class="language-text">一般原理
   │
   ├─ Trigger
@@ -1269,25 +1271,23 @@ Task を Loop にできる
 <p>一般原理は、<strong>仕事をどう制御するか</strong>を定める。</p>
 <p>製品固有の制約は、<strong>その制御をどこまで実装できるか</strong>を定める。</p>
 <p>製品の仕様は変わる。</p>
-<p>そのたびに、Loop の概念そのものを書き換える必要はない。</p>
+<p>そのたびに、Task / Loop の概念そのものを書き換える必要はない。</p>
 <p><strong>原理と実装を分ければ、製品が変わっても設計は残る。</strong></p>
-<hr />
+<hr/>
 <h2 id="付録A-参照資料">付録A. 参照資料</h2>
 <h3 id="引用着想元">引用・着想元</h3>
 <ul>
-<li>
-<p>Addy Osmani — <em>Practical Loop Engineering</em><br />
+<li><p>Addy Osmani — <em>Practical Loop Engineering</em><br/>
 <a href="https://addyosmani.com/blog/practical-loop-engineering/">https://addyosmani.com/blog/practical-loop-engineering/</a></p>
 </li>
-<li>
-<p><strong>approved / needs_fix / cannot_proceed</strong><br />
-nrslib — <em>TAKT Workflow ガイド</em><br />
+<li><p><strong>approved / needs_fix / cannot_proceed</strong><br/>
+nrslib — <em>TAKT Workflow ガイド</em><br/>
 <a href="https://github.com/nrslib/takt/blob/main/docs/workflows.ja.md">https://github.com/nrslib/takt/blob/main/docs/workflows.ja.md</a></p>
 </li>
 </ul>
 </article>
 <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-12 21:51 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-15 04:30 JST</footer>
 </body>
 </html>
