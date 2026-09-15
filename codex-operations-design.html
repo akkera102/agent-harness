@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-12 21:51 JST">
+<meta name="last-modified" content="2026-09-15 16:18 JST">
 <meta name="description" content="Codexに長時間の解析・実装を任せるための、ハーネス、安全境界、検証、復旧、引き継ぎの運用設計ガイド。">
 <title>Codex Workplace Design Guide</title>
 <style>
+
 :root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
 @media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
 *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;line-height:1.82;font-size:16px}
@@ -20,13 +21,14 @@ table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-siz
 footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted);font-size:.85rem}.backtop{display:inline-block;margin-top:2em}
 @media(max-width:700px){body{font-size:15px}main{padding:30px 18px 70px}.doc-title{font-size:1.72rem}.meta{display:block}.meta span{display:block;margin:.2em 0}.toc{padding:15px 16px}h2{font-size:1.34rem}h3{font-size:1.15rem}footer{padding:0 18px 36px}}
 @media print{body{background:#fff;color:#000;font-size:11pt}main{max-width:none;padding:0}.doc-head{margin-top:0}.toc{break-after:page;background:#fff}.toc a{color:#000}.backtop{display:none}a{color:#000;text-decoration:none}pre,blockquote,table{break-inside:avoid}}
+
 </style>
 </head>
 <body>
 <main id="top">
 <header class="doc-head">
 <h1 class="doc-title">Codex Workplace Design Guide</h1>
-<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-12 21:51 JST</span><span>Language: Japanese</span></div>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-15 16:18 JST</span><span>Language: Japanese</span></div>
 </header>
 <nav class="toc" aria-label="目次">
 <div class="toc-title">目次</div>
@@ -80,15 +82,16 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h3"><a href="#40-時間方向と作業方向を分ける">40. 時間方向と作業方向を分ける</a></li>
 <li class="toc-h3"><a href="#41-日付作業単位でスナップショットを残す">41. 日付・作業単位でスナップショットを残す</a></li>
 <li class="toc-h3"><a href="#42-日付作業単位をまたいで作業状態を増やさない">42. 日付・作業単位をまたいで作業状態を増やさない</a></li>
-<li class="toc-h3"><a href="#43-終業整理と人間の振り返りを両方行う">43. 終業整理と人間の振り返りを両方行う</a></li>
+<li class="toc-h3"><a href="#43-現在状態を一つの正本へ圧縮しない">43. 現在状態を一つの正本へ圧縮しない</a></li>
+<li class="toc-h3"><a href="#44-終業整理と人間の振り返りを両方行う">44. 終業整理と人間の振り返りを両方行う</a></li>
 <li class="toc-h2"><a href="#第VIII部-運用を育てる">第VIII部　運用を育てる</a></li>
-<li class="toc-h3"><a href="#44-失敗を分類してから運用を変える">44. 失敗を分類してから運用を変える</a></li>
-<li class="toc-h3"><a href="#45-情報で導くと仕組みで閉じるを使い分ける">45. 「情報で導く」と「仕組みで閉じる」を使い分ける</a></li>
-<li class="toc-h3"><a href="#46-毎回同じ判断をしているなら環境へ移せないか考える">46. 毎回同じ判断をしているなら、環境へ移せないか考える</a></li>
-<li class="toc-h3"><a href="#47-運用は環境に適合させ設計は運用から学ぶ">47. 運用は環境に適合させ、設計は運用から学ぶ</a></li>
-<li class="toc-h3"><a href="#48-会話を仕事の記憶にしない">48. 会話を仕事の記憶にしない</a></li>
-<li class="toc-h3"><a href="#49-Codex-は壊れる">49. Codex は壊れる</a></li>
-<li class="toc-h3"><a href="#50-ハーネスとは何か">50. ハーネスとは何か</a></li>
+<li class="toc-h3"><a href="#45-失敗を分類してから運用を変える">45. 失敗を分類してから運用を変える</a></li>
+<li class="toc-h3"><a href="#46-情報で導くと仕組みで閉じるを使い分ける">46. 「情報で導く」と「仕組みで閉じる」を使い分ける</a></li>
+<li class="toc-h3"><a href="#47-毎回同じ判断をしているなら環境へ移せないか考える">47. 毎回同じ判断をしているなら、環境へ移せないか考える</a></li>
+<li class="toc-h3"><a href="#48-運用は環境に適合させ設計は運用から学ぶ">48. 運用は環境に適合させ、設計は運用から学ぶ</a></li>
+<li class="toc-h3"><a href="#49-会話を仕事の記憶にしない">49. 会話を仕事の記憶にしない</a></li>
+<li class="toc-h3"><a href="#50-Codex-は壊れる">50. Codex は壊れる</a></li>
+<li class="toc-h3"><a href="#51-ハーネスとは何か">51. ハーネスとは何か</a></li>
 <li class="toc-h2"><a href="#おわりに">おわりに</a></li>
 <li class="toc-h2"><a href="#付録A-参照資料">付録A. 参照資料</a></li>
 <li class="toc-h3"><a href="#引用着想元">引用・着想元</a></li>
@@ -164,44 +167,37 @@ Codex / Agent   : 調査・実装を進める
 <h3 id="5-現時点で採用したい最小原則">5. 現時点で採用したい最小原則</h3>
 <p>最初からすべてを実装しなくても、次を守る。</p>
 <ol>
-<li>
-<p><strong>Approval をクリック儀式にしない。</strong></p>
+<li><p><strong>Approval をクリック儀式にしない。</strong></p>
 <ul>
 <li>定常作業は適切に自動化し、本当に重要な境界で人間へ返す。</li>
 </ul>
 </li>
-<li>
-<p><strong>Sandbox を一語で扱わない。</strong></p>
+<li><p><strong>Sandbox を一語で扱わない。</strong></p>
 <ul>
 <li>各境界を分けて捉え、実際の挙動で確かめる。</li>
 </ul>
 </li>
-<li>
-<p><strong>正解判定を AI 自身に閉じない。</strong></p>
+<li><p><strong>正解判定を AI 自身に閉じない。</strong></p>
 <ul>
 <li>AI の判断ではない独立した実測値を使う。</li>
 </ul>
 </li>
-<li>
-<p><strong>人間の推測も仮説である。</strong></p>
+<li><p><strong>人間の推測も仮説である。</strong></p>
 <ul>
 <li>観測と推測を分ける。</li>
 </ul>
 </li>
-<li>
-<p><strong>失敗したら一次資料へ戻る。</strong></p>
+<li><p><strong>失敗したら一次資料へ戻る。</strong></p>
 <ul>
 <li>別案の大量生成より一次資料を優先する。</li>
 </ul>
 </li>
-<li>
-<p><strong>失敗は正常な終了経路である。</strong></p>
+<li><p><strong>失敗は正常な終了経路である。</strong></p>
 <ul>
 <li>不確かなまま完遂するより、必要な地点で人間へ返す。</li>
 </ul>
 </li>
-<li>
-<p><strong>外へ出さない。</strong></p>
+<li><p><strong>外へ出さない。</strong></p>
 <ul>
 <li>解析情報は外部送信しない。</li>
 </ul>
@@ -300,7 +296,7 @@ memo/&lt;tool&gt;_spec.md          = 検証済みの確定知識
 <li>再び踏みそうな重要な棄却案</li>
 <li>未解決事項</li>
 </ul>
-<p>つまり、**解析は「消さずに積む」、新規開発は「現在の決定へ圧縮する」**と考える。</p>
+<p>つまり、<strong>解析は「消さずに積む」、新規開発は「現在の決定へ圧縮する」</strong>と考える。</p>
 <hr />
 <h3 id="11-作業する側と作業環境を変更する側を分ける">11. 作業する側と、作業環境を変更する側を分ける</h3>
 <p><code>AGENTS.md</code>、<code>OPERATIONS.md</code>、本書など、Codex の作業環境そのものを定義する文書は、通常の解析・実装とは別の管理系統でメンテナンスする。</p>
@@ -736,7 +732,37 @@ work/0909/
 <p><code>MMDD</code> や <code>HHMM</code> の境界は、単に保存場所を変えるためのものではない。</p>
 <p><strong>現在の成果を新しい基準状態として次へ進む地点で境界を切り、継続に必要な作業状態だけを持ち越す。</strong></p>
 <hr />
-<h3 id="43-終業整理と人間の振り返りを両方行う">43. 終業整理と人間の振り返りを両方行う</h3>
+<h3 id="43-現在状態を一つの正本へ圧縮しない">43. 現在状態を一つの正本へ圧縮しない</h3>
+<p>作業を再開するために必要な現在状態は、一つの文書へ集約しなければならないとは限らない。</p>
+<p>解析では、少なくとも三つの状態が同時に存在する。</p>
+<pre><code class="language-text">spec
+  確定知識の現在地
+
+analysis
+  探索の現在地
+
+work / MMDD
+  作業実体の現在地
+</code></pre>
+<p><code>spec</code> には、検証済みで、以後の実装や判断が依存してよい知識を置く。</p>
+<p><code>analysis</code> には、未解析箇所、生きている仮説、矛盾、調査中のアドレス、次に確認する位置など、探索の現在地を置く。</p>
+<p><code>analysis</code> は作業履歴そのものではない。過去の観測や試行を含みながら、現在どこが未確定で、どの仮説が生きており、次にどこを見るかを保持する。</p>
+<p><code>work/MMDD/HHMM/</code> には、その探索を実際に再開するためのツール、生成物、中間状態を残す。</p>
+<p>ここで重要なのは、履歴をすべて現在状態とみなさないことである。</p>
+<p>過去の試行や棄却された仮説には価値があるが、新しい Agent が作業を再開するために、履歴を最初から再生する必要はない。</p>
+<p>一方で、解析では未確定性そのものが現在状態の一部であるため、すべてを確定仕様へ圧縮することもできない。</p>
+<pre><code class="language-text">履歴を全部読む
+    ≠
+現在地を復元する
+
+現在地を一つに集約する
+    ≠
+再開可能にする
+</code></pre>
+<p>必要なのは、確定知識、探索の前線、再開可能な作業実体が、それぞれどこにあるか分かることである。</p>
+<p><strong>現在状態のすべてを、一つの正本へ圧縮しない。仕事を再開するために必要な状態を、役割ごとに分けて持つ。</strong></p>
+<hr />
+<h3 id="44-終業整理と人間の振り返りを両方行う">44. 終業整理と人間の振り返りを両方行う</h3>
 <p>作業を終えるとき、Codex はまず <code>OPERATIONS.md</code> に従って、次のセッションから再開できる状態を残して返却する。</p>
 <p><strong>作業中は机が散らかってもよい。しかし、次のセッションへ汚れた机を渡さない。</strong></p>
 <p>終業整理と人間による振り返りは別の工程とする。</p>
@@ -746,7 +772,7 @@ work/0909/
 <p>運用文書の変更が必要な場合は、ChatGPT 側の管理系統で行う。</p>
 <hr />
 <h2 id="第VIII部-運用を育てる">第VIII部　運用を育てる</h2>
-<h3 id="44-失敗を分類してから運用を変える">44. 失敗を分類してから運用を変える</h3>
+<h3 id="45-失敗を分類してから運用を変える">45. 失敗を分類してから運用を変える</h3>
 <p>Codex が失敗した場合、すぐにルールを追加したり、自由度を下げたりしない。</p>
 <p>まず、作業に必要な情報・道具・観測・検証・復旧手段を、Codex が実際に利用できたか確認する。</p>
 <p>例:</p>
@@ -761,7 +787,7 @@ work/0909/
 <p><strong>Harness 側の不足をルール不足と取り違えない。</strong></p>
 <p>そのうえで再発防止が必要なら、禁止事項を増やす前に、何を守る必要があったのかを特定する。</p>
 <hr />
-<h3 id="45-情報で導くと仕組みで閉じるを使い分ける">45. 「情報で導く」と「仕組みで閉じる」を使い分ける</h3>
+<h3 id="46-情報で導くと仕組みで閉じるを使い分ける">46. 「情報で導く」と「仕組みで閉じる」を使い分ける</h3>
 <p>同じ運用上の問題に対して、少なくとも二つの解決方向がある。</p>
 <p><strong>情報で導く</strong></p>
 <p>Markdown や情報構造を使い、必要な情報・原則・選択肢を AI が参照できる形にし、状況に応じた判断を残す。</p>
@@ -784,7 +810,7 @@ work/0909/
 <p>仕組みで閉じることは、安全性のためだけに使うものではない。</p>
 <p><strong>AI が毎回判断しなければならない範囲を減らす。</strong></p>
 <hr />
-<h3 id="46-毎回同じ判断をしているなら環境へ移せないか考える">46. 毎回同じ判断をしているなら、環境へ移せないか考える</h3>
+<h3 id="47-毎回同じ判断をしているなら環境へ移せないか考える">47. 毎回同じ判断をしているなら、環境へ移せないか考える</h3>
 <p>AI に自由を与えること自体を目的にしない。</p>
 <p>次のような判断は、<strong>仕組みで閉じる</strong>候補になる。</p>
 <ul>
@@ -804,7 +830,7 @@ work/0909/
 </ul>
 <p><strong>強制できるから強制するのではない。繰り返す必要のない推論を取り除ける場合に強制する。</strong></p>
 <hr />
-<h3 id="47-運用は環境に適合させ設計は運用から学ぶ">47. 運用は環境に適合させ、設計は運用から学ぶ</h3>
+<h3 id="48-運用は環境に適合させ設計は運用から学ぶ">48. 運用は環境に適合させ、設計は運用から学ぶ</h3>
 <p>モデル、Sandbox、Approval、MCP、Skills などの実行環境は変化する。そのため、現在うまく機能している設定や運用手順を、そのまま恒久的な資産とはみなさない。</p>
 <p>特に、モデル固有の回避指示、製品・UI・tool 固有の手順、prompt tuning などは、現在の環境へ適合させた短寿命の成果物として扱う。</p>
 <p>一方、次のような設計理由は、実装方式が変わっても残る可能性が高い。</p>
@@ -830,7 +856,7 @@ work/0909/
 <p><strong>規約は従う対象であると同時に、現実との不整合が観測された場合は検査対象にもなる。</strong></p>
 <p><strong>運用は環境に適合させ、設計は運用から学習する。</strong></p>
 <hr />
-<h3 id="48-会話を仕事の記憶にしない">48. 会話を仕事の記憶にしない</h3>
+<h3 id="49-会話を仕事の記憶にしない">49. 会話を仕事の記憶にしない</h3>
 <p>人間同士の仕事では、口頭やチャットの曖昧なやり取りが、共有された経験や常識によって補われてきた。</p>
 <p>「前に話したこと」「昨日の感じ」「この場合だけの例外」のような情報は、その場では十分でも、時間が経ち、担当者が変われば失われる。</p>
 <p>Agent が仕事へ入ることで、この弱さはより明確になる。</p>
@@ -839,13 +865,13 @@ work/0909/
 <p>そこで得た判断を、設計、仕様、運用手順、検証条件などの後から参照できる形へ移し、必要なものを Codex へ返す。</p>
 <p><strong>会話で生まれた判断は、会話の外へ出して初めて仕事の記憶になる。</strong></p>
 <hr />
-<h3 id="49-Codex-は壊れる">49. Codex は壊れる</h3>
+<h3 id="50-Codex-は壊れる">50. Codex は壊れる</h3>
 <p>Codex は、対象ファイルの取り違え、誤った上書き保存、誤操作によるプロジェクトの破壊など、重大な事故を起こす。</p>
 <p>これは例外的な事故ではなく、一定の確率で発生する。現代のエージェントは、同じ文字列の指示を与えても、毎回同じ判断や命令を生成するとは限らないからである。残念ながら、<code>AGENTS.md</code> に明示した指示や禁止事項をすり抜ける形でも発生し得る。</p>
 <p>なぜ壊れたのかを追跡しても、徒労に終わる可能性が高い。</p>
 <p><strong>Codex が壊れても、仕事まで壊れない環境を作る。</strong></p>
 <hr />
-<h3 id="50-ハーネスとは何か">50. ハーネスとは何か</h3>
+<h3 id="51-ハーネスとは何か">51. ハーネスとは何か</h3>
 <p>ハーネスは、AI に仕事を任せるための単なる規則集ではない。</p>
 <p>人間が毎回判断しなくても作業を進められるように、必要な情報、権限、観測、検証、拒否、復旧、返却経路を環境として組み立てる。</p>
 <p>その目的は、AI を無制限に自律させることではない。<br />
@@ -873,21 +899,17 @@ work/0909/
 <h4 id="人間側に残る判断">人間側に残る判断</h4>
 <p>人間側には、少なくとも次の判断が残る。</p>
 <ul>
-<li>
-<p><strong>何を Good Job とするか。</strong><br />
+<li><p><strong>何を Good Job とするか。</strong><br />
 その仕事がどちらへ進むべきかを決める。<br />
 <code>taste</code>、<code>risk tolerance</code>、<code>polish</code>、<code>shortcut</code>、<code>done</code> は、この方向を構成する。</p>
 </li>
-<li>
-<p><strong>何を不変条件とするか。</strong><br />
+<li><p><strong>何を不変条件とするか。</strong><br />
 その方向へ進む途中でも、何が常に守られなければならないかを決める。</p>
 </li>
-<li>
-<p><strong>何を証拠とするか。</strong><br />
+<li><p><strong>何を証拠とするか。</strong><br />
 何を観測すれば、不変条件や必要な性質を検証できるかを決める。</p>
 </li>
-<li>
-<p><strong>証拠が十分かを判断する。</strong><br />
+<li><p><strong>証拠が十分かを判断する。</strong><br />
 得られた観測から、その仕事を成立したものとして受け入れ、ここで止めてよいかを決める。</p>
 </li>
 </ul>
@@ -945,53 +967,43 @@ Ryan Lopopolo — <em>What Does It Mean to Do a Good Job?</em><br />
 </ul>
 <h3 id="現行仕様">現行仕様</h3>
 <ul>
-<li>
-<p>OpenAI Developers<br />
+<li><p>OpenAI Developers<br />
 <a href="https://developers.openai.com/">https://developers.openai.com/</a></p>
 </li>
-<li>
-<p>Codex Permissions<br />
+<li><p>Codex Permissions<br />
 <a href="https://learn.chatgpt.com/docs/permissions">https://learn.chatgpt.com/docs/permissions</a></p>
 </li>
-<li>
-<p>Codex Sandboxing<br />
+<li><p>Codex Sandboxing<br />
 <a href="https://learn.chatgpt.com/docs/sandboxing">https://learn.chatgpt.com/docs/sandboxing</a></p>
 </li>
-<li>
-<p>Agent approvals &amp; security<br />
+<li><p>Agent approvals &amp; security<br />
 <a href="https://learn.chatgpt.com/docs/agent-approvals-security">https://learn.chatgpt.com/docs/agent-approvals-security</a></p>
 </li>
-<li>
-<p>Codex Config Basics<br />
+<li><p>Codex Config Basics<br />
 <a href="https://learn.chatgpt.com/docs/config-file/config-basic">https://learn.chatgpt.com/docs/config-file/config-basic</a></p>
 </li>
-<li>
-<p>Codex Rules<br />
+<li><p>Codex Rules<br />
 <a href="https://learn.chatgpt.com/docs/agent-configuration/rules">https://learn.chatgpt.com/docs/agent-configuration/rules</a></p>
 </li>
-<li>
-<p>Codex Windows Sandbox<br />
+<li><p>Codex Windows Sandbox<br />
 <a href="https://learn.chatgpt.com/docs/windows/windows-sandbox">https://learn.chatgpt.com/docs/windows/windows-sandbox</a></p>
 </li>
 </ul>
 <h3 id="設計実装運用">設計・実装・運用</h3>
 <ul>
-<li>
-<p>OpenAI — Building a safe, effective sandbox to enable Codex on Windows<br />
+<li><p>OpenAI — Building a safe, effective sandbox to enable Codex on Windows<br />
 <a href="https://openai.com/index/building-codex-windows-sandbox/">https://openai.com/index/building-codex-windows-sandbox/</a></p>
 </li>
-<li>
-<p>OpenAI — Running Codex safely at OpenAI<br />
+<li><p>OpenAI — Running Codex safely at OpenAI<br />
 <a href="https://openai.com/index/running-codex-safely/">https://openai.com/index/running-codex-safely/</a></p>
 </li>
-<li>
-<p>OpenAI — Harness engineering: leveraging Codex in an agent-first world<br />
+<li><p>OpenAI — Harness engineering: leveraging Codex in an agent-first world<br />
 <a href="https://openai.com/index/harness-engineering/">https://openai.com/index/harness-engineering/</a></p>
 </li>
 </ul>
 </article>
 <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Codex Workplace Design Guide / Author: akkera102 / Updated: 2026-09-12 21:51 JST</footer>
+<footer>Codex Workplace Design Guide / Author: akkera102 / Updated: 2026-09-15 16:18 JST</footer>
 </body>
 </html>

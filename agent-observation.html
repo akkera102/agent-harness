@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-15 10:21 JST">
+<meta name="last-modified" content="2026-09-15 17:28 JST">
 <meta name="description" content="Agentを使った探索・実装・検証で、探索、証拠、人間の負担、仕組み、判断、知識の流れを観測するためのガイド。">
 <title>Agent Observation Guide</title>
 <style>
+
 :root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
 @media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
 *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;line-height:1.82;font-size:16px}
@@ -20,58 +21,61 @@ table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-siz
 footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted);font-size:.85rem}.backtop{display:inline-block;margin-top:2em}
 @media(max-width:700px){body{font-size:15px}main{padding:30px 18px 70px}.doc-title{font-size:1.72rem}.meta{display:block}.meta span{display:block;margin:.2em 0}.toc{padding:15px 16px}h2{font-size:1.34rem}h3{font-size:1.15rem}footer{padding:0 18px 36px}}
 @media print{body{background:#fff;color:#000;font-size:11pt}main{max-width:none;padding:0}.doc-head{margin-top:0}.toc{break-after:page;background:#fff}.toc a{color:#000}.backtop{display:none}a{color:#000;text-decoration:none}pre,blockquote,table{break-inside:avoid}}
+
 </style>
 </head>
 <body>
 <main id="top">
 <header class="doc-head">
 <h1 class="doc-title">Agent Observation Guide</h1>
-<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-15 10:21 JST</span><span>Language: Japanese</span></div>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-15 17:28 JST</span><span>Language: Japanese</span></div>
 </header>
 <nav class="toc" aria-label="目次">
 <div class="toc-title">目次</div>
 <ul>
-<li class="toc-h2"><a href="#I-探索を進める">I. 探索を進める</a></li>
+<li class="toc-h2"><a href="#第I部-探索を進める">第I部　探索を進める</a></li>
 <li class="toc-h3"><a href="#1-確認事項の粒度を見る">1. 確認事項の粒度を見る</a></li>
 <li class="toc-h3"><a href="#2-候補集合の変化を見る">2. 候補集合の変化を見る</a></li>
 <li class="toc-h3"><a href="#3-探索は-decision-gap-で制御する">3. 探索は decision gap で制御する</a></li>
-<li class="toc-h2"><a href="#II-成立と証拠を判定する">II. 成立と証拠を判定する</a></li>
-<li class="toc-h3"><a href="#4-成果物を成果にしない">4. 成果物を成果にしない</a></li>
-<li class="toc-h3"><a href="#5-変更は失敗を再投入して確かめる">5. 変更は、失敗を再投入して確かめる</a></li>
-<li class="toc-h3"><a href="#6-合格は完成ではなく昇格である">6. 合格は完成ではなく昇格である</a></li>
-<li class="toc-h3"><a href="#7-Evidence-から-Claim-への推論を見る">7. Evidence から Claim への推論を見る</a></li>
-<li class="toc-h3"><a href="#8-Proof-はどこで十分とするかを見る">8. Proof はどこで十分とするかを見る</a></li>
-<li class="toc-h3"><a href="#9-green-は問題がないことを意味しない">9. green は問題がないことを意味しない</a></li>
-<li class="toc-h3"><a href="#10-観測は判断に必要な情報量で設計する">10. 観測は判断に必要な情報量で設計する</a></li>
-<li class="toc-h3"><a href="#11-検査の検査には終点がいる">11. 検査の検査には終点がいる</a></li>
-<li class="toc-h2"><a href="#III-人間に残る負担を見る">III. 人間に残る負担を見る</a></li>
-<li class="toc-h3"><a href="#12-作業時間を一つの時間で語らない">12. 作業時間を一つの時間で語らない</a></li>
-<li class="toc-h3"><a href="#13-人間に残る負担を三つに分けて見る">13. 人間に残る負担を三つに分けて見る</a></li>
-<li class="toc-h3"><a href="#14-人間の思考負荷が高いなら仕組みを疑う">14. 人間の思考負荷が高いなら、仕組みを疑う</a></li>
-<li class="toc-h3"><a href="#15-意味のある分岐を人間が所有する">15. 意味のある分岐を人間が所有する</a></li>
-<li class="toc-h2"><a href="#IV-仕組みと介入点を設計する">IV. 仕組みと介入点を設計する</a></li>
-<li class="toc-h3"><a href="#16-仕組みを増やす条件">16. 仕組みを増やす条件</a></li>
-<li class="toc-h3"><a href="#17-介入点はコストで選ぶ">17. 介入点はコストで選ぶ</a></li>
-<li class="toc-h3"><a href="#18-Gate-は介入点に置く">18. Gate は介入点に置く</a></li>
-<li class="toc-h2"><a href="#V-境界と仕組みを更新する">V. 境界と仕組みを更新する</a></li>
-<li class="toc-h3"><a href="#19-Agent-は-Architecture-を決めずにいる時間の価格を変える">19. Agent は Architecture を決めずにいる時間の価格を変える</a></li>
-<li class="toc-h3"><a href="#20-Architecture-は後から変えにくい境界から先に決める">20. Architecture は後から変えにくい境界から先に決める</a></li>
-<li class="toc-h3"><a href="#21-人間と仕組みの境界は時間とともに動く">21. 人間と仕組みの境界は時間とともに動く</a></li>
-<li class="toc-h3"><a href="#22-仕組みに移した判断は永久に正しいとは限らない">22. 仕組みに移した判断は、永久に正しいとは限らない</a></li>
-<li class="toc-h3"><a href="#23-移行より作り直しが安いことがある">23. 移行より作り直しが安いことがある</a></li>
-<li class="toc-h3"><a href="#24-変更対象とは別に制御経路を持つ">24. 変更対象とは別に制御経路を持つ</a></li>
-<li class="toc-h2"><a href="#VI-判断と責任を分ける">VI. 判断と責任を分ける</a></li>
-<li class="toc-h3"><a href="#25-実装を外すと判断の生産が露出する">25. 実装を外すと判断の生産が露出する</a></li>
-<li class="toc-h3"><a href="#26-Agent-に工程を持たせない">26. Agent に工程を持たせない</a></li>
-<li class="toc-h3"><a href="#27-Role-と-Actor-は分けて考える">27. Role と Actor は分けて考える</a></li>
-<li class="toc-h3"><a href="#28-Actor-を増やすコストを見る">28. Actor を増やすコストを見る</a></li>
-<li class="toc-h3"><a href="#29-責任を時間で分ける">29. 責任を時間で分ける</a></li>
-<li class="toc-h2"><a href="#VII-知識と作業を次へ渡す">VII. 知識と作業を次へ渡す</a></li>
-<li class="toc-h3"><a href="#30-Repository-は-Prompt-Surface-である">30. Repository は Prompt Surface である</a></li>
-<li class="toc-h3"><a href="#31-環境を整えるには推論taxがかかる">31. 環境を整えるには、推論taxがかかる</a></li>
-<li class="toc-h3"><a href="#32-知識へのアクセス経路を残す">32. 知識へのアクセス経路を残す</a></li>
-<li class="toc-h3"><a href="#33-作業は再開できる単位でそろえる">33. 作業は、再開できる単位でそろえる</a></li>
-<li class="toc-h3"><a href="#34-失敗成功幸運を分けて振り返る">34. 失敗、成功、幸運を分けて振り返る</a></li>
+<li class="toc-h3"><a href="#4-Task-の境界は検証可能性に現れる">4. Task の境界は検証可能性に現れる</a></li>
+<li class="toc-h2"><a href="#第II部-成立と証拠を判定する">第II部　成立と証拠を判定する</a></li>
+<li class="toc-h3"><a href="#5-成果物を成果にしない">5. 成果物を成果にしない</a></li>
+<li class="toc-h3"><a href="#6-変更は失敗を再投入して確かめる">6. 変更は、失敗を再投入して確かめる</a></li>
+<li class="toc-h3"><a href="#7-合格は完成ではなく昇格である">7. 合格は完成ではなく昇格である</a></li>
+<li class="toc-h3"><a href="#8-Checker-の独立性は-context-境界で見る">8. Checker の独立性は context 境界で見る</a></li>
+<li class="toc-h3"><a href="#9-Evidence-から-Claim-への推論を見る">9. Evidence から Claim への推論を見る</a></li>
+<li class="toc-h3"><a href="#10-Proof-はどこで十分とするかを見る">10. Proof はどこで十分とするかを見る</a></li>
+<li class="toc-h3"><a href="#11-green-は問題がないことを意味しない">11. green は問題がないことを意味しない</a></li>
+<li class="toc-h3"><a href="#12-観測は判断に必要な情報量で設計する">12. 観測は判断に必要な情報量で設計する</a></li>
+<li class="toc-h3"><a href="#13-検査の検査には終点がいる">13. 検査の検査には終点がいる</a></li>
+<li class="toc-h2"><a href="#第III部-人間に残る負担を見る">第III部　人間に残る負担を見る</a></li>
+<li class="toc-h3"><a href="#14-作業時間を一つの時間で語らない">14. 作業時間を一つの時間で語らない</a></li>
+<li class="toc-h3"><a href="#15-人間に残る負担を三つに分けて見る">15. 人間に残る負担を三つに分けて見る</a></li>
+<li class="toc-h3"><a href="#16-人間の思考負荷が高いなら仕組みを疑う">16. 人間の思考負荷が高いなら、仕組みを疑う</a></li>
+<li class="toc-h3"><a href="#17-意味のある分岐を人間が所有する">17. 意味のある分岐を人間が所有する</a></li>
+<li class="toc-h2"><a href="#第IV部-仕組みと介入点を設計する">第IV部　仕組みと介入点を設計する</a></li>
+<li class="toc-h3"><a href="#18-仕組みを増やす条件">18. 仕組みを増やす条件</a></li>
+<li class="toc-h3"><a href="#19-介入点はコストで選ぶ">19. 介入点はコストで選ぶ</a></li>
+<li class="toc-h3"><a href="#20-Gate-は介入点に置く">20. Gate は介入点に置く</a></li>
+<li class="toc-h2"><a href="#第V部-境界と仕組みを更新する">第V部　境界と仕組みを更新する</a></li>
+<li class="toc-h3"><a href="#21-Agent-は-Architecture-を決めずにいる時間の価格を変える">21. Agent は Architecture を決めずにいる時間の価格を変える</a></li>
+<li class="toc-h3"><a href="#22-Architecture-は後から変えにくい境界から先に決める">22. Architecture は後から変えにくい境界から先に決める</a></li>
+<li class="toc-h3"><a href="#23-人間と仕組みの境界は時間とともに動く">23. 人間と仕組みの境界は時間とともに動く</a></li>
+<li class="toc-h3"><a href="#24-仕組みに移した判断は永久に正しいとは限らない">24. 仕組みに移した判断は、永久に正しいとは限らない</a></li>
+<li class="toc-h3"><a href="#25-移行より作り直しが安いことがある">25. 移行より作り直しが安いことがある</a></li>
+<li class="toc-h3"><a href="#26-変更対象とは別に制御経路を持つ">26. 変更対象とは別に制御経路を持つ</a></li>
+<li class="toc-h2"><a href="#第VI部-判断と責任を分ける">第VI部　判断と責任を分ける</a></li>
+<li class="toc-h3"><a href="#27-実装を外すと判断の生産が露出する">27. 実装を外すと判断の生産が露出する</a></li>
+<li class="toc-h3"><a href="#28-Agent-に工程を持たせない">28. Agent に工程を持たせない</a></li>
+<li class="toc-h3"><a href="#29-Role-と-Actor-は分けて考える">29. Role と Actor は分けて考える</a></li>
+<li class="toc-h3"><a href="#30-Actor-を増やすコストを見る">30. Actor を増やすコストを見る</a></li>
+<li class="toc-h3"><a href="#31-責任を時間で分ける">31. 責任を時間で分ける</a></li>
+<li class="toc-h2"><a href="#第VII部-知識と作業を次へ渡す">第VII部　知識と作業を次へ渡す</a></li>
+<li class="toc-h3"><a href="#32-Repository-は-Prompt-Surface-である">32. Repository は Prompt Surface である</a></li>
+<li class="toc-h3"><a href="#33-環境を整えるには推論taxがかかる">33. 環境を整えるには、推論taxがかかる</a></li>
+<li class="toc-h3"><a href="#34-知識へのアクセス経路を残す">34. 知識へのアクセス経路を残す</a></li>
+<li class="toc-h3"><a href="#35-作業は再開できる単位でそろえる">35. 作業は、再開できる単位でそろえる</a></li>
+<li class="toc-h3"><a href="#36-失敗成功幸運を分けて振り返る">36. 失敗、成功、幸運を分けて振り返る</a></li>
 </ul>
 </nav>
 <article>
@@ -80,7 +84,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <p>目的: Agent を使った探索・実装・検証の中で、何が進展し、何が成立し、人間にどの負担や判断が残り、仕組みや知識がどう働いているかを観測するための視点を整理する。</p>
 <p>本書は特定の運用手順や自律化方式を定めるものではない。探索、証拠、負担、仕組み、判断、知識の流れを分けて見ることで、どこに問題があり、次に何を変えるべきかを判断するための観測ガイドである。</p>
 </blockquote>
-<h2 id="I-探索を進める">I. 探索を進める</h2>
+<h2 id="第I部-探索を進める">第I部　探索を進める</h2>
 <h3 id="1-確認事項の粒度を見る">1. 確認事項の粒度を見る</h3>
 <p>探索が停滞しているときは、確認事項を次の判断に使える単位へ分けられるかを見る。</p>
 <p>たとえば、</p>
@@ -114,30 +118,62 @@ C
 <p>たとえば、原因候補が <code>A</code> と <code>B</code> に絞られているなら、<code>A</code> と <code>B</code> を区別できる一つの観測を探す。</p>
 <p>探索の初期には広く読む必要がある。候補が見え始めた後は、decision gap を基準に観測先を絞る。</p>
 <p><strong>探索先は、関係の深さではなく、判断を変えられるかで選ぶ。</strong></p>
-<h2 id="II-成立と証拠を判定する">II. 成立と証拠を判定する</h2>
-<h3 id="4-成果物を成果にしない">4. 成果物を成果にしない</h3>
+<h3 id="4-Task-の境界は検証可能性に現れる">4. Task の境界は検証可能性に現れる</h3>
+<p>Task の境界は、作業量を均等に分けたところに現れるとは限らない。</p>
+<p>一つの仕事について、</p>
+<pre><code class="language-text">前提を確認できる
+    ↓
+変更できる
+    ↓
+結果を検証できる
+    ↓
+その単位を閉じられる
+</code></pre>
+<p>ところまでが、一つの成立した輪郭として見える。</p>
+<p>別の Task が終わらなければ結果を確かめられないなら、現在見ている境界は依存関係をまたいでいる可能性がある。</p>
+<p>ここで見るのは Task の大きさではない。</p>
+<p><strong>Task の境界は、その単位だけで成立を確かめて閉じられるかに現れる。</strong></p>
+<h2 id="第II部-成立と証拠を判定する">第II部　成立と証拠を判定する</h2>
+<h3 id="5-成果物を成果にしない">5. 成果物を成果にしない</h3>
 <p>コード、文書、道具、報告、検査結果など、Agent が作った成果物は、作られただけでは完成品ではない。</p>
 <p>すべてを試作として見る。</p>
 <p>重要なのは、その試作によって何が確認できたか、目的としていた状態が本当に成立したかである。</p>
 <p><strong>Agent が作った成果物は、成立が確認されるまでは試作として扱う。</strong></p>
-<h3 id="5-変更は失敗を再投入して確かめる">5. 変更は、失敗を再投入して確かめる</h3>
-<p>変更は、書いた時点では改善ではない。<br/>
+<h3 id="6-変更は失敗を再投入して確かめる">6. 変更は、失敗を再投入して確かめる</h3>
+<p>変更は、書いた時点では改善ではない。<br />
 実装した時点でも、まだ改善とは限らない。</p>
-<p>ただし、すべての変更に大規模な試験が必要なわけではない。<br/>
+<p>ただし、すべての変更に大規模な試験が必要なわけではない。<br />
 変更の大きさではなく、<strong>失敗したときの影響に応じて再現の強さを変える。</strong></p>
-<p><code>Rule → 反例</code><br/>
-<code>手順 → 失敗場面</code><br/>
-<code>Harness → 境界到達</code><br/>
+<p><code>Rule → 反例</code><br />
+<code>手順 → 失敗場面</code><br />
+<code>Harness → 境界到達</code><br />
 <code>復旧処理 → 中断と再開</code></p>
-<p>同じ反例で何度もRuleが破られるなら、そのRuleは文章だけで守らせるには弱い可能性がある。<br/>
+<p>同じ反例で何度もRuleが破られるなら、そのRuleは文章だけで守らせるには弱い可能性がある。<br />
 その場合は、文章を増やすのではなく、Harnessや構造へ移せないかを見る。</p>
 <p><strong>失敗を直す変更は、以前の失敗を変えられたときに初めて確認される。</strong></p>
-<h3 id="6-合格は完成ではなく昇格である">6. 合格は完成ではなく昇格である</h3>
+<h3 id="7-合格は完成ではなく昇格である">7. 合格は完成ではなく昇格である</h3>
 <p>試作の前提、観測範囲、証拠を確認する。</p>
 <p>ここでの合格は、永久に正しいという意味ではない。</p>
 <p>現在の前提、観測範囲、証拠のもとで、次の判断や作業の根拠として使ってよいという意味である。</p>
 <p><strong>合格は完成ではなく、次に使える状態への昇格である。</strong></p>
-<h3 id="7-Evidence-から-Claim-への推論を見る">7. Evidence から Claim への推論を見る</h3>
+<h3 id="8-Checker-の独立性は-context-境界で見る">8. Checker の独立性は context 境界で見る</h3>
+<p>Maker と Checker を分けても、同じ説明、仮説、推論経路をそのまま引き継げば、見方まで引き継ぐ。</p>
+<p>Checker の独立性を見るときは、Actor の数ではなく、どの context から判断を始めているかを見る。</p>
+<pre><code class="language-text">Maker context
+    ↓
+成果物 / 正本 / 差分 / 観測結果
+    ↓
+context 境界
+    ↓
+Checker context
+</code></pre>
+<p>Checker に最初から必要なのは、Maker の説明ではない。</p>
+<p>成果物、正本、変更差分、検証結果など、判断に必要な対象を先に見る。</p>
+<p>Maker が途中で立てた仮説、捨てた案、説明の流れは、必要になったときに参照すればよい。</p>
+<p>別 Agent を用意しなくても、別 session や別 thread から確認を始めれば、同じ Actor でも context を分けられることがある。</p>
+<p>ここで見るのは、人を増やしたかではない。</p>
+<p><strong>Checker が Maker の結論を引き継ぐ前に、自分の判断を作れる context になっているかを見る。</strong></p>
+<h3 id="9-Evidence-から-Claim-への推論を見る">9. Evidence から Claim への推論を見る</h3>
 <p>Evidence から Claim（主張）へ進む間には推論がある。</p>
 <p>疑い方は、少なくとも三つに分けられる。</p>
 <pre><code class="language-text">結論を疑う
@@ -168,18 +204,18 @@ Claim
 </code></pre>
 <p>前者が成立しても、後者まで証明されたとは限らない。</p>
 <p><strong>正しい Evidence から、強すぎる Claim へ飛んでいないかを見る。</strong></p>
-<h3 id="8-Proof-はどこで十分とするかを見る">8. Proof はどこで十分とするかを見る</h3>
+<h3 id="10-Proof-はどこで十分とするかを見る">10. Proof はどこで十分とするかを見る</h3>
 <p>Proof（成立確認）では、不確実性をすべて取り除く必要があるとは限らない。</p>
 <p>Evidence、Claim、残っている不確実性を確認し、現在の目的に対してどこまで確かなら十分かを判断する。</p>
 <p>この判断を <code>Sufficiency（十分性）</code> と考える。</p>
 <p>証拠を増やし続けても、判断が変わらないなら追加確認の価値は下がる。</p>
 <p><strong>Proof は、何が確かかだけでなく、どこで十分とするかまで含めて考える。</strong></p>
-<h3 id="9-green-は問題がないことを意味しない">9. green は問題がないことを意味しない</h3>
+<h3 id="11-green-は問題がないことを意味しない">11. green は問題がないことを意味しない</h3>
 <p>test、lint、validator、monitoring が何も問題を報告しなかったとき、<code>green</code> には二つの可能性がある。</p>
 <p>問題がない場合と、問題はあるが検査で検出できていない場合である。</p>
 <p><strong>green は「問題がない」という観測ではない。検査で問題を検出しなかったという観測である。</strong></p>
 <p>検査にも可視範囲と盲点があるため、必要に応じて検査そのものも観測対象にする。</p>
-<h3 id="10-観測は判断に必要な情報量で設計する">10. 観測は判断に必要な情報量で設計する</h3>
+<h3 id="12-観測は判断に必要な情報量で設計する">12. 観測は判断に必要な情報量で設計する</h3>
 <p>大量の処理がすべて成功したとき、一件ごとの成功ログを並べても、判断に必要な情報はほとんど増えない。</p>
 <pre><code class="language-text">file_001 OK
 file_002 OK
@@ -210,7 +246,7 @@ Failure
 </code></pre>
 <p>raw log を残すことと、raw log をそのまま Agent に読ませることは別である。</p>
 <p><strong>観測は、出力できる事実の量ではなく、次の判断に必要な情報量で設計する。</strong></p>
-<h3 id="11-検査の検査には終点がいる">11. 検査の検査には終点がいる</h3>
+<h3 id="13-検査の検査には終点がいる">13. 検査の検査には終点がいる</h3>
 <p>検査に盲点があるなら、その検査を別の検査で確認したくなる。</p>
 <p>しかし、その検査にも盲点があるため、さらに別の検査を置くことができる。</p>
 <p>この連鎖を完全に終わらせることはできない。</p>
@@ -223,8 +259,8 @@ Failure
 <p>を判断する。</p>
 <p>この判断を <code>Sufficiency（十分性）</code> と考える。</p>
 <p><strong>検査を増やし続けるのではなく、現在の目的に対してどこで十分とするかを決める。</strong></p>
-<h2 id="III-人間に残る負担を見る">III. 人間に残る負担を見る</h2>
-<h3 id="12-作業時間を一つの時間で語らない">12. 作業時間を一つの時間で語らない</h3>
+<h2 id="第III部-人間に残る負担を見る">第III部　人間に残る負担を見る</h2>
+<h3 id="14-作業時間を一つの時間で語らない">14. 作業時間を一つの時間で語らない</h3>
 <p>「速いか遅いか」は、一つの時間だけでは決まらない。</p>
 <p>たとえば、</p>
 <ul>
@@ -238,7 +274,7 @@ Failure
 <p>逆に、Agent が高速でも、人の確認や修正が増えれば、仕事全体が速くなったとは言えない。</p>
 <p>Agent が作る量が人の確認できる量を上回れば、未確認の成果物がたまる。</p>
 <p><strong>速さを見るときは、誰のどの時間を見ているのかを分ける。</strong></p>
-<h3 id="13-人間に残る負担を三つに分けて見る">13. 人間に残る負担を三つに分けて見る</h3>
+<h3 id="15-人間に残る負担を三つに分けて見る">15. 人間に残る負担を三つに分けて見る</h3>
 <p>ここでは、負担を三つに分けて見る。</p>
 <pre><code class="language-text">Human Observation Time
     結果を理解するまで
@@ -256,14 +292,14 @@ Human Judgment Width
 <p>小さな判断を何度も人間へ返す運用では、個々の判断が簡単でも、Human Judgment Count は増える。</p>
 <p>判断回数が同じ一回でも、少数の選択肢と整理された根拠から選ぶ場合と、多数の成果物や未確定事項を読み直して方針そのものを作る場合では、Human Judgment Width が違う。</p>
 <p><strong>Agent の仕事量ではなく、人間に何が残ったかを見る。</strong></p>
-<h3 id="14-人間の思考負荷が高いなら仕組みを疑う">14. 人間の思考負荷が高いなら、仕組みを疑う</h3>
+<h3 id="16-人間の思考負荷が高いなら仕組みを疑う">16. 人間の思考負荷が高いなら、仕組みを疑う</h3>
 <p>正しく作業するために、人間が多くの条件を覚え、例外を追い、常に注意を張り続けなければならないなら、その負荷を人間の能力だけで吸収しない。</p>
 <p>複雑な仕事には、考えること自体が必要な場合もある。</p>
 <p>しかし、同じ作業を安全に行うための注意や記憶が大きすぎるなら、手順、境界、配置、表示、道具など、仕事を支える仕組みに負荷の原因がないかを見る。</p>
 <p>判断を人間へ返すときは、<strong>認知作業の所有</strong>も見る。</p>
 <p>人間が判断のたびに状況を再構築しなければならないなら、判断だけでなく、状況理解から判断までの認知作業そのものが人間へ戻っている。</p>
 <p><strong>人間が頑張ることで成立している場所は、仕組みを見直す候補になる。</strong></p>
-<h3 id="15-意味のある分岐を人間が所有する">15. 意味のある分岐を人間が所有する</h3>
+<h3 id="17-意味のある分岐を人間が所有する">17. 意味のある分岐を人間が所有する</h3>
 <p>Agent に作業を任せていくと、人間には難しい判断だけが残ることがある。</p>
 <p>その判断に至る過程まで任せていると、人間は必要な文脈を持たないまま、最も不確実で負荷の高い場面だけを引き受けることになる。</p>
 <ul>
@@ -275,8 +311,8 @@ Human Judgment Width
 <p>この問いに人間が答えられない時、意味のある分岐から、判断の所有が失われている。</p>
 <p><strong>意味のある分岐を所有する。</strong></p>
 <p>自動化の境界は、Agent に何ができるかだけでなく、<strong>人間に何を所有させておく必要があるかを見る。</strong></p>
-<h2 id="IV-仕組みと介入点を設計する">IV. 仕組みと介入点を設計する</h2>
-<h3 id="16-仕組みを増やす条件">16. 仕組みを増やす条件</h3>
+<h2 id="第IV部-仕組みと介入点を設計する">第IV部　仕組みと介入点を設計する</h2>
+<h3 id="18-仕組みを増やす条件">18. 仕組みを増やす条件</h3>
 <p>新しい仕組みには、追加する理由と維持する理由の両方がいる。</p>
 <p>追加候補になるのは、たとえば、</p>
 <ul>
@@ -288,14 +324,14 @@ Human Judgment Width
 </ul>
 <p>場合である。</p>
 <p><strong>追加する理由だけでなく、維持し続ける理由も見る。</strong></p>
-<h3 id="17-介入点はコストで選ぶ">17. 介入点はコストで選ぶ</h3>
+<h3 id="19-介入点はコストで選ぶ">19. 介入点はコストで選ぶ</h3>
 <p>同じ失敗でも、介入できる地点は一つではない。</p>
 <p>実行前に防ぐことも、実行直後に検出することも、後工程でまとめて検査し、必要なら修正・再生成することもできる。</p>
 <p>介入点を選ぶときは、早さだけを目的にしない。</p>
 <p>早く介入すれば失敗の伝播を小さくできるが、待ち時間や調整が増えることもある。</p>
 <p>一方、介入を遅らせれば、後で失敗を直す負担が大きくなる可能性がある。</p>
 <p><strong>介入点は、早く介入する負担と、後で失敗を直す負担を比べて選ぶ。</strong></p>
-<h3 id="18-Gate-は介入点に置く">18. Gate は介入点に置く</h3>
+<h3 id="20-Gate-は介入点に置く">20. Gate は介入点に置く</h3>
 <p>まず、失敗にどこで介入するかを決める。</p>
 <p>Gate は、その介入点に置く一つの仕組みである。</p>
 <p>最初に「Gate を強くするか」を考えるのではない。</p>
@@ -309,8 +345,8 @@ Human Judgment Width
 <p>小さく再生成できる成果物では、早い段階で何度も止めるより、後段で強く検証し、失敗したら捨てて作り直す方が安い場合もある。</p>
 <p>一方、不可逆操作や他へ伝播する変更では、実行前に介入する価値が高い。</p>
 <p><strong>先に介入点を選び、必要な仕組みをそこに置く。</strong></p>
-<h2 id="V-境界と仕組みを更新する">V. 境界と仕組みを更新する</h2>
-<h3 id="19-Agent-は-Architecture-を決めずにいる時間の価格を変える">19. Agent は Architecture を決めずにいる時間の価格を変える</h3>
+<h2 id="第V部-境界と仕組みを更新する">第V部　境界と仕組みを更新する</h2>
+<h3 id="21-Agent-は-Architecture-を決めずにいる時間の価格を変える">21. Agent は Architecture を決めずにいる時間の価格を変える</h3>
 <p>Architecture は、早く決めても遅く決めてもコストを伴う。</p>
 <p>早く固定すれば、まだ十分に分かっていない段階で誤った境界を作る可能性が生まれる。</p>
 <p>一方、判断を遅らせれば探索の自由は残るが、その間に局所的な pattern が前例として増殖していく。</p>
@@ -327,7 +363,7 @@ Agent が前例として参照する
 <p>Agent が高速に実装できる環境では、この増殖も速くなる。</p>
 <p>したがって Architecture を決める時期は、早く固定するコストと、判断を遅らせた間に前例が増殖するコストの比較になる。</p>
 <p>Agent 時代では、<strong>判断を遅らせる側のコストが、以前より短時間で膨らみやすい。</strong></p>
-<h3 id="20-Architecture-は後から変えにくい境界から先に決める">20. Architecture は後から変えにくい境界から先に決める</h3>
+<h3 id="22-Architecture-は後から変えにくい境界から先に決める">22. Architecture は後から変えにくい境界から先に決める</h3>
 <p>Architecture を決めないままパターンが増えるほど、後から境界を変える負担も大きくなる。</p>
 <p>変更対象のコードだけでなく、</p>
 <ul>
@@ -352,7 +388,7 @@ Agent が前例として参照する
 </ul>
 <p>などである。</p>
 <p>先に検討する価値が高いのは、<strong>増殖したあとで変更すると高くつく境界</strong>である。</p>
-<h3 id="21-人間と仕組みの境界は時間とともに動く">21. 人間と仕組みの境界は時間とともに動く</h3>
+<h3 id="23-人間と仕組みの境界は時間とともに動く">23. 人間と仕組みの境界は時間とともに動く</h3>
 <p>仕事の中には、最初は人間にしか判断できないことがある。</p>
 <p>たとえば、</p>
 <ul>
@@ -364,7 +400,7 @@ Agent が前例として参照する
 </ul>
 <p>といった判断である。</p>
 <p><strong>安定した判断は仕組みへ移せるようになり、まだ一般化できない判断は人間に残る。人間と仕組みの境界は、その繰り返しによって動いていく。</strong></p>
-<h3 id="22-仕組みに移した判断は永久に正しいとは限らない">22. 仕組みに移した判断は、永久に正しいとは限らない</h3>
+<h3 id="24-仕組みに移した判断は永久に正しいとは限らない">24. 仕組みに移した判断は、永久に正しいとは限らない</h3>
 <p>環境、モデル、Repository、目的、コスト構造が変われば、以前は有効だった規則が新しい仕事を妨げることがある。</p>
 <pre><code class="language-text">判断
     ↓
@@ -380,7 +416,7 @@ Agent が前例として参照する
 </code></pre>
 <p>したがって、規則化は判断の終了ではない。</p>
 <p><strong>仕組みに移した判断も、環境が変われば再び人間の判断へ戻ることがある。</strong></p>
-<h3 id="23-移行より作り直しが安いことがある">23. 移行より作り直しが安いことがある</h3>
+<h3 id="25-移行より作り直しが安いことがある">25. 移行より作り直しが安いことがある</h3>
 <p>既存実装を新しい設計へ移すとき、常に段階的な移行が安全とは限らない。</p>
 <p>特に、小さく再生成可能な道具では、旧実装を少しずつ修正することで、かえって旧世界と新世界が長く共存することがある。</p>
 <pre><code class="language-text">旧方式
@@ -395,12 +431,12 @@ Agent が前例として参照する
 </code></pre>
 <p>この状態は、実装上の複雑さだけでなく推論負債も増やす。</p>
 <p>小さく再生成可能な道具では、<code>scrap-and-build</code> を選べることがある。</p>
-<h3 id="24-変更対象とは別に制御経路を持つ">24. 変更対象とは別に制御経路を持つ</h3>
+<h3 id="26-変更対象とは別に制御経路を持つ">26. 変更対象とは別に制御経路を持つ</h3>
 <p>現在使っている制御経路そのものを変更するとき、その経路だけに復旧を依存させない。</p>
 <p><strong>今から切る電線を使って、電線を切る命令を送らない。</strong></p>
 <p>変更前に別の制御経路を成立させ、その経路から対象を観測できることを確認する。</p>
-<h2 id="VI-判断と責任を分ける">VI. 判断と責任を分ける</h2>
-<h3 id="25-実装を外すと判断の生産が露出する">25. 実装を外すと判断の生産が露出する</h3>
+<h2 id="第VI部-判断と責任を分ける">第VI部　判断と責任を分ける</h2>
+<h3 id="27-実装を外すと判断の生産が露出する">27. 実装を外すと判断の生産が露出する</h3>
 <p>Agent が code、test、documentation、CI、tool、review artifact を生成するようになると、人間の実装作業量は減る。</p>
 <p>しかし、それだけで人間の仕事そのものが消えるわけではない。</p>
 <pre><code class="language-text">何をやるか
@@ -416,14 +452,14 @@ Agent が前例として参照する
 agent-decided
 </code></pre>
 <p>したがって Agent 化を見るときは、どれだけ実装を自動化したかだけでなく、<strong>どの判断が、誰によって、どこで生産されているかを見る。</strong></p>
-<h3 id="26-Agent-に工程を持たせない">26. Agent に工程を持たせない</h3>
+<h3 id="28-Agent-に工程を持たせない">28. Agent に工程を持たせない</h3>
 <p>Agent は、現在の Role に必要な仕事を行う。</p>
-<p>調べれば分かることは Agent が調べる。<br/>
-定型的に進められる部分は Agent が進める。<br/>
+<p>調べれば分かることは Agent が調べる。<br />
+定型的に進められる部分は Agent が進める。<br />
 要件の曖昧さ、判断の衝突、権限不足、進行不能など、構造の中で閉じられない分岐だけを人間へ返す。</p>
 <p>人間の判断は、<strong>通常経路では処理できない意味のある分岐のエスカレーション先</strong>として置ける。</p>
 <p><strong>Agent に仕事の進め方を覚えさせるのではなく、仕事の進め方の中に Agent を置く。</strong></p>
-<h3 id="27-Role-と-Actor-は分けて考える">27. Role と Actor は分けて考える</h3>
+<h3 id="29-Role-と-Actor-は分けて考える">29. Role と Actor は分けて考える</h3>
 <p>仕事の中に異なる役割があるからといって、必ず異なる Agent が必要とは限らない。</p>
 <p>たとえば、</p>
 <ul>
@@ -453,7 +489,7 @@ Actor も違う
 <p>一つの Actor が、複数の Role を順番に担うこともできる。</p>
 <p>逆に、一つの Role を複数の Actor に分担させることもできる。</p>
 <p><strong>役割が違うなら Agent も分けるべきだ、という発想だけで Agent を増やさない。</strong></p>
-<h3 id="28-Actor-を増やすコストを見る">28. Actor を増やすコストを見る</h3>
+<h3 id="30-Actor-を増やすコストを見る">30. Actor を増やすコストを見る</h3>
 <p>Agent を増やすと、</p>
 <ul>
 <li>文脈の引き継ぎ</li>
@@ -467,15 +503,15 @@ Actor も違う
 <p>同じ Agent が、実装 Role を終えたあとに整理 Role へ切り替えてもよい。</p>
 <p>重要なのは、Actor の数ではなく、<strong>必要な責任が明示され、混ざらずに実行されること</strong>である。</p>
 <p><strong>Role は責任の単位であり、Actor はその責任を担う主体である。Role を分けることと、Actor を増やすことは別の設計判断である。</strong></p>
-<h3 id="29-責任を時間で分ける">29. 責任を時間で分ける</h3>
+<h3 id="31-責任を時間で分ける">31. 責任を時間で分ける</h3>
 <p>必要であることと、今実行すべきことは同じではない。</p>
 <p>現在の責任でなければ、その場で仕事を広げるのではなく、後の時間へ渡す。</p>
 <p>これは責任を捨てることではない。</p>
 <p><strong>責任を、実行すべき時間へ配置することである。</strong></p>
 <p>作業中は現在の目的に集中し、作業後や定期的な振り返りでは、今回の仕事が将来の作業へ何を残したかを見る。</p>
 <p><strong>責任は、同時に抱える必要はない。時間を分けて実行できる。</strong></p>
-<h2 id="VII-知識と作業を次へ渡す">VII. 知識と作業を次へ渡す</h2>
-<h3 id="30-Repository-は-Prompt-Surface-である">30. Repository は Prompt Surface である</h3>
+<h2 id="第VII部-知識と作業を次へ渡す">第VII部　知識と作業を次へ渡す</h2>
+<h3 id="32-Repository-は-Prompt-Surface-である">32. Repository は Prompt Surface である</h3>
 <p>Agent に対する Prompt は、チャットなどの指示だけではない。</p>
 <p>Agent が見ることのできる、</p>
 <ul>
@@ -501,7 +537,7 @@ Actor も違う
 <p>この意味で、Repository は単なる code storage ではなく、<strong>Prompt Surface</strong> である。</p>
 <p>重要なのは、Repository に存在するものが、現在も正しいかどうかを判定されてから Agent に見えるわけではないことである。</p>
 <p><strong>Agent に何を言うかだけが Prompt ではない。Agent に何を見せているかも Prompt である。</strong></p>
-<h3 id="31-環境を整えるには推論taxがかかる">31. 環境を整えるには、推論taxがかかる</h3>
+<h3 id="33-環境を整えるには推論taxがかかる">33. 環境を整えるには、推論taxがかかる</h3>
 <p>Agent が迷わず働けるように情報を配置すると、その情報を読む、解釈する、引き継ぐための推論コストが生まれる。</p>
 <p>このコストは、情報をどこに置き、どう運ぶかで形が変わる。</p>
 <pre><code class="language-text">恒常環境
@@ -517,7 +553,7 @@ Loop回覧経路
 <p>Task 固有層へ置けば、その仕事に必要な Goal、制約、現在状態だけを渡せる。不要になれば Task と一緒に捨てられるが、Task ごとに何を渡すかを選ぶ必要がある。</p>
 <p>Loop回覧経路を作れば、Task固有の状態、知識、判断理由、差し戻し条件を、cycle や担当をまたいで運べる。一方、受け渡すたびに読み直しと再解釈が発生する。</p>
 <p><strong>情報をどこに置き、どう運ぶかは、どの推論taxを払い、どの推論を省きたいかで選ぶ。</strong></p>
-<h3 id="32-知識へのアクセス経路を残す">32. 知識へのアクセス経路を残す</h3>
+<h3 id="34-知識へのアクセス経路を残す">34. 知識へのアクセス経路を残す</h3>
 <p>知識を整理すると、答えは残っても、そこへ辿り着いた経路が消えることがある。</p>
 <p>記録には、</p>
 <pre><code class="language-text">困った
@@ -531,13 +567,13 @@ Loop回覧経路
 <p>という形で、知識そのものだけでなく、知識へのアクセス経路が残る。</p>
 <p>この経路があれば、次に似た問題へ出会った人や Agent は、答えだけでなく、どの症状からどの情報へ進めばよいかを再利用できる。</p>
 <p><strong>答えだけでなく、答えへ辿る経路を残す。</strong></p>
-<h3 id="33-作業は再開できる単位でそろえる">33. 作業は、再開できる単位でそろえる</h3>
+<h3 id="35-作業は再開できる単位でそろえる">35. 作業は、再開できる単位でそろえる</h3>
 <p>変更の結果だけを残しても、再開に必要な材料が離れていると、あとから別の探索が必要になる。</p>
 <p>設計書、コード、検証結果、実行に必要な生成物など、同じ作業から生まれたものは、可能な限り同じ作業単位でそろえて残す。</p>
 <p>ここでそろえるとは、必ず同じフォルダに置くことではない。</p>
 <p>対応関係と所在がたどれ、どれが正本か迷わない状態にする。</p>
 <p><strong>作業は、成果だけでなく、再開に必要な組をそろえて閉じる。</strong></p>
-<h3 id="34-失敗成功幸運を分けて振り返る">34. 失敗、成功、幸運を分けて振り返る</h3>
+<h3 id="36-失敗成功幸運を分けて振り返る">36. 失敗、成功、幸運を分けて振り返る</h3>
 <p>振り返りを失敗だけに寄せると、変更、禁止、抑止を増やす方向へ偏りやすい。</p>
 <p>そこで、結果を少なくとも三つに分けて見る。</p>
 <pre><code class="language-text">失敗した
@@ -557,6 +593,6 @@ Loop回覧経路
 </article>
 <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Agent Observation Guide / Author: akkera102 / Updated: 2026-09-15 10:21 JST</footer>
+<footer>Agent Observation Guide / Author: akkera102 / Updated: 2026-09-15 17:28 JST</footer>
 </body>
 </html>
