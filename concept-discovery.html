@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="akkera102">
+<meta name="last-modified" content="2026-09-17 19:32 JST">
+<meta name="description" content="対象の状態、差、関係、作用、境界を複数の観測軸から読み、議論可能なConceptの輪郭を発見するためのガイド。">
+<title>Concept Discovery</title>
+<style>
+:root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
+@media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;line-height:1.82;font-size:16px}
+main{max-width:var(--max);margin:0 auto;padding:56px 34px 96px}.doc-head{border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:30px}.doc-title{font-size:2.15rem;line-height:1.35;margin:0 0 12px;font-weight:760;letter-spacing:.01em}.meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.toc{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:18px 22px;margin:28px 0 40px}.toc-title{font-weight:700;margin-bottom:8px}.toc ul{list-style:none;margin:0;padding:0}.toc li{margin:.18em 0}.toc-h3{padding-left:1.3em;font-size:.94em}.toc a{text-decoration:none;color:var(--fg)}.toc a:hover{text-decoration:underline;color:var(--link)}
+h1,h2,h3,h4{line-height:1.42;letter-spacing:.01em;scroll-margin-top:18px}h2{font-size:1.52rem;margin:2.35em 0 .65em;border-bottom:1px solid var(--line);padding-bottom:.28em}h3{font-size:1.25rem;margin:2em 0 .55em}h4{font-size:1.08rem;margin:1.8em 0 .45em}
+p,ul,ol,pre,blockquote,table{margin:.78em 0 1.15em}ul,ol{padding-left:1.55em}li+li{margin-top:.18em}a{color:var(--link)}strong{font-weight:750}hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:var(--code);padding:.12em .32em;border-radius:4px;font-size:.93em}pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow:auto;line-height:1.58}pre code{background:transparent;padding:0;border-radius:0}blockquote{margin-left:0;padding:.72em 1em;background:var(--quote);border-left:4px solid var(--line);color:var(--muted)}
+table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}th,td{border:1px solid var(--line);padding:.55em .72em;text-align:left;vertical-align:top}th{background:var(--soft)}
+footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted);font-size:.85rem}.backtop{display:inline-block;margin-top:2em}
+@media(max-width:700px){body{font-size:15px}main{padding:30px 18px 70px}.doc-title{font-size:1.72rem}.meta{display:block}.meta span{display:block;margin:.2em 0}.toc{padding:15px 16px}h2{font-size:1.34rem}h3{font-size:1.15rem}footer{padding:0 18px 36px}}
+@media print{body{background:#fff;color:#000;font-size:11pt}main{max-width:none;padding:0}.doc-head{margin-top:0}.toc{break-after:page;background:#fff}.toc a{color:#000}.backtop{display:none}a{color:#000;text-decoration:none}pre,blockquote,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main id="top">
+<header class="doc-head">
+<h1 class="doc-title">Concept Discovery</h1>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-17 19:32 JST</span><span>Language: Japanese</span></div>
+</header>
+<nav class="toc" aria-label="目次">
+<div class="toc-title">目次</div>
+<ul>
+<li class="toc-h2"><a href="#第I部-輪郭を発見する">第I部　輪郭を発見する</a></li>
+<li class="toc-h3"><a href="#1-Concept-は定義する前に輪郭を取る">1. Concept は定義する前に輪郭を取る</a></li>
+<li class="toc-h3"><a href="#2-観測位置を固定する">2. 観測位置を固定する</a></li>
+<li class="toc-h3"><a href="#3-機能名ではなく責任を読む">3. 機能名ではなく責任を読む</a></li>
+<li class="toc-h3"><a href="#4-正常系より失われる瞬間を見る">4. 正常系より失われる瞬間を見る</a></li>
+<li class="toc-h3"><a href="#5-成立させない状態を見る">5. 成立させない状態を見る</a></li>
+<li class="toc-h3"><a href="#6-見えるものと見えないものを分ける">6. 見えるものと見えないものを分ける</a></li>
+<li class="toc-h3"><a href="#7-「ない」を一つにしない">7. 「ない」を一つにしない</a></li>
+<li class="toc-h2"><a href="#第II部-状態と時間を追う">第II部　状態と時間を追う</a></li>
+<li class="toc-h3"><a href="#8-ファイルではなく状態を追う">8. ファイルではなく状態を追う</a></li>
+<li class="toc-h3"><a href="#9-lifecycle-を時間軸として読む">9. lifecycle を時間軸として読む</a></li>
+<li class="toc-h3"><a href="#10-遷移を通して残る芯を見る">10. 遷移を通して残る芯を見る</a></li>
+<li class="toc-h3"><a href="#11-可逆と不可逆を分ける">11. 可逆と不可逆を分ける</a></li>
+<li class="toc-h3"><a href="#12-working-context-と-durable-state-を分ける">12. working context と durable state を分ける</a></li>
+<li class="toc-h3"><a href="#13-「本物」ではなく基準性を読む">13. 「本物」ではなく基準性を読む</a></li>
+<li class="toc-h3"><a href="#14-状態の置き場所と移動経路を分ける">14. 状態の置き場所と移動経路を分ける</a></li>
+<li class="toc-h2"><a href="#第III部-関係から境界を読む">第III部　関係から境界を読む</a></li>
+<li class="toc-h3"><a href="#15-dependency-から成立条件を読む">15. dependency から成立条件を読む</a></li>
+<li class="toc-h3"><a href="#16-composition-から部分と全体を読む">16. composition から部分と全体を読む</a></li>
+<li class="toc-h3"><a href="#17-authority-は主体対象変化で読む">17. authority は主体・対象・変化で読む</a></li>
+<li class="toc-h3"><a href="#18-scope-は効力の端から読む">18. scope は効力の端から読む</a></li>
+<li class="toc-h3"><a href="#19-Concept-と-Concept-の間を見る">19. Concept と Concept の間を見る</a></li>
+<li class="toc-h3"><a href="#20-判定と状態変更を分けて読む">20. 判定と状態変更を分けて読む</a></li>
+<li class="toc-h3"><a href="#21-推論と構造の境界を読む">21. 推論と構造の境界を読む</a></li>
+<li class="toc-h3"><a href="#22-一緒に変わる場所と分かれる場所から境界を読む">22. 一緒に変わる場所と分かれる場所から境界を読む</a></li>
+<li class="toc-h2"><a href="#第IV部-Concept-として残す">第IV部　Concept として残す</a></li>
+<li class="toc-h3"><a href="#23-成立と「よさ」を分けて読む">23. 成立と「よさ」を分けて読む</a></li>
+<li class="toc-h3"><a href="#24-docs-は地図実装と-test-を一次資料にする">24. docs は地図、実装と test を一次資料にする</a></li>
+<li class="toc-h3"><a href="#25-固有名を消しても残るかを見る">25. 固有名を消しても残るかを見る</a></li>
+<li class="toc-h3"><a href="#26-既存モデルへ無理に押し込まない">26. 既存モデルへ無理に押し込まない</a></li>
+<li class="toc-h3"><a href="#27-追加読書が判断を変えなくなったら止める">27. 追加読書が判断を変えなくなったら止める</a></li>
+</ul>
+</nav>
+<article>
+
+<p><strong>対象から概念を発見するための観測法</strong></p>
+<blockquote>
+<p>目的: 対象を既存の名前や分類として受け取るのではなく、そこに現れる状態、差、関係、作用、境界から、議論可能な Concept の輪郭を発見する。</p>
+<p>本書は特定の対象の読み順や調査手順を定めるものではない。Concept をあらかじめ定義して対象へ当てはめるのではなく、複数の観測から輪郭を取り、その輪郭が何を表しているかを発見するための視点を整理する。</p>
+</blockquote>
+<p>Concept は、条件を何個満たしたかで認定するものではない。</p>
+<p>世界は動き続け、観測者も固定されない。Concept は世界そのものの state を保存するものでも、発見した時点で正しさを保証されたものでもない。</p>
+<p>一方で、任意に線を引いて Concept と呼ぶわけでもない。観測できる差、反復、境界、作用、評価が議題として残るとき、その輪郭を候補として扱う。</p>
+<p>対象をどこから見るかによって、同じものが部分にも全体にもなり、同じ遷移が継続にも断絶にも見える。</p>
+<p>そのため、本書では一つの絶対的な輪郭を先に置かない。</p>
+<pre><code class="language-text">failure
+state
+lifecycle
+identity
+dependency
+composition
+transition
+authority
+scope
+observation
+criterion
+</code></pre>
+<p>複数の軸から対象を切り、そのたびに現れる境界を重ねる。</p>
+<p>そこで繰り返し残る責任、状態、関係、禁止、遷移、基準が、Concept の候補になる。</p>
+<p><strong>Concept Discovery は、名前を付ける作業ではない。動き続ける世界から、議論できる輪郭を持ち帰る作業である。</strong></p>
+<hr/>
+<h2 id="第I部-輪郭を発見する">第I部　輪郭を発見する</h2>
+<h3 id="1-Concept-は定義する前に輪郭を取る">1. Concept は定義する前に輪郭を取る</h3>
+<p>調査の最初から、対象を既知の分類へ入れようとしない。</p>
+<p>最初に得られるのは、断片的な finding である。</p>
+<pre><code class="language-text">ここで state を保持している
+ここで retry を止めている
+ここで authority を確認している
+ここで別の経路へ分かれる
+</code></pre>
+<p>一つ一つは事実であっても、それだけでは Concept ではない。</p>
+<p>複数の finding が、同じ責任や境界を別の場所から指し始めたとき、一つの輪郭が見える。</p>
+<pre><code class="language-text">finding
+finding
+finding
+   ↓
+同じ境界を指す
+   ↓
+Concept の輪郭
+</code></pre>
+<p>ここで重要なのは、先に名称を決めないことである。</p>
+<p>名称は輪郭を見やすくするために使うのであって、輪郭を名称へ合わせるために使わない。</p>
+<p><strong>断片を集めるのではなく、断片の背後で繰り返し現れる輪郭を探す。</strong></p>
+<hr/>
+<h3 id="2-観測位置を固定する">2. 観測位置を固定する</h3>
+<p>同じ対象でも、見る位置によって輪郭は変わる。</p>
+<p>たとえば Task は、</p>
+<pre><code class="language-text">人間から見る      一つの仕事
+Loopから見る      Goalまでの区間
+engineから見る    遷移する state unit
+保存層から見る    復元対象
+</code></pre>
+<p>として現れることがある。</p>
+<p>どれか一つを唯一の正しい Task と決める必要はない。</p>
+<p>先に決めるのは、どの関係、どの責任、どの状態遷移から見ているかである。</p>
+<p>観測位置を固定すると、その位置から見える輪郭を議論できる。</p>
+<p>さらに、別の位置から得た輪郭と並べると、ずれそのものが設計上の問いになる。</p>
+<pre><code class="language-text">人間には一つに見える
+engineでは二つに分かれている
+</code></pre>
+<p>この差は説明の違いではなく、責任や状態の境界が一致していない可能性を示す。</p>
+<p><strong>Concept の輪郭を語る前に、どこから見た輪郭なのかを固定する。</strong></p>
+<hr/>
+<h3 id="3-機能名ではなく責任を読む">3. 機能名ではなく責任を読む</h3>
+<p>対象には、製品固有の名前が多く現れる。</p>
+<p><code>workflow</code>、<code>facet</code>、<code>reviewer</code>、<code>task</code> のような名前を覚えても、それだけでは他の設計へ持ち出せない。</p>
+<p>見るのは、その機能が何を担当しているかである。</p>
+<pre><code class="language-text">何を保持するか
+誰が読むか
+いつ生成されるか
+どこへ保存されるか
+次へ何を渡すか
+何が状態を変えるか
+</code></pre>
+<p>別の機能にも同じ責任が現れるなら、その責任は製品固有機能より上位の Concept である可能性が高い。</p>
+<p>反対に、同じ名前でも責任が異なるなら、同じ Concept とみなす理由は弱い。</p>
+<p><strong>対象は名前の集合ではなく、責任の配置として読む。</strong></p>
+<hr/>
+<h3 id="4-正常系より失われる瞬間を見る">4. 正常系より失われる瞬間を見る</h3>
+<p>成功経路では、多くの状態が暗黙のままでも動く。</p>
+<p>境界が露出するのは、失敗したときである。</p>
+<pre><code class="language-text">retry
+resume
+requeue
+timeout
+abort
+conflict
+stale
+missing
+exceeded
+</code></pre>
+<p>このような経路を読むと、</p>
+<ul>
+<li>何を識別し直す必要があるか</li>
+<li>何が正本でなければならないか</li>
+<li>何を二重実行してはいけないか</li>
+<li>何を最後の正常状態として残すか</li>
+</ul>
+<p>が見える。</p>
+<p>failure は Concept を壊すだけではない。</p>
+<p>普段は隠れている責任や境界を、観測可能な形にする。</p>
+<p><strong>成功経路より、再開経路の方が設計思想をよく表す。</strong></p>
+<hr/>
+<h3 id="5-成立させない状態を見る">5. 成立させない状態を見る</h3>
+<p>設計は、何を実行するかだけでなく、何を成立させないかにも現れる。</p>
+<pre><code class="language-text">二重実行させない
+stale actor に書かせない
+未検証 state を正本にしない
+権限外へ出さない
+不完全な結果で次へ進ませない
+</code></pre>
+<p>そのために、実装には次のような道具が現れる。</p>
+<pre><code class="language-text">guard
+validation
+version
+lease
+fence
+assert
+reject
+</code></pre>
+<p>道具そのものを一般化する必要はない。</p>
+<p>複数の場所で同じ禁止状態を守っているなら、その禁止の背後に invariant がある。</p>
+<p>failure path が「壊れたときに何が露出するか」を見るのに対し、invariant は「そもそも何を壊れた状態として成立させないか」を見る。</p>
+<p><strong>存在する機能だけでなく、成立を拒まれている状態から Concept を掘る。</strong></p>
+<hr/>
+<h3 id="6-見えるものと見えないものを分ける">6. 見えるものと見えないものを分ける</h3>
+<p>Concept のすべての性質が、同じ場所から観測できるとは限らない。</p>
+<pre><code class="language-text">UIでは active
+runtimeでは terminated
+
+外からは成功
+内部では durable state が未確定
+
+logには残る
+canonical stateには残らない
+</code></pre>
+<p>ここで見るのは、単なる observability の量ではない。</p>
+<p>どの性質がどの観測面から見え、その欠落がどの誤認を生むかを見る。</p>
+<p>たとえば「完了」は UI 表示だけでは確定できないかもしれない。</p>
+<p>「権限がある」は設定値だけでは確定できないかもしれない。</p>
+<p>観測できるものだけで Concept を定義すると、見えない部分を存在しないものとして扱ってしまう。</p>
+<p><strong>何を認知でき、何を認知できないかも、Concept の輪郭の一部である。</strong></p>
+<hr/>
+<h3 id="7-「ない」を一つにしない">7. 「ない」を一つにしない</h3>
+<p>何かが見つからなかったとき、すぐに存在しないと結論しない。</p>
+<p>たとえば <code>checkpoint がない</code> には、複数の状態がある。</p>
+<pre><code class="language-text">そもそも存在しない
+存在するが、このAPIから見えない
+存在するが、現在のactorには読めない
+存在するが、まだmaterializeされていない
+存在したが、失効した
+観測手段そのものがない
+</code></pre>
+<p>同じことは、state、authority、history、evidence にも起こる。</p>
+<pre><code class="language-text">nonexistent
+unknown
+inaccessible
+hidden
+expired
+not yet created
+</code></pre>
+<p>これらを一つの「ない」に畳むと、Concept の境界を誤る。</p>
+<p>不在を観測するときも、観測位置と観測可能性を先に固定する。</p>
+<p><strong>見えないことと、存在しないことを同じ finding にしない。</strong></p>
+<hr/>
+<h2 id="第II部-状態と時間を追う">第II部　状態と時間を追う</h2>
+<h3 id="8-ファイルではなく状態を追う">8. ファイルではなく状態を追う</h3>
+<p>一つのファイルを最初から最後まで読んでも、設計上の責任が見えるとは限らない。</p>
+<p>状態は複数の場所を通る。</p>
+<pre><code class="language-text">schema
+  ↓
+loader / builder
+  ↓
+runtime
+  ↓
+persistence
+  ↓
+resume / failure
+  ↓
+test
+</code></pre>
+<p>たとえば一つの Task state が、schema で定義され、runtime で更新され、別ファイルへ保存され、resume で再利用されるなら、その一連を一本として読む。</p>
+<p>同じ state を追うことで、実装ファイルをまたいで一つの責任が見える。</p>
+<p><strong>Concept はファイル境界ではなく、状態が通る経路に現れる。</strong></p>
+<hr/>
+<h3 id="9-lifecycle-を時間軸として読む">9. lifecycle を時間軸として読む</h3>
+<p>state がどこに存在するかだけでなく、時間とともにどの状態を通るかを見る。</p>
+<pre><code class="language-text">create
+  ↓
+active
+  ↓
+suspend
+  ↓
+resume
+  ↓
+complete
+  ↓
+retire
+</code></pre>
+<p>これは別々の Concept を並べているのではない。</p>
+<p>一つの Concept が時間軸上で持つ輪郭を追っている。</p>
+<p>各遷移について、</p>
+<ul>
+<li>いつ存在し始めるか</li>
+<li>いつ意味や authority を持つか</li>
+<li>何をきっかけに無効になるか</li>
+<li>suspend 中に何が保持されるか</li>
+<li>終了後に何が残るか</li>
+</ul>
+<p>を見る。</p>
+<p>時間方向の遷移を一本で追うと、単一時点の state だけでは見えない境界が現れる。</p>
+<p><strong>Concept の輪郭は、ある時点の値だけでなく、時間軸上の遷移にも現れる。</strong></p>
+<hr/>
+<h3 id="10-遷移を通して残る芯を見る">10. 遷移を通して残る芯を見る</h3>
+<p>同じ Concept は、時間の中で多くのものを変える。</p>
+<p>Task なら、仮説、実装、担当、作業方法、検証手段が途中で変わることがある。</p>
+<p>それでも「同じ Task を続けている」と扱われることがある。</p>
+<pre><code class="language-text">開始
+  ↓
+調査
+  ↓
+実装
+  ↓
+失敗
+  ↓
+再定義
+  ↓
+再開
+</code></pre>
+<p>ここで見るのは、不変の部品を探すことではない。</p>
+<p>何が変わっても同じものとして扱われ、何が変わると別のものとして扱われるかを見る。</p>
+<p>実装上は、次のようなものが同一性を支えることがある。</p>
+<pre><code class="language-text">identity
+operation id
+generation
+version
+owner
+parent
+checkpoint
+</code></pre>
+<p>しかし識別子が同じだから同じ Concept とは限らない。</p>
+<p>逆に、構成要素が置き換わっても、設計上は同じものとして追跡されることがある。</p>
+<p>テセウスの船を解く必要はない。</p>
+<p>見るのは、その設計が何を同一性の規則として採用しているかである。</p>
+<p><strong>遷移の中で残る芯を探し、何をもって同じものとしているかを読む。</strong></p>
+<hr/>
+<h3 id="11-可逆と不可逆を分ける">11. 可逆と不可逆を分ける</h3>
+<p>時間軸上の遷移には、戻れるものと戻れないものがある。</p>
+<pre><code class="language-text">draft → approved
+open → closed
+candidate → canonical
+temporary → committed
+</code></pre>
+<p>見かけ上、以前の state に戻せても、世界全体が以前と同じになるとは限らない。</p>
+<pre><code class="language-text">ファイルは戻せる
+外部APIへ送った事実は戻らない
+
+stateは戻せる
+人間が見た情報は戻らない
+
+設定は戻せる
+一度成立した承認履歴は残る
+</code></pre>
+<p>そのため、次を分けて読む。</p>
+<pre><code class="language-text">reversible state change
+compensation
+reconstruction
+rollback
+irreversible effect
+</code></pre>
+<p>rollback は、世界そのものの state 保存ではない。</p>
+<p>どの境界を越えると以前と同じものではなくなるかを見ると、その Concept にとって意味のある変化が見える。</p>
+<p><strong>可逆性ではなく、何が戻らないかから遷移の重さを読む。</strong></p>
+<hr/>
+<h3 id="12-working-context-と-durable-state-を分ける">12. working context と durable state を分ける</h3>
+<p>Agent が今読んでいる context と、再開のために残す state は目的が違う。</p>
+<pre><code class="language-text">working context
+  今回の判断に使う
+
+durable state
+  session を跨いでも残す
+
+event log
+  何が起きたかを記録する
+
+artifact
+  作業の結果として残す
+</code></pre>
+<p>これらを一つにすると、再開時に大量の履歴を読み直したり、逆に必要な判断理由が失われたりする。</p>
+<p>特に <code>resume</code> や <code>retry</code> がある実装では、どの state を再利用するのかを見る。</p>
+<p>working context から durable state へ何を残すかは、単なる保存量ではない。</p>
+<p>何を次の時点でも Concept の一部として必要とみなすかという判断である。</p>
+<p><strong>今必要な情報と、あとで復元するための情報を分けて読む。</strong></p>
+<hr/>
+<h3 id="13-「本物」ではなく基準性を読む">13. 「本物」ではなく基準性を読む</h3>
+<p>同じ Concept が、複数の state や representation として現れることがある。</p>
+<pre><code class="language-text">state → UI
+state → cache
+state → report
+state → index
+</code></pre>
+<p>どれも Concept を表していてよい。</p>
+<p>見るのは、表現が食い違ったときの非対称である。</p>
+<pre><code class="language-text">どれを更新判断の基準にするか
+どれから他を再構成するか
+どれを失っても作り直せるか
+競合したとき、どれを優先するか
+</code></pre>
+<p><code>canonical</code> は、Concept そのものや絶対的な真実を意味しない。</p>
+<p>その設計の中で、基準として扱われる役割を持つだけである。</p>
+<p><strong>どれが本物かではなく、どれが基準として扱われているかを読む。</strong></p>
+<hr/>
+<h3 id="14-状態の置き場所と移動経路を分ける">14. 状態の置き場所と移動経路を分ける</h3>
+<p>情報が存在する場所と、それを次へ運ぶ仕組みは別である。</p>
+<pre><code class="language-text">置き場所
+  恒常環境
+  Task固有層
+
+移動経路
+  Loop回覧経路
+</code></pre>
+<p>たとえば、Task固有の knowledge や policy が存在していても、次の cycle や別の担当へ渡されなければ、回覧経路は成立していない。</p>
+<p>逆に、handoff の仕組みがあっても、何を正本として運ぶかが決まっていなければ、状態の再解釈が毎回発生する。</p>
+<p>保存場所と transport を分けることで、Concept の保持責任と移動責任を別々に観測できる。</p>
+<p><strong>何を持つかと、どう運ぶかを同じ仕組みとして読まない。</strong></p>
+<hr/>
+<h2 id="第III部-関係から境界を読む">第III部　関係から境界を読む</h2>
+<h3 id="15-dependency-から成立条件を読む">15. dependency から成立条件を読む</h3>
+<p>Concept は単独で成立しているとは限らない。</p>
+<pre><code class="language-text">A があるから B が成立する
+B がある間だけ C が有効
+C を失うと D は意味を失う
+</code></pre>
+<p>ここで見るのは、依存関係一覧ではない。</p>
+<p>その Concept が、何を失うと Concept として成立しなくなるかを見る。</p>
+<p>たとえば、</p>
+<pre><code class="language-text">approval
+  depends on
+request identity + current state + authority
+
+resume
+  depends on
+checkpoint + environment + assumptions
+</code></pre>
+<p>となっているなら、依存物のどれが交換可能で、どれを失うと意味そのものが崩れるかを見る。</p>
+<p>時間軸が「いつ同じものとして続くか」を示すなら、dependency 軸は「何に支えられて同じものとして成立するか」を示す。</p>
+<p><strong>外部条件を剥がし、どこで意味が崩れるかから Concept の輪郭を取る。</strong></p>
+<hr/>
+<h3 id="16-composition-から部分と全体を読む">16. composition から部分と全体を読む</h3>
+<p>依存と構成は同じではない。</p>
+<pre><code class="language-text">whole
+ ├─ A
+ ├─ B
+ └─ C
+</code></pre>
+<p>A、B、C が互いに依存していなくても、一つの whole を構成していることがある。</p>
+<p>ここでは、</p>
+<ul>
+<li>何を内部に含んでいるか</li>
+<li>どの部分は交換可能か</li>
+<li>どの部分を抜くと全体が成立しなくなるか</li>
+<li>一部が変わっても同じ whole と呼べるか</li>
+</ul>
+<p>を見る。</p>
+<p>重要なのは、部分と全体を絶対的な大きさとして扱わないことである。</p>
+<p>同じ対象が、ある観測では whole であり、別の観測ではより大きな Concept の part になる。</p>
+<pre><code class="language-text">Task は work の whole
+Task は Loop の part
+</code></pre>
+<p>どちらも成立する。</p>
+<p><strong>部分と全体は観測位置で変わる。composition は、その視点から何が一つを構成しているかを見る。</strong></p>
+<hr/>
+<h3 id="17-authority-は主体対象変化で読む">17. authority は主体・対象・変化で読む</h3>
+<p>責任の所在と、変化を成立させる力は同じではない。</p>
+<pre><code class="language-text">ownership
+  誰が責任を持つか
+
+authority
+  誰が何に何を起こせるか
+</code></pre>
+<p>たとえば、request は作れても approval は別の主体しか成立させられないことがある。</p>
+<p>state は読めても、基準となる state を更新できる主体は限られることがある。</p>
+<p>主体だけを列挙しても authority は見えない。</p>
+<pre><code class="language-text">誰が
+何に
+何を起こせるか
+</code></pre>
+<p>という関係を読む。</p>
+<p><strong>変化を成立させる主体・対象・効果の非対称から authority の輪郭を取る。</strong></p>
+<hr/>
+<h3 id="18-scope-は効力の端から読む">18. scope は効力の端から読む</h3>
+<p>composition が「何を内部に含むか」を見るのに対し、scope は「作用や規則がどこまで意味を持つか」を見る。</p>
+<pre><code class="language-text">この Task にだけ有効
+この Loop の間だけ有効
+この session を越えない
+この repository には効くが外部 system には届かない
+</code></pre>
+<p>ここで見るのは、単なる包含範囲ではない。</p>
+<pre><code class="language-text">誰に
+何に
+どの条件で
+どこまで効くか
+</code></pre>
+<p>が変わる地点を見る。</p>
+<p>実在する作用に限らない。仮定上の規則でも、効力の条件と端を議論できるなら scope は観測できる。</p>
+<p><strong>何を含むかではなく、作用や規則の効き目がどこで終わるかを見る。</strong></p>
+<hr/>
+<h3 id="19-Concept-と-Concept-の間を見る">19. Concept と Concept の間を見る</h3>
+<p>Concept は、内部だけで完結するとは限らない。</p>
+<p>二つの Concept の間を何が通るかに、独自の責任が現れることがある。</p>
+<pre><code class="language-text">Maker
+  ↓
+artifact / diff / evidence
+  ↓
+Checker
+</code></pre>
+<p>あるいは、</p>
+<pre><code class="language-text">working context
+  ↓
+selection / compression
+  ↓
+durable state
+</code></pre>
+<p>このとき、境界通過には、</p>
+<ul>
+<li>何を渡すか</li>
+<li>何を渡さないか</li>
+<li>どの形式へ変換するか</li>
+<li>何を通過条件にするか</li>
+<li>誰が次の authority を持つか</li>
+</ul>
+<p>という責任がある。</p>
+<p>これは dependency でも composition でもない。</p>
+<p>A と B の間で成立する handoff、conversion、promotion、rejection 自体に Concept がある可能性を読む。</p>
+<p><strong>Concept の内部だけでなく、Concept と Concept の間にも輪郭を探す。</strong></p>
+<hr/>
+<h3 id="20-判定と状態変更を分けて読む">20. 判定と状態変更を分けて読む</h3>
+<p>ある結果が出たことと、その結果に基づいて次の状態へ進むことは別である。</p>
+<pre><code class="language-text">Observation
+   ↓
+Judgment
+   ↓
+State word
+   ↓
+Transition
+</code></pre>
+<p>実装では、この四つが一つの関数や一つの出力へ畳み込まれていることがある。</p>
+<p>たとえば <code>REJECT</code> を見たときは、否定された事実だけでなく、</p>
+<pre><code class="language-text">reason
+retry condition
+next route
+</code></pre>
+<p>がどこに保持されるかを見る。</p>
+<p>Judgment が Concept を分類し、Transition が世界を変える。</p>
+<p>この二つを分けると、観測と作用の境界が見える。</p>
+<p><strong>何を判定したかと、何を起こしたかを同じ責任にしない。</strong></p>
+<hr/>
+<h3 id="21-推論と構造の境界を読む">21. 推論と構造の境界を読む</h3>
+<p>Agent が意味を判断する部分と、engine や仕組みが固定する部分を分けて見る。</p>
+<pre><code class="language-text">Inference
+  意味を判断する
+  候補を作る
+  状況を解釈する
+
+Structure
+  state を保持する
+  input を選ぶ
+  transition を適用する
+  Bound を強制する
+  durable state を残す
+</code></pre>
+<p>重要な境界をすべて Agent の記憶や判断に任せているなら、その設計は推論側に寄っている。</p>
+<p>逆に、すべてを構造で固定すると、状況依存の判断まで失う。</p>
+<p>ここで見るのは、どちらが優れているかではない。</p>
+<p>何を推論に残し、何を構造へ移したか、その境界にどんな責任が置かれているかを見る。</p>
+<p><strong>どの推論を構造へ移し、どの推論を残したかから設計思想を読む。</strong></p>
+<hr/>
+<h3 id="22-一緒に変わる場所と分かれる場所から境界を読む">22. 一緒に変わる場所と分かれる場所から境界を読む</h3>
+<p>Concept は、変更の伝播にも現れる。</p>
+<p>ある機能追加や修正で、</p>
+<pre><code class="language-text">schema
+runtime
+persistence
+resume
+test
+docs
+</code></pre>
+<p>が毎回セットで変わるなら、それらは同じ責任を共有している可能性が高い。</p>
+<p>一方で、似た対象を並べたとき、扱いが分かれる地点にも境界が現れる。</p>
+<pre><code class="language-text">A は保持する
+B は捨てる
+
+A は再開する
+B は再生成する
+
+A は人間が確定する
+B は engine が確定する
+</code></pre>
+<p>Concept そのものを直接言葉にできなくても、どこで同じ扱いを受け、どこで分岐するかは観測できる。</p>
+<pre><code class="language-text">co-change
+  同じ責任の候補
+
+divergence
+  別の輪郭の候補
+</code></pre>
+<p><strong>一緒に変わる場所と、似ているのに分かれる場所の両方から Concept 境界を読む。</strong></p>
+<hr/>
+<h2 id="第IV部-Concept-として残す">第IV部　Concept として残す</h2>
+<h3 id="23-成立と「よさ」を分けて読む">23. 成立と「よさ」を分けて読む</h3>
+<p>成立することと、よいと判断されることは別である。</p>
+<pre><code class="language-text">A でも動く
+B でも動く
+
+しかし A の方を選ぶ
+</code></pre>
+<p>その差には、明示された規則だけでなく、読みやすさ、対称性、単純さ、慣習、経験のような criterion が働くことがある。</p>
+<p>一部は <code>taste</code> としか呼べない場合もある。</p>
+<p>それでも、何を観測してその判断に至ったかを示せるなら、評価基準そのものを Concept の輪郭として読むことができる。</p>
+<p>これは恣意性を認めることとは違う。</p>
+<p>観測された差も関係もなく、乱数で線を引いただけなら Discovery ではない。</p>
+<p>criterion は正しさを先に保証しないが、観測され、議論され、壊され、更新されうる。</p>
+<p><strong>何が成立するかだけでなく、何をよいとみなすかも観測する。</strong></p>
+<hr/>
+<h3 id="24-docs-は地図実装と-test-を一次資料にする">24. docs は地図、実装と test を一次資料にする</h3>
+<p>docs は、用語や入口を知るには強い。</p>
+<p>しかし、docs に書かれた説明と、実際に状態を保持し遷移させている実装は同じとは限らない。</p>
+<p>Concept の輪郭を確かめるときは、できるだけ次の順で確認する。</p>
+<pre><code class="language-text">test / runtime artifact
+        ↓
+implementation
+        ↓
+schema / configuration
+        ↓
+official docs
+        ↓
+Issue / discussion
+</code></pre>
+<p>Issue は、Concept を定義する資料というより、境界が壊れたときに何が起きるかを見る資料として使う。</p>
+<p>観測位置が違えば資料の価値も変わるが、Concept の成立を主張するときは、実際に守られている境界を優先する。</p>
+<p><strong>説明された設計より、実際に守られている境界を優先する。</strong></p>
+<hr/>
+<h3 id="25-固有名を消しても残るかを見る">25. 固有名を消しても残るかを見る</h3>
+<p>抽出した finding から製品固有語を消す。</p>
+<pre><code class="language-text">facet
+workflow
+companion
+repertoire
+</code></pre>
+<p>などを一般語へ置き換える。</p>
+<p>それでも、</p>
+<pre><code class="language-text">何を保持するか
+何を運ぶか
+何を判定するか
+何を防ぐか
+何に依存するか
+何を同じものとして追うか
+</code></pre>
+<p>が説明できるなら、一般 Concept として残す価値がある。</p>
+<p>固有名を消した瞬間に意味がなくなるなら、それは機能説明に近い。</p>
+<p>ただし、一般化のために輪郭を削りすぎない。</p>
+<p>名前を失っても残るのは、抽象語ではなく責任と境界である。</p>
+<p><strong>Concept は、名前を失っても輪郭が残る。</strong></p>
+<hr/>
+<h3 id="26-既存モデルへ無理に押し込まない">26. 既存モデルへ無理に押し込まない</h3>
+<p>先に持っている分類は、対象を読むための仮説であって結論ではない。</p>
+<p>たとえば、</p>
+<pre><code class="language-text">恒常環境
+Task固有層
+Loop回覧経路
+</code></pre>
+<p>という三つで多くを説明できても、すべてをそこへ押し込む必要はない。</p>
+<p>次のような輪郭が繰り返し現れるなら、新しい Concept の候補として扱う。</p>
+<pre><code class="language-text">独自の state を持つ
+独自の lifecycle を持つ
+独自の dependency を持つ
+独自の authority や scope を持つ
+別の観測位置からも同じ境界が出る
+failure 時に独立して残る
+他の Concept から単純に導出できない
+</code></pre>
+<p>これは判定表ではない。</p>
+<p>複数の観測軸が同じ輪郭を指しているかを見るための手掛かりである。</p>
+<p>分類を守るために例外を増やし始めたら、分類側を疑う。</p>
+<p><strong>対象をモデルへ合わせるのではなく、モデルを対象で壊す。</strong></p>
+<hr/>
+<h3 id="27-追加読書が判断を変えなくなったら止める">27. 追加読書が判断を変えなくなったら止める</h3>
+<p>対象を全部読む必要はない。</p>
+<p>Concept Discovery の Goal は網羅ではなく、輪郭について判断可能になることである。</p>
+<p>同じ責任について追加の実装や test を読んでも、</p>
+<ul>
+<li>分類が変わらない</li>
+<li>state の境界が変わらない</li>
+<li>lifecycle の理解が変わらない</li>
+<li>dependency の理解が変わらない</li>
+<li>authority や scope の理解が変わらない</li>
+<li>criterion の理解が変わらない</li>
+<li>failure の理解が変わらない</li>
+<li>新しい責任が出てこない</li>
+</ul>
+<p>状態になったら、その探索の価値は下がる。</p>
+<p>反対に、一つの failure path、一つの依存、一つの不可逆な遷移が既存モデルを崩したなら、そこは深く読む価値がある。</p>
+<p>停止は「十分な量を読んだ」ではなく、「追加証拠が輪郭を変えるか」で決める。</p>
+<p><strong>読了はファイル数ではなく、追加証拠が Concept の輪郭を変えるかで決める。</strong></p>
+
+</article>
+<a class="backtop" href="#top">↑ ページ上部へ戻る</a>
+</main>
+<footer>Concept Discovery / Author: akkera102 / Updated: 2026-09-17 19:32 JST</footer>
+</body>
+</html>

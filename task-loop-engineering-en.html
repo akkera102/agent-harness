@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-15 12:57 JST">
+<meta name="last-modified" content="2026-09-17 19:51 JST">
 <meta name="description" content="A guide to engineering Agent Tasks and Loops through control structures including Trigger, Goal, Thought, Bound, Verification, and evaluation.">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -26,7 +26,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <main id="top">
 <header class="doc-head">
 <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-15 12:57 JST</span><span>Language: English</span></div>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-17 19:51 JST</span><span>Language: English</span></div>
 </header>
 <nav class="toc" aria-label="Table of contents">
 <div class="toc-title">Table of Contents</div>
@@ -43,17 +43,17 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h2"><a href="#Part-II--Basic-Structure-of-a-Loop">Part II — Basic Structure of a Loop</a></li>
 <li class="toc-h3"><a href="#9-A-Loop-Connects-Cycles">9. A Loop Connects Cycles</a></li>
 <li class="toc-h3"><a href="#10-The-Loop-Controller-Initiates-the-Next-Cycle">10. The Loop Controller Initiates the Next Cycle</a></li>
-<li class="toc-h3"><a href="#11-In-Turn-Based-Loops-the-Human-Initiates-the-Next-Cycle">11. In Turn-Based Loops, the Human Initiates the Next Cycle</a></li>
-<li class="toc-h3"><a href="#12-In-Goal-Based-Loops-an-Unachieved-Goal-Initiates-the-Next-Cycle">12. In Goal-Based Loops, an Unachieved Goal Initiates the Next Cycle</a></li>
-<li class="toc-h3"><a href="#13-In-Time-Based-Loops-Time-Initiates-the-Next-Cycle">13. In Time-Based Loops, Time Initiates the Next Cycle</a></li>
-<li class="toc-h3"><a href="#14-In-Proactive-Loops-the-External-World-Initiates-the-Next-Cycle">14. In Proactive Loops, the External World Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#11-In-Turn-Based-Loops,-the-Human-Initiates-the-Next-Cycle">11. In Turn-Based Loops, the Human Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#12-In-Goal-Based-Loops,-an-Unachieved-Goal-Initiates-the-Next-Cycle">12. In Goal-Based Loops, an Unachieved Goal Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#13-In-Time-Based-Loops,-Time-Initiates-the-Next-Cycle">13. In Time-Based Loops, Time Initiates the Next Cycle</a></li>
+<li class="toc-h3"><a href="#14-In-Proactive-Loops,-the-External-World-Initiates-the-Next-Cycle">14. In Proactive Loops, the External World Initiates the Next Cycle</a></li>
 <li class="toc-h3"><a href="#15-Triggers-and-End-Conditions-Can-Be-Combined-Independently">15. Triggers and End Conditions Can Be Combined Independently</a></li>
 <li class="toc-h3"><a href="#16-Making-a-Loop-More-Autonomous-Moves-Loop-Control-into-Conditions">16. Making a Loop More Autonomous Moves Loop Control into Conditions</a></li>
 <li class="toc-h3"><a href="#17-Loop-Length-Is-Not-the-Essential-Point">17. Loop Length Is Not the Essential Point</a></li>
 <li class="toc-h3"><a href="#18-Decide-What-Should-Be-a-Loop-by-Asking-Who-or-What-Should-Initiate-the-Next-Cycle">18. Decide What Should Be a Loop by Asking Who or What Should Initiate the Next Cycle</a></li>
 <li class="toc-h3"><a href="#19-View-a-Loop-as-Three-Questions">19. View a Loop as Three Questions</a></li>
 <li class="toc-h3"><a href="#20-A-Task-Can-Contain-a-Cycle">20. A Task Can Contain a Cycle</a></li>
-<li class="toc-h2"><a href="#Part-III--Goal-Verification-and-Bound">Part III — Goal, Verification, and Bound</a></li>
+<li class="toc-h2"><a href="#Part-III--Goal,-Verification,-and-Bound">Part III — Goal, Verification, and Bound</a></li>
 <li class="toc-h3"><a href="#21-A-Goal-Becomes-the-Finish-Line-Shared-Across-Multiple-Cycles">21. A Goal Becomes the Finish Line Shared Across Multiple Cycles</a></li>
 <li class="toc-h3"><a href="#22-Write-a-Goal-So-Its-Attainment-Can-Be-Determined">22. Write a Goal So Its Attainment Can Be Determined</a></li>
 <li class="toc-h3"><a href="#23-A-Bound-Defines-the-Permitted-Range-of-a-Loop-Pursuing-a-Goal">23. A Bound Defines the Permitted Range of a Loop Pursuing a Goal</a></li>
@@ -66,11 +66,11 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h3"><a href="#29-A-Time-Based-Loop-Re-Observes-State-Along-the-Time-Axis">29. A Time-Based Loop Re-Observes State Along the Time Axis</a></li>
 <li class="toc-h3"><a href="#30-The-Work-Stays-the-Same-While-Only-the-Input-Changes">30. The Work Stays the Same While Only the Input Changes</a></li>
 <li class="toc-h3"><a href="#31-A-Time-Budget-Is-a-Type-of-Bound">31. A Time Budget Is a Type of Bound</a></li>
-<li class="toc-h2"><a href="#Part-V--Delegation-Supervision-and-Evaluation">Part V — Delegation, Supervision, and Evaluation</a></li>
+<li class="toc-h2"><a href="#Part-V--Delegation,-Supervision,-and-Evaluation">Part V — Delegation, Supervision, and Evaluation</a></li>
 <li class="toc-h3"><a href="#32-Decide-Delegation-by-the-Nature-of-the-Task">32. Decide Delegation by the Nature of the Task</a></li>
 <li class="toc-h3"><a href="#33-The-Strength-of-Verification-Determines-the-Delegation-Distance">33. The Strength of Verification Determines the Delegation Distance</a></li>
 <li class="toc-h3"><a href="#34-Separate-the-Maker-and-the-Checker">34. Separate the Maker and the Checker</a></li>
-<li class="toc-h3"><a href="#35-Even-with-Verification-the-Observation-Axes-May-Be-Insufficient">35. Even with Verification, the Observation Axes May Be Insufficient</a></li>
+<li class="toc-h3"><a href="#35-Even-with-Verification,-the-Observation-Axes-May-Be-Insufficient">35. Even with Verification, the Observation Axes May Be Insufficient</a></li>
 <li class="toc-h3"><a href="#36-Treat-Judgment-Separately-Even-When-the-Task-Is-Delegated">36. Treat Judgment Separately Even When the Task Is Delegated</a></li>
 <li class="toc-h3"><a href="#37-Do-Not-Mix-Three-Different-Evaluations">37. Do Not Mix Three Different Evaluations</a></li>
 <li class="toc-h2"><a href="#Part-VI--Task--Loop-in-Practice">Part VI — Task / Loop in Practice</a></li>
@@ -83,16 +83,18 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h3"><a href="#44-A-Task-Can-Be-Written-as-a-Small-Contract">44. A Task Can Be Written as a Small Contract</a></li>
 <li class="toc-h2"><a href="#Part-VII--Limits-and-Stopping-of-Loops">Part VII — Limits and Stopping of Loops</a></li>
 <li class="toc-h3"><a href="#45-A-Loop-Does-Not-Resolve-Ambiguous-Judgment">45. A Loop Does Not Resolve Ambiguous Judgment</a></li>
-<li class="toc-h3"><a href="#46-Deterministic-Evaluation-and-Inferential-Evaluation">46. Deterministic Evaluation and Inferential Evaluation</a></li>
-<li class="toc-h3"><a href="#47-Narrow-the-Output-Space-of-Inferential-Evaluation">47. Narrow the Output Space of Inferential Evaluation</a></li>
-<li class="toc-h3"><a href="#48-Separate-Evaluation-from-State-Change">48. Separate Evaluation from State Change</a></li>
+<li class="toc-h3"><a href="#46-A-Signal-Is-the-Change-Returned-by-One-Loop">46. A Signal Is the Change Returned by One Loop</a></li>
+<li class="toc-h3"><a href="#47-Deterministic-Evaluation-and-Inferential-Evaluation">47. Deterministic Evaluation and Inferential Evaluation</a></li>
+<li class="toc-h3"><a href="#48-Narrow-the-Output-Space-of-Inferential-Evaluation">48. Narrow the Output Space of Inferential Evaluation</a></li>
+<li class="toc-h3"><a href="#49-Separate-Evaluation-from-State-Change">49. Separate Evaluation from State Change</a></li>
 <li class="toc-h2"><a href="#Part-VIII--Product-Specific-Constraints">Part VIII — Product-Specific Constraints</a></li>
-<li class="toc-h3"><a href="#49-Separate-Product-Specific-Constraints-from-General-Principles">49. Separate Product-Specific Constraints from General Principles</a></li>
+<li class="toc-h3"><a href="#50-Separate-Product-Specific-Constraints-from-General-Principles">50. Separate Product-Specific Constraints from General Principles</a></li>
 <li class="toc-h2"><a href="#Appendix-A-References">Appendix A. References</a></li>
 <li class="toc-h3"><a href="#Sources-of-Quotations-and-Ideas">Sources of Quotations and Ideas</a></li>
 </ul>
 </nav>
 <article>
+
 <p><strong>How to start, continue, verify, and stop an Agent's work</strong></p>
 <blockquote>
 <p>Purpose: To organize what starts, continues, verifies, and stops an Agent's work. This guide focuses on the control structures of Tasks and Loops and treats them separately from product-specific implementation details.</p>
@@ -327,7 +329,7 @@ Check the state
 <p>What differs is <strong>what is responsible for deciding whether to start the next cycle</strong>.</p>
 <p>This difference lets us think of Loops as Turn-based, Goal-based, Time-based, or Proactive.</p>
 <p><strong>The type of Loop is determined by what serves as its Loop controller.</strong></p>
-<h3 id="11-In-Turn-Based-Loops-the-Human-Initiates-the-Next-Cycle">11. In Turn-Based Loops, the Human Initiates the Next Cycle</h3>
+<h3 id="11-In-Turn-Based-Loops,-the-Human-Initiates-the-Next-Cycle">11. In Turn-Based Loops, the Human Initiates the Next Cycle</h3>
 <p>Turn-based is a Loop in which <strong>a human reviews the result and initiates the next cycle by giving the next Prompt</strong>.</p>
 <pre><code class="language-text">Prompt
   ↓
@@ -353,7 +355,7 @@ Next Task
 <p>And <strong>the human who decides whether to provide that Prompt is the Loop controller</strong>.</p>
 <p>In a Turn-based Loop, the Agent does not move on by itself.</p>
 <p><strong>The human connects one cycle to the next.</strong></p>
-<h3 id="12-In-Goal-Based-Loops-an-Unachieved-Goal-Initiates-the-Next-Cycle">12. In Goal-Based Loops, an Unachieved Goal Initiates the Next Cycle</h3>
+<h3 id="12-In-Goal-Based-Loops,-an-Unachieved-Goal-Initiates-the-Next-Cycle">12. In Goal-Based Loops, an Unachieved Goal Initiates the Next Cycle</h3>
 <p>Goal-based is a Loop that <strong>initiates the next cycle while the Goal remains unachieved, and stops once the Goal is reached</strong>.</p>
 <pre><code class="language-text">Task execution
     ↓
@@ -376,7 +378,7 @@ Goal achieved?
 <p><strong>Determine whether the Goal has been achieved, and if it has not, connect to the next cycle.</strong></p>
 <p>In a Turn-based Loop, a human connects the cycles.</p>
 <p>In a Goal-based Loop, <strong>the unachieved state of the Goal connects one cycle to the next</strong>.</p>
-<h3 id="13-In-Time-Based-Loops-Time-Initiates-the-Next-Cycle">13. In Time-Based Loops, Time Initiates the Next Cycle</h3>
+<h3 id="13-In-Time-Based-Loops,-Time-Initiates-the-Next-Cycle">13. In Time-Based Loops, Time Initiates the Next Cycle</h3>
 <p>Time-based is a Loop that <strong>uses time as the Trigger for starting the next cycle</strong>.</p>
 <pre><code class="language-text">Task execution
     ↓
@@ -408,7 +410,7 @@ Time as Bound    End after 30 minutes
 <p>Time as Trigger defines <strong>when to initiate the next Task</strong>.</p>
 <p>Time as Bound defines <strong>how long the current Task may continue</strong>.</p>
 <p>Both use time, but <strong>a Trigger opens the entry, while a Bound closes the exit</strong>.</p>
-<h3 id="14-In-Proactive-Loops-the-External-World-Initiates-the-Next-Cycle">14. In Proactive Loops, the External World Initiates the Next Cycle</h3>
+<h3 id="14-In-Proactive-Loops,-the-External-World-Initiates-the-Next-Cycle">14. In Proactive Loops, the External World Initiates the Next Cycle</h3>
 <p>Proactive is a Loop that <strong>uses an external Event or a change in State as the Trigger for initiating a Task</strong>.</p>
 <pre><code class="language-text">External change
     ↓
@@ -564,7 +566,7 @@ Repeat while the condition holds
 <p>After leaving the cycle, the Task can perform end processing such as recording, saving, Verification, or return.</p>
 <p><strong>End processing is outside the cycle and inside the Task.</strong></p>
 <p>To start another Task after this Task ends, that Task needs its own separate Trigger.</p>
-<h2 id="Part-III--Goal-Verification-and-Bound">Part III — Goal, Verification, and Bound</h2>
+<h2 id="Part-III--Goal,-Verification,-and-Bound">Part III — Goal, Verification, and Bound</h2>
 <h3 id="21-A-Goal-Becomes-the-Finish-Line-Shared-Across-Multiple-Cycles">21. A Goal Becomes the Finish Line Shared Across Multiple Cycles</h3>
 <p>In a Goal-based Loop, <strong>the Goal becomes the finish line shared across multiple cycles</strong>.</p>
 <pre><code class="language-text">What you want to do
@@ -847,7 +849,7 @@ Time budget      = Bound
 </code></pre>
 <p>The Time in a Time-based Loop means <strong>start because the time has arrived</strong>.</p>
 <p>The Time in a Time budget means <strong>stop because the allotted time has been used up</strong>.</p>
-<h2 id="Part-V--Delegation-Supervision-and-Evaluation">Part V — Delegation, Supervision, and Evaluation</h2>
+<h2 id="Part-V--Delegation,-Supervision,-and-Evaluation">Part V — Delegation, Supervision, and Evaluation</h2>
 <h3 id="32-Decide-Delegation-by-the-Nature-of-the-Task">32. Decide Delegation by the Nature of the Task</h3>
 <p>Delegation should <strong>not be decided only by whether the Task is easy or difficult</strong>.</p>
 <pre><code class="language-text">Task
@@ -898,7 +900,7 @@ Assessment
 <p>For that reason, staying within the same perspective can make some errors harder to notice.</p>
 <p>Separating the Checker makes it possible to verify the artifact from a different context and a different perspective.</p>
 <p><strong>Separate making from checking.</strong></p>
-<h3 id="35-Even-with-Verification-the-Observation-Axes-May-Be-Insufficient">35. Even with Verification, the Observation Axes May Be Insufficient</h3>
+<h3 id="35-Even-with-Verification,-the-Observation-Axes-May-Be-Insufficient">35. Even with Verification, the Observation Axes May Be Insufficient</h3>
 <p>Even when Verification is correct, <strong>the set of things being observed can still be insufficient</strong>.</p>
 <pre><code class="language-text">Measuring correctly
        ≠
@@ -1170,7 +1172,34 @@ Can turn the Task into a Loop
 </code></pre>
 <p>The fact that an Agent can perform the work is different from being able to express the continuation and ending of that work as conditions.</p>
 <p><strong>A Loop does not remove ambiguity. Work is better suited to a Loop when its ending can be written as conditions.</strong></p>
-<h3 id="46-Deterministic-Evaluation-and-Inferential-Evaluation">46. Deterministic Evaluation and Inferential Evaluation</h3>
+<h3 id="46-A-Signal-Is-the-Change-Returned-by-One-Loop">46. A Signal Is the Change Returned by One Loop</h3>
+<p>A Signal is information obtained from one Loop that changes the next iteration.</p>
+<p>Changes such as having moved forward, moved backward, or needing to try a different direction become Signals.</p>
+<p>A Signal is not Verification.<br/>
+It is used not to determine whether the requirement has been satisfied, but to decide how the next iteration should change.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Direction</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bound</td>
+<td>outside → inside</td>
+<td>“Do not cross this line.”</td>
+</tr>
+<tr>
+<td>Signal</td>
+<td>inside → outside</td>
+<td>“In this iteration, the state moved this way.”</td>
+</tr>
+</tbody>
+</table>
+<p>A Bound gives a Loop its contour from the outside, while a Signal is returned from inside the Loop to the outside.</p>
+<h3 id="47-Deterministic-Evaluation-and-Inferential-Evaluation">47. Deterministic Evaluation and Inferential Evaluation</h3>
 <p>The evaluations made by a Loop controller include <strong>deterministic evaluation</strong> and <strong>inferential evaluation</strong>.</p>
 <p>Deterministic evaluation is an evaluation whose result is uniquely determined from the observed state and the rule.</p>
 <p>Inferential evaluation is an evaluation for which observation alone does not uniquely determine the result and inference is required.</p>
@@ -1178,7 +1207,7 @@ Can turn the Task into a Loop
 <p>Only the parts that cannot be determined are passed to inferential evaluation.</p>
 <p>Even when inferential evaluation is used, constrain the range of possible transitions in advance when that range can be constrained.</p>
 <p><strong>Determine what can be determined, and infer only what cannot.</strong></p>
-<h3 id="47-Narrow-the-Output-Space-of-Inferential-Evaluation">47. Narrow the Output Space of Inferential Evaluation</h3>
+<h3 id="48-Narrow-the-Output-Space-of-Inferential-Evaluation">48. Narrow the Output Space of Inferential Evaluation</h3>
 <p>In inferential evaluation, rather than letting the Agent return an unconstrained judgment, narrow in advance the state terms allowed for each condition.</p>
 <p>For example, the result of a review can be limited to state terms such as:</p>
 <pre><code class="language-text">Approved          approved
@@ -1201,7 +1230,7 @@ Next control
 <p>Move any criteria that can be made deterministic outside the inference, and leave only the remainder to inference.</p>
 <p>Narrowing the output space for each inference condition reduces the freedom of inferential evaluation.</p>
 <p>For each inference condition, design state terms that narrow the output space.</p>
-<h3 id="48-Separate-Evaluation-from-State-Change">48. Separate Evaluation from State Change</h3>
+<h3 id="49-Separate-Evaluation-from-State-Change">49. Separate Evaluation from State Change</h3>
 <p>In evaluation, separate the process that evaluates the state from the process that changes the state of the target.</p>
 <p>If the target is modified during evaluation, the object being evaluated changes during the evaluation.</p>
 <pre><code class="language-text">Observation
@@ -1231,7 +1260,7 @@ Evaluate again
 <p>The evaluator assesses the state and passes the state change to the next process.</p>
 <p><strong>Separating evaluation from state change preserves what was actually evaluated.</strong></p>
 <h2 id="Part-VIII--Product-Specific-Constraints">Part VIII — Product-Specific Constraints</h2>
-<h3 id="49-Separate-Product-Specific-Constraints-from-General-Principles">49. Separate Product-Specific Constraints from General Principles</h3>
+<h3 id="50-Separate-Product-Specific-Constraints-from-General-Principles">50. Separate Product-Specific Constraints from General Principles</h3>
 <p>General principles of Task / Loop should be considered separately from implementation constraints specific to a product.</p>
 <pre><code class="language-text">General principles
   │
@@ -1268,9 +1297,10 @@ nrslib — <em>TAKT Workflow Guide</em><br/>
 <a href="https://github.com/nrslib/takt/blob/main/docs/workflows.ja.md">https://github.com/nrslib/takt/blob/main/docs/workflows.ja.md</a></p>
 </li>
 </ul>
+
 </article>
 <a class="backtop" href="#top">↑ Back to top</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-15 12:57 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-17 19:51 JST</footer>
 </body>
 </html>

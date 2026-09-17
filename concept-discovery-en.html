@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="akkera102">
+<meta name="last-modified" content="2026-09-17 20:13 JST">
+<meta name="description" content="A guide to discovering discussable Concept contours from states, differences, relationships, effects, and boundaries across multiple observation axes.">
+<title>Concept Discovery</title>
+<style>
+:root { color-scheme: light dark; --bg:#fbfbfa; --fg:#1d1d1f; --muted:#666; --line:#d8d8d8; --soft:#f1f1ef; --link:#2457a6; --code:#f4f4f2; --quote:#f7f7f5; --max:980px; }
+@media (prefers-color-scheme: dark){:root{--bg:#151515;--fg:#ececec;--muted:#aaa;--line:#3a3a3a;--soft:#202020;--link:#8ab4f8;--code:#202020;--quote:#1c1c1c;}}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;line-height:1.82;font-size:16px}
+main{max-width:var(--max);margin:0 auto;padding:56px 34px 96px}.doc-head{border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:30px}.doc-title{font-size:2.15rem;line-height:1.35;margin:0 0 12px;font-weight:760;letter-spacing:.01em}.meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.toc{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:18px 22px;margin:28px 0 40px}.toc-title{font-weight:700;margin-bottom:8px}.toc ul{list-style:none;margin:0;padding:0}.toc li{margin:.18em 0}.toc-h3{padding-left:1.3em;font-size:.94em}.toc a{text-decoration:none;color:var(--fg)}.toc a:hover{text-decoration:underline;color:var(--link)}
+h1,h2,h3,h4{line-height:1.42;letter-spacing:.01em;scroll-margin-top:18px}h2{font-size:1.52rem;margin:2.35em 0 .65em;border-bottom:1px solid var(--line);padding-bottom:.28em}h3{font-size:1.25rem;margin:2em 0 .55em}h4{font-size:1.08rem;margin:1.8em 0 .45em}
+p,ul,ol,pre,blockquote,table{margin:.78em 0 1.15em}ul,ol{padding-left:1.55em}li+li{margin-top:.18em}a{color:var(--link)}strong{font-weight:750}hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:var(--code);padding:.12em .32em;border-radius:4px;font-size:.93em}pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow:auto;line-height:1.58}pre code{background:transparent;padding:0;border-radius:0}blockquote{margin-left:0;padding:.72em 1em;background:var(--quote);border-left:4px solid var(--line);color:var(--muted)}
+table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}th,td{border:1px solid var(--line);padding:.55em .72em;text-align:left;vertical-align:top}th{background:var(--soft)}
+footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted);font-size:.85rem}.backtop{display:inline-block;margin-top:2em}
+@media(max-width:700px){body{font-size:15px}main{padding:30px 18px 70px}.doc-title{font-size:1.72rem}.meta{display:block}.meta span{display:block;margin:.2em 0}.toc{padding:15px 16px}h2{font-size:1.34rem}h3{font-size:1.15rem}footer{padding:0 18px 36px}}
+@media print{body{background:#fff;color:#000;font-size:11pt}main{max-width:none;padding:0}.doc-head{margin-top:0}.toc{break-after:page;background:#fff}.toc a{color:#000}.backtop{display:none}a{color:#000;text-decoration:none}pre,blockquote,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main id="top">
+<header class="doc-head">
+<h1 class="doc-title">Concept Discovery</h1>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-17 20:13 JST</span><span>Language: English</span></div>
+</header>
+<nav class="toc" aria-label="Table of contents">
+<div class="toc-title">Table of Contents</div>
+<ul>
+<li class="toc-h2"><a href="#Part-I--Discovering-the-Contour">Part I — Discovering the Contour</a></li>
+<li class="toc-h3"><a href="#1-Trace-the-Contour-Before-Defining-the-Concept">1. Trace the Contour Before Defining the Concept</a></li>
+<li class="toc-h3"><a href="#2-Fix-the-Observation-Position">2. Fix the Observation Position</a></li>
+<li class="toc-h3"><a href="#3-Read-Responsibilities,-Not-Feature-Names">3. Read Responsibilities, Not Feature Names</a></li>
+<li class="toc-h3"><a href="#4-Look-at-the-Moment-Something-Is-Lost,-Not-Only-the-Happy-Path">4. Look at the Moment Something Is Lost, Not Only the Happy Path</a></li>
+<li class="toc-h3"><a href="#5-Look-at-States-the-Design-Refuses-to-Let-Exist">5. Look at States the Design Refuses to Let Exist</a></li>
+<li class="toc-h3"><a href="#6-Separate-What-Can-Be-Seen-from-What-Cannot">6. Separate What Can Be Seen from What Cannot</a></li>
+<li class="toc-h3"><a href="#7-Do-Not-Collapse-Every-Kind-of-Absent-into-One">7. Do Not Collapse Every Kind of “Absent” into One</a></li>
+<li class="toc-h2"><a href="#Part-II--Following-State-and-Time">Part II — Following State and Time</a></li>
+<li class="toc-h3"><a href="#8-Follow-State,-Not-Files">8. Follow State, Not Files</a></li>
+<li class="toc-h3"><a href="#9-Read-the-Lifecycle-Along-the-Time-Axis">9. Read the Lifecycle Along the Time Axis</a></li>
+<li class="toc-h3"><a href="#10-Look-for-the-Core-That-Survives-Transition">10. Look for the Core That Survives Transition</a></li>
+<li class="toc-h3"><a href="#11-Separate-Reversible-from-Irreversible-Change">11. Separate Reversible from Irreversible Change</a></li>
+<li class="toc-h3"><a href="#12-Separate-Working-Context-from-Durable-State">12. Separate Working Context from Durable State</a></li>
+<li class="toc-h3"><a href="#13-Read-Reference-Status,-Not-The-Real-One">13. Read Reference Status, Not “The Real One”</a></li>
+<li class="toc-h3"><a href="#14-Separate-Where-State-Lives-from-How-It-Moves">14. Separate Where State Lives from How It Moves</a></li>
+<li class="toc-h2"><a href="#Part-III--Reading-Boundaries-from-Relationships">Part III — Reading Boundaries from Relationships</a></li>
+<li class="toc-h3"><a href="#15-Read-the-Conditions-Under-Which-a-Concept-Holds-from-Its-Dependencies">15. Read the Conditions Under Which a Concept Holds from Its Dependencies</a></li>
+<li class="toc-h3"><a href="#16-Read-Part-and-Whole-from-Composition">16. Read Part and Whole from Composition</a></li>
+<li class="toc-h3"><a href="#17-Read-Authority-Through-Actor,-Target,-and-Change">17. Read Authority Through Actor, Target, and Change</a></li>
+<li class="toc-h3"><a href="#18-Read-Scope-from-the-Edge-of-Effect">18. Read Scope from the Edge of Effect</a></li>
+<li class="toc-h3"><a href="#19-Look-Between-One-Concept-and-Another">19. Look Between One Concept and Another</a></li>
+<li class="toc-h3"><a href="#20-Separate-Evaluation-from-State-Change">20. Separate Evaluation from State Change</a></li>
+<li class="toc-h3"><a href="#21-Read-the-Boundary-Between-Inference-and-Structure">21. Read the Boundary Between Inference and Structure</a></li>
+<li class="toc-h3"><a href="#22-Read-Boundaries-from-What-Changes-Together-and-What-Splits-Apart">22. Read Boundaries from What Changes Together and What Splits Apart</a></li>
+<li class="toc-h2"><a href="#Part-IV--Retaining-It-as-a-Concept">Part IV — Retaining It as a Concept</a></li>
+<li class="toc-h3"><a href="#23-Separate-It-Holds-from-It-Is-Good">23. Separate “It Holds” from “It Is Good”</a></li>
+<li class="toc-h3"><a href="#24-Docs-Are-Maps-Implementation-and-Tests-Are-Primary-Sources">24. Docs Are Maps; Implementation and Tests Are Primary Sources</a></li>
+<li class="toc-h3"><a href="#25-Remove-Product-Specific-Names-and-See-What-Remains">25. Remove Product-Specific Names and See What Remains</a></li>
+<li class="toc-h3"><a href="#26-Do-Not-Force-the-Subject-into-an-Existing-Model">26. Do Not Force the Subject into an Existing Model</a></li>
+<li class="toc-h3"><a href="#27-Stop-When-Additional-Reading-No-Longer-Changes-the-Judgment">27. Stop When Additional Reading No Longer Changes the Judgment</a></li>
+</ul>
+</nav>
+<article>
+
+<p><strong>Observation methods for discovering concepts from a subject</strong></p>
+<blockquote>
+<p>Purpose: To discover the contours of discussable Concepts from the states, differences, relationships, effects, and boundaries that appear in a subject, rather than accepting the subject through existing names or classifications.</p>
+<p>This book does not prescribe a reading order or investigation procedure for any particular subject. Rather than defining a Concept in advance and fitting the subject into it, this book organizes viewpoints for tracing a contour from multiple observations and discovering what that contour represents.</p>
+</blockquote>
+<p>A Concept is not certified by counting how many conditions it satisfies.</p>
+<p>The world keeps moving, and the observer is not fixed. A Concept does not preserve the state of the world itself, nor is its correctness guaranteed at the moment it is discovered.</p>
+<p>At the same time, we do not draw an arbitrary line and call it a Concept. When observable differences, repetitions, boundaries, effects, and evaluations persist as matters for discussion, we treat the contour they form as a candidate.</p>
+<p>Depending on where the subject is observed from, the same thing can appear as a part or as a whole, and the same transition can appear as continuity or as a break.</p>
+<p>For that reason, this book does not place one absolute contour first.</p>
+<pre><code class="language-text">failure
+state
+lifecycle
+identity
+dependency
+composition
+transition
+authority
+scope
+observation
+criterion
+</code></pre>
+<p>Cut the subject along multiple axes and overlay the boundaries that appear each time.</p>
+<p>The responsibilities, states, relationships, prohibitions, transitions, and criteria that recur across observations become candidates for a Concept.</p>
+<p><strong>Concept Discovery is not the work of assigning names. It is the work of bringing back a contour that can be discussed from a world that never stops moving.</strong></p>
+<hr/>
+<h2 id="Part-I--Discovering-the-Contour">Part I — Discovering the Contour</h2>
+<h3 id="1-Trace-the-Contour-Before-Defining-the-Concept">1. Trace the Contour Before Defining the Concept</h3>
+<p>Do not begin an investigation by trying to place the subject into a known classification.</p>
+<p>What appears first is a set of fragmentary findings.</p>
+<pre><code class="language-text">state is held here
+retry is stopped here
+authority is checked here
+the path branches here
+</code></pre>
+<p>Each one may be a fact, but a fact by itself is not yet a Concept.</p>
+<p>A contour begins to appear when multiple findings point, from different places, to the same responsibility or boundary.</p>
+<pre><code class="language-text">finding
+finding
+finding
+   ↓
+point to the same boundary
+   ↓
+contour of a Concept
+</code></pre>
+<p>The important thing is not to decide the name first.</p>
+<p>Use names to make the contour easier to see. Do not force the contour to fit the name.</p>
+<p><strong>Do not merely collect fragments. Look for the contour that repeatedly appears behind them.</strong></p>
+<hr/>
+<h3 id="2-Fix-the-Observation-Position">2. Fix the Observation Position</h3>
+<p>The same subject has different contours depending on where it is observed from.</p>
+<p>For example, a Task may appear as:</p>
+<pre><code class="language-text">from the human          one piece of work
+from the Loop           a segment up to the Goal
+from the engine         a state unit that transitions
+from persistence        something to restore
+</code></pre>
+<p>There is no need to choose one of these as the single correct Task.</p>
+<p>First decide which relationship, responsibility, or state transition you are observing from.</p>
+<p>Once the observation position is fixed, the contour visible from that position can be discussed.</p>
+<p>Place it beside a contour taken from another position, and the mismatch itself becomes a design question.</p>
+<pre><code class="language-text">the human sees one thing
+the engine divides it into two
+</code></pre>
+<p>That difference is not merely a difference in explanation. It may show that the boundaries of responsibility or state do not coincide.</p>
+<p><strong>Before speaking about the contour of a Concept, fix the position from which that contour is being observed.</strong></p>
+<hr/>
+<h3 id="3-Read-Responsibilities,-Not-Feature-Names">3. Read Responsibilities, Not Feature Names</h3>
+<p>A subject contains many product-specific names.</p>
+<p>Learning names such as <code>workflow</code>, <code>facet</code>, <code>reviewer</code>, or <code>task</code> does not by itself make the knowledge reusable in another design.</p>
+<p>Look at what the feature is responsible for.</p>
+<pre><code class="language-text">what it holds
+who reads it
+when it is created
+where it is stored
+what it passes onward
+what changes its state
+</code></pre>
+<p>If the same responsibility appears in another feature, that responsibility may be a higher-level Concept than the product-specific feature.</p>
+<p>Conversely, if the responsibilities differ even when the names are the same, there is little reason to treat them as the same Concept.</p>
+<p><strong>Read the subject not as a collection of names, but as an arrangement of responsibilities.</strong></p>
+<hr/>
+<h3 id="4-Look-at-the-Moment-Something-Is-Lost,-Not-Only-the-Happy-Path">4. Look at the Moment Something Is Lost, Not Only the Happy Path</h3>
+<p>On a successful path, many states can remain implicit and the system can still work.</p>
+<p>Boundaries become exposed when something fails.</p>
+<pre><code class="language-text">retry
+resume
+requeue
+timeout
+abort
+conflict
+stale
+missing
+exceeded
+</code></pre>
+<p>Reading paths like these reveals:</p>
+<ul>
+<li>what must be identified again</li>
+<li>what must be the source of truth</li>
+<li>what must not be executed twice</li>
+<li>what must be preserved as the last normal state</li>
+</ul>
+<p>Failure does not only break a Concept.</p>
+<p>It makes normally hidden responsibilities and boundaries observable.</p>
+<p><strong>A recovery path often expresses the design philosophy more clearly than a successful path.</strong></p>
+<hr/>
+<h3 id="5-Look-at-States-the-Design-Refuses-to-Let-Exist">5. Look at States the Design Refuses to Let Exist</h3>
+<p>A design appears not only in what it executes, but also in the states it refuses to allow.</p>
+<pre><code class="language-text">do not execute twice
+do not let a stale actor write
+do not make an unverified state authoritative
+do not act outside authority
+do not advance with an incomplete result
+</code></pre>
+<p>Implementations use tools such as:</p>
+<pre><code class="language-text">guard
+validation
+version
+lease
+fence
+assert
+reject
+</code></pre>
+<p>There is no need to generalize the tools themselves.</p>
+<p>If multiple places protect against the same prohibited state, there is an invariant behind that prohibition.</p>
+<p>A failure path shows what becomes visible after something breaks. An invariant shows what the design refuses to let become a broken state in the first place.</p>
+<p><strong>Do not mine Concepts only from existing features. Mine them from the states the design refuses to allow.</strong></p>
+<hr/>
+<h3 id="6-Separate-What-Can-Be-Seen-from-What-Cannot">6. Separate What Can Be Seen from What Cannot</h3>
+<p>Not every property of a Concept can be observed from the same place.</p>
+<pre><code class="language-text">active in the UI
+terminated at runtime
+
+successful from the outside
+durable state still unsettled inside
+
+present in the log
+absent from authoritative state
+</code></pre>
+<p>The question is not merely how much observability exists.</p>
+<p>Ask which property is visible from which observation surface, and what misconception is caused when that property is missing from view.</p>
+<p>For example, completion may not be established from a UI display alone.</p>
+<p>Having authority may not be established from a configuration value alone.</p>
+<p>If a Concept is defined only by what can be observed, invisible parts are easily mistaken for nonexistent parts.</p>
+<p><strong>What can be perceived, and what cannot, is also part of a Concept's contour.</strong></p>
+<hr/>
+<h3 id="7-Do-Not-Collapse-Every-Kind-of-Absent-into-One">7. Do Not Collapse Every Kind of “Absent” into One</h3>
+<p>When something cannot be found, do not immediately conclude that it does not exist.</p>
+<p>For example, <code>there is no checkpoint</code> can describe several different states.</p>
+<pre><code class="language-text">it does not exist at all
+it exists but is not visible from this API
+it exists but the current actor cannot read it
+it exists but has not yet been materialized
+it existed but has expired
+there is no means to observe it
+</code></pre>
+<p>The same problem occurs with state, authority, history, and evidence.</p>
+<pre><code class="language-text">nonexistent
+unknown
+inaccessible
+hidden
+expired
+not yet created
+</code></pre>
+<p>Collapsing these into one kind of absence distorts the boundary of a Concept.</p>
+<p>Even when observing absence, first fix the observation position and what can be observed from it.</p>
+<p><strong>Do not turn “not visible” and “does not exist” into the same finding.</strong></p>
+<hr/>
+<h2 id="Part-II--Following-State-and-Time">Part II — Following State and Time</h2>
+<h3 id="8-Follow-State,-Not-Files">8. Follow State, Not Files</h3>
+<p>Reading one file from beginning to end does not necessarily reveal the design responsibility.</p>
+<p>State moves through multiple places.</p>
+<pre><code class="language-text">schema
+  ↓
+loader / builder
+  ↓
+runtime
+  ↓
+persistence
+  ↓
+resume / failure
+  ↓
+test
+</code></pre>
+<p>If one Task state is defined in a schema, updated at runtime, stored in another file, and reused on resume, read that sequence as one path.</p>
+<p>Following the same state reveals one responsibility across implementation files.</p>
+<p><strong>A Concept appears not at file boundaries, but along the path through which state moves.</strong></p>
+<hr/>
+<h3 id="9-Read-the-Lifecycle-Along-the-Time-Axis">9. Read the Lifecycle Along the Time Axis</h3>
+<p>Look not only at where state exists, but also at the states it passes through over time.</p>
+<pre><code class="language-text">create
+  ↓
+active
+  ↓
+suspend
+  ↓
+resume
+  ↓
+complete
+  ↓
+retire
+</code></pre>
+<p>These are not separate Concepts placed side by side.</p>
+<p>They trace the contour that one Concept has along the time axis.</p>
+<p>For each transition, look at:</p>
+<ul>
+<li>when it begins to exist</li>
+<li>when it gains meaning or authority</li>
+<li>what invalidates it</li>
+<li>what is retained while suspended</li>
+<li>what remains after it ends</li>
+</ul>
+<p>Following transitions as one line through time exposes boundaries that cannot be seen from a state at a single moment.</p>
+<p><strong>The contour of a Concept appears not only in values at one moment, but also in transitions along the time axis.</strong></p>
+<hr/>
+<h3 id="10-Look-for-the-Core-That-Survives-Transition">10. Look for the Core That Survives Transition</h3>
+<p>The same Concept can change many things over time.</p>
+<p>For a Task, the hypothesis, implementation, owner, work method, or verification method may all change along the way.</p>
+<p>Even so, it may continue to be treated as “the same Task.”</p>
+<pre><code class="language-text">start
+  ↓
+investigate
+  ↓
+implement
+  ↓
+fail
+  ↓
+redefine
+  ↓
+resume
+</code></pre>
+<p>The point is not to search for an immutable component.</p>
+<p>Look at what may change while the thing is still treated as the same, and what change causes it to be treated as a different thing.</p>
+<p>In implementation, identity may be supported by things such as:</p>
+<pre><code class="language-text">identity
+operation id
+generation
+version
+owner
+parent
+checkpoint
+</code></pre>
+<p>But the same identifier does not necessarily mean the same Concept.</p>
+<p>Conversely, even when components are replaced, the design may continue to track the thing as the same one.</p>
+<p>There is no need to solve the Ship of Theseus.</p>
+<p>Look at what the design itself adopts as the rule of identity.</p>
+<p><strong>Find the core that survives transition, and read what makes the design treat something as the same thing.</strong></p>
+<hr/>
+<h3 id="11-Separate-Reversible-from-Irreversible-Change">11. Separate Reversible from Irreversible Change</h3>
+<p>Transitions along the time axis include both reversible and irreversible ones.</p>
+<pre><code class="language-text">draft → approved
+open → closed
+candidate → canonical
+temporary → committed
+</code></pre>
+<p>Even if a previous state can apparently be restored, the world as a whole may not return to the same state.</p>
+<pre><code class="language-text">the file can be restored
+the fact that an external API was called cannot
+
+state can be restored
+information already seen by a human cannot
+
+a setting can be restored
+the history of an approval that once took effect remains
+</code></pre>
+<p>Read these separately:</p>
+<pre><code class="language-text">reversible state change
+compensation
+reconstruction
+rollback
+irreversible effect
+</code></pre>
+<p>A rollback is not a snapshot of the state of the world itself.</p>
+<p>Looking at which boundary, once crossed, prevents the situation from being the same as before reveals changes that matter to the Concept.</p>
+<p><strong>Do not read only reversibility. Read the weight of a transition from what cannot be restored.</strong></p>
+<hr/>
+<h3 id="12-Separate-Working-Context-from-Durable-State">12. Separate Working Context from Durable State</h3>
+<p>The context an Agent is reading now and the state preserved for later resumption serve different purposes.</p>
+<pre><code class="language-text">working context
+  used for the current judgment
+
+durable state
+  preserved across sessions
+
+event log
+  records what happened
+
+artifact
+  remains as the result of work
+</code></pre>
+<p>If these are treated as one thing, resumption may require rereading a large history, or the reasons needed for a later judgment may be lost.</p>
+<p>In implementations with <code>resume</code> or <code>retry</code>, look at which state is reused.</p>
+<p>What is carried from working context into durable state is not merely a question of storage volume.</p>
+<p>It is a judgment about what must still be treated as part of the Concept at a later point in time.</p>
+<p><strong>Separate information needed now from information needed later for reconstruction.</strong></p>
+<hr/>
+<h3 id="13-Read-Reference-Status,-Not-The-Real-One">13. Read Reference Status, Not “The Real One”</h3>
+<p>The same Concept may appear through multiple states or representations.</p>
+<pre><code class="language-text">state → UI
+state → cache
+state → report
+state → index
+</code></pre>
+<p>All of them may represent the Concept.</p>
+<p>What matters is the asymmetry that appears when the representations disagree.</p>
+<pre><code class="language-text">which one is used as the basis for updates
+which one is used to reconstruct the others
+which one can be lost and rebuilt
+which one takes precedence in a conflict
+</code></pre>
+<p><code>canonical</code> does not mean the Concept itself or an absolute truth.</p>
+<p>It only means that, within the design, something has a role that is treated as a reference.</p>
+<p><strong>Do not ask which one is real. Read which one is treated as the reference.</strong></p>
+<hr/>
+<h3 id="14-Separate-Where-State-Lives-from-How-It-Moves">14. Separate Where State Lives from How It Moves</h3>
+<p>The place where information exists and the mechanism that carries it onward are different things.</p>
+<pre><code class="language-text">where it lives
+  persistent environment
+  Task-specific layer
+
+how it moves
+  Loop handoff path
+</code></pre>
+<p>For example, Task-specific knowledge or policy may exist, but if it is not passed to the next cycle or another owner, the handoff path is not established.</p>
+<p>Conversely, even if a handoff mechanism exists, if the source of truth to be carried is not defined, the state is reinterpreted every time.</p>
+<p>Separating storage location from transport lets the responsibility for holding a Concept and the responsibility for moving it be observed independently.</p>
+<p><strong>Do not read what is held and how it is carried as the same mechanism.</strong></p>
+<hr/>
+<h2 id="Part-III--Reading-Boundaries-from-Relationships">Part III — Reading Boundaries from Relationships</h2>
+<h3 id="15-Read-the-Conditions-Under-Which-a-Concept-Holds-from-Its-Dependencies">15. Read the Conditions Under Which a Concept Holds from Its Dependencies</h3>
+<p>A Concept does not necessarily stand on its own.</p>
+<pre><code class="language-text">B holds because A exists
+C is valid only while B exists
+D loses its meaning when C is lost
+</code></pre>
+<p>The point is not to make a dependency inventory.</p>
+<p>Look at what can be removed before the Concept no longer holds as that Concept.</p>
+<p>For example:</p>
+<pre><code class="language-text">approval
+  depends on
+request identity + current state + authority
+
+resume
+  depends on
+checkpoint + environment + assumptions
+</code></pre>
+<p>Then ask which dependencies are replaceable and which ones, if lost, collapse the meaning itself.</p>
+<p>If the time axis shows when something continues as the same thing, the dependency axis shows what supports it in continuing to hold as the same thing.</p>
+<p><strong>Strip away external conditions and trace the contour of the Concept from the point where its meaning collapses.</strong></p>
+<hr/>
+<h3 id="16-Read-Part-and-Whole-from-Composition">16. Read Part and Whole from Composition</h3>
+<p>Dependency and composition are not the same.</p>
+<pre><code class="language-text">whole
+ ├─ A
+ ├─ B
+ └─ C
+</code></pre>
+<p>A, B, and C may constitute one whole even if they do not depend on one another.</p>
+<p>Look at:</p>
+<ul>
+<li>what is included inside it</li>
+<li>which parts are replaceable</li>
+<li>which parts, if removed, make the whole cease to hold</li>
+<li>whether it can still be called the same whole after one part changes</li>
+</ul>
+<p>The important point is not to treat part and whole as absolute sizes.</p>
+<p>The same subject can be a whole from one observation position and a part of a larger Concept from another.</p>
+<pre><code class="language-text">A Task is the whole of a piece of work
+A Task is a part of a Loop
+</code></pre>
+<p>Both can hold.</p>
+<p><strong>Part and whole change with the observation position. Composition asks what constitutes one thing from that position.</strong></p>
+<hr/>
+<h3 id="17-Read-Authority-Through-Actor,-Target,-and-Change">17. Read Authority Through Actor, Target, and Change</h3>
+<p>Responsibility and the power to make a change take effect are not the same.</p>
+<pre><code class="language-text">ownership
+  who is responsible
+
+authority
+  who can cause what to happen to what
+</code></pre>
+<p>For example, an actor may be able to create a request while only another actor can make an approval take effect.</p>
+<p>An actor may be able to read state while only a limited actor can update the state used as a reference.</p>
+<p>Listing actors alone does not reveal authority.</p>
+<p>Read the relationship:</p>
+<pre><code class="language-text">who
+can cause what change
+to what
+</code></pre>
+<p><strong>Trace the contour of authority from the asymmetry among the actor, the target, and the change that can be made to take effect.</strong></p>
+<hr/>
+<h3 id="18-Read-Scope-from-the-Edge-of-Effect">18. Read Scope from the Edge of Effect</h3>
+<p>Composition asks what is included inside something. Scope asks how far an effect or rule remains meaningful.</p>
+<pre><code class="language-text">valid only for this Task
+valid only during this Loop
+does not cross this session
+applies in this repository but does not reach an external system
+</code></pre>
+<p>This is not merely a containment boundary.</p>
+<p>Look at where these change:</p>
+<pre><code class="language-text">for whom
+for what
+under what conditions
+how far it applies
+</code></pre>
+<p>This is not limited to effects that actually occur. Even a hypothetical rule has an observable scope if the conditions and edge of its applicability can be discussed.</p>
+<p><strong>Do not ask only what is contained. Look at where the effect of an action or rule ends.</strong></p>
+<hr/>
+<h3 id="19-Look-Between-One-Concept-and-Another">19. Look Between One Concept and Another</h3>
+<p>A Concept is not necessarily self-contained.</p>
+<p>An independent responsibility can appear in what passes between two Concepts.</p>
+<pre><code class="language-text">Maker
+  ↓
+artifact / diff / evidence
+  ↓
+Checker
+</code></pre>
+<p>Or:</p>
+<pre><code class="language-text">working context
+  ↓
+selection / compression
+  ↓
+durable state
+</code></pre>
+<p>Crossing such a boundary carries responsibilities such as:</p>
+<ul>
+<li>what is passed</li>
+<li>what is not passed</li>
+<li>which form it is converted into</li>
+<li>what must be true to cross the boundary</li>
+<li>who holds authority next</li>
+</ul>
+<p>This is neither dependency nor composition.</p>
+<p>Look for a Concept in the handoff, conversion, promotion, or rejection that arises between A and B.</p>
+<p><strong>Look for contours not only inside Concepts, but also between one Concept and another.</strong></p>
+<hr/>
+<h3 id="20-Separate-Evaluation-from-State-Change">20. Separate Evaluation from State Change</h3>
+<p>Obtaining a result and moving to the next state because of that result are different things.</p>
+<pre><code class="language-text">Observation
+   ↓
+Judgment
+   ↓
+State word
+   ↓
+Transition
+</code></pre>
+<p>An implementation may collapse these four into one function or one output.</p>
+<p>When you see <code>REJECT</code>, for example, look not only at the fact of rejection but also at where these are held:</p>
+<pre><code class="language-text">reason
+retry condition
+next route
+</code></pre>
+<p>Judgment classifies the Concept. Transition changes the world.</p>
+<p>Separating them reveals the boundary between observation and action.</p>
+<p><strong>Do not treat what was judged and what was caused to happen as the same responsibility.</strong></p>
+<hr/>
+<h3 id="21-Read-the-Boundary-Between-Inference-and-Structure">21. Read the Boundary Between Inference and Structure</h3>
+<p>Separate the part where an Agent interprets meaning from the part fixed by an engine or other mechanism.</p>
+<pre><code class="language-text">Inference
+  judges meaning
+  creates candidates
+  interprets the situation
+
+Structure
+  holds state
+  selects input
+  applies transitions
+  enforces Bound
+  preserves durable state
+</code></pre>
+<p>If every important boundary is left to the Agent's memory or judgment, the design leans toward inference.</p>
+<p>If everything is fixed in structure, context-dependent judgment is lost as well.</p>
+<p>The point is not to decide which is superior.</p>
+<p>Look at what remains as inference, what has been moved into structure, and what responsibility is placed on that boundary.</p>
+<p><strong>Read the design philosophy from what was moved out of inference into structure and what was left to inference.</strong></p>
+<hr/>
+<h3 id="22-Read-Boundaries-from-What-Changes-Together-and-What-Splits-Apart">22. Read Boundaries from What Changes Together and What Splits Apart</h3>
+<p>A Concept also appears in the propagation of change.</p>
+<p>If a feature addition or fix repeatedly changes these together:</p>
+<pre><code class="language-text">schema
+runtime
+persistence
+resume
+test
+docs
+</code></pre>
+<p>then they may share one responsibility.</p>
+<p>At the same time, place similar subjects side by side and look at the points where their treatment diverges.</p>
+<pre><code class="language-text">A is retained
+B is discarded
+
+A is resumed
+B is regenerated
+
+A is established by a human
+B is established by the engine
+</code></pre>
+<p>Even when the Concept itself cannot be stated directly in words, it is possible to observe where the same treatment is applied and where it diverges.</p>
+<pre><code class="language-text">co-change
+  candidate for the same responsibility
+
+divergence
+  candidate for a different contour
+</code></pre>
+<p><strong>Read Concept boundaries from both the places that change together and the places that look similar but split apart.</strong></p>
+<hr/>
+<h2 id="Part-IV--Retaining-It-as-a-Concept">Part IV — Retaining It as a Concept</h2>
+<h3 id="23-Separate-It-Holds-from-It-Is-Good">23. Separate “It Holds” from “It Is Good”</h3>
+<p>For something to hold and for it to be judged good are different things.</p>
+<pre><code class="language-text">A works
+B also works
+
+but A is chosen
+</code></pre>
+<p>The difference may be shaped not only by explicit rules, but also by criteria such as readability, symmetry, simplicity, convention, or experience.</p>
+<p>Some of it may only be describable as <code>taste</code>.</p>
+<p>Even then, if the observations behind the judgment can be shown, the evaluation criterion itself can be read as part of the Concept's contour.</p>
+<p>This is not permission for arbitrariness.</p>
+<p>If there is no observed difference or relationship and the line was drawn at random, it is not Discovery.</p>
+<p>A criterion does not guarantee correctness in advance, but it can be observed, discussed, broken, and updated.</p>
+<p><strong>Observe not only what holds, but also what is treated as good.</strong></p>
+<hr/>
+<h3 id="24-Docs-Are-Maps-Implementation-and-Tests-Are-Primary-Sources">24. Docs Are Maps; Implementation and Tests Are Primary Sources</h3>
+<p>Docs are useful for learning terminology and finding entry points.</p>
+<p>But the design described in docs is not necessarily the same as the implementation that actually maintains and transitions state.</p>
+<p>When checking the contour of a Concept, prefer roughly this order:</p>
+<pre><code class="language-text">test / runtime artifact
+        ↓
+implementation
+        ↓
+schema / configuration
+        ↓
+official docs
+        ↓
+Issue / discussion
+</code></pre>
+<p>Use Issues less as sources that define a Concept and more as sources for seeing what happens when a boundary breaks.</p>
+<p>The value of a source changes with the observation position, but when claiming that a Concept holds, prefer boundaries that are actually enforced.</p>
+<p><strong>Prefer the boundary that is actually enforced over the design that is merely described.</strong></p>
+<hr/>
+<h3 id="25-Remove-Product-Specific-Names-and-See-What-Remains">25. Remove Product-Specific Names and See What Remains</h3>
+<p>Remove product-specific terms from the findings you extracted.</p>
+<pre><code class="language-text">facet
+workflow
+companion
+repertoire
+</code></pre>
+<p>Replace them with general terms.</p>
+<p>If you can still explain:</p>
+<pre><code class="language-text">what is held
+what is carried
+what is evaluated
+what is prevented
+what it depends on
+what is tracked as the same thing
+</code></pre>
+<p>then it may be worth preserving as a general Concept.</p>
+<p>If the meaning disappears as soon as the product-specific name is removed, it is closer to a feature description.</p>
+<p>But do not erase the contour merely to generalize it.</p>
+<p>What remains after the name is gone is not an abstract word. It is responsibility and boundary.</p>
+<p><strong>A Concept keeps its contour even after it loses its name.</strong></p>
+<hr/>
+<h3 id="26-Do-Not-Force-the-Subject-into-an-Existing-Model">26. Do Not Force the Subject into an Existing Model</h3>
+<p>A classification you already have is a hypothesis for reading the subject, not the conclusion.</p>
+<p>For example:</p>
+<pre><code class="language-text">persistent environment
+Task-specific layer
+Loop handoff path
+</code></pre>
+<p>Even if these three explain much of the subject, there is no need to force everything into them.</p>
+<p>If contours like these appear repeatedly, treat them as candidates for a new Concept.</p>
+<pre><code class="language-text">has its own state
+has its own lifecycle
+has its own dependency
+has its own authority or scope
+the same boundary appears from another observation position
+remains independently after failure
+cannot be derived simply from another Concept
+</code></pre>
+<p>This is not a scorecard.</p>
+<p>These are clues for seeing whether multiple observation axes point to the same contour.</p>
+<p>If you begin adding exceptions merely to preserve the classification, question the classification instead.</p>
+<p><strong>Do not fit the subject to the model. Break the model with the subject.</strong></p>
+<hr/>
+<h3 id="27-Stop-When-Additional-Reading-No-Longer-Changes-the-Judgment">27. Stop When Additional Reading No Longer Changes the Judgment</h3>
+<p>There is no need to read the entire subject.</p>
+<p>The Goal of Concept Discovery is not completeness. It is to reach a point where a judgment can be made about the contour.</p>
+<p>When reading more implementation or tests about the same responsibility no longer changes:</p>
+<ul>
+<li>the classification</li>
+<li>the state boundary</li>
+<li>the understanding of the lifecycle</li>
+<li>the understanding of dependency</li>
+<li>the understanding of authority or scope</li>
+<li>the understanding of the criterion</li>
+<li>the understanding of failure</li>
+<li>the set of responsibilities that appear</li>
+</ul>
+<p>then the value of further exploration decreases.</p>
+<p>Conversely, if one failure path, one dependency, or one irreversible transition breaks the existing model, that place is worth reading more deeply.</p>
+<p>Stop not because “enough material has been read,” but because additional evidence no longer changes the contour.</p>
+<p><strong>Completion is not measured by file count, but by whether additional evidence changes the contour of the Concept.</strong></p>
+
+</article>
+<a class="backtop" href="#top">↑ Back to top</a>
+</main>
+<footer>Concept Discovery / Author: akkera102 / Updated: 2026-09-17 20:13 JST</footer>
+</body>
+</html>

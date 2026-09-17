@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-15 04:30 JST">
+<meta name="last-modified" content="2026-09-17 04:16 JST">
 <meta name="description" content="AgentのTaskとLoopを、Trigger、Goal、Thought、Bound、Verification、判定などの制御構造から設計するガイド。">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -26,7 +26,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <main id="top">
 <header class="doc-head">
 <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-15 04:30 JST</span><span>Language: Japanese</span></div>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-17 04:16 JST</span><span>Language: Japanese</span></div>
 </header>
 <nav class="toc" aria-label="目次">
 <div class="toc-title">目次</div>
@@ -83,16 +83,18 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h3"><a href="#44-Taskは小さな契約として書ける">44. Taskは小さな契約として書ける</a></li>
 <li class="toc-h2"><a href="#第VII部-Loop-の限界と停止">第VII部　Loop の限界と停止</a></li>
 <li class="toc-h3"><a href="#45-Loopは曖昧な判断を解消しない">45. Loopは曖昧な判断を解消しない</a></li>
-<li class="toc-h3"><a href="#46-確定判定と推論判定">46. 確定判定と推論判定</a></li>
-<li class="toc-h3"><a href="#47-推論判定の出力空間を狭める">47. 推論判定の出力空間を狭める</a></li>
-<li class="toc-h3"><a href="#48-判定と状態変更を分ける">48. 判定と状態変更を分ける</a></li>
+<li class="toc-h3"><a href="#46-Signalは1回のLoopが返す変化">46. Signalは1回のLoopが返す変化</a></li>
+<li class="toc-h3"><a href="#47-確定判定と推論判定">47. 確定判定と推論判定</a></li>
+<li class="toc-h3"><a href="#48-推論判定の出力空間を狭める">48. 推論判定の出力空間を狭める</a></li>
+<li class="toc-h3"><a href="#49-判定と状態変更を分ける">49. 判定と状態変更を分ける</a></li>
 <li class="toc-h2"><a href="#第VIII部-製品固有の制約">第VIII部　製品固有の制約</a></li>
-<li class="toc-h3"><a href="#49-製品固有の制約は一般原理と分ける">49. 製品固有の制約は一般原理と分ける</a></li>
+<li class="toc-h3"><a href="#50-製品固有の制約は一般原理と分ける">50. 製品固有の制約は一般原理と分ける</a></li>
 <li class="toc-h2"><a href="#付録A-参照資料">付録A. 参照資料</a></li>
 <li class="toc-h3"><a href="#引用着想元">引用・着想元</a></li>
 </ul>
 </nav>
 <article>
+
 <p><strong>Agentの仕事を、どう始め、続け、確かめ、止めるか</strong></p>
 <blockquote>
 <p>目的: Agent の仕事を、何によって始め、続け、確かめ、止めるかを整理する。Task と Loop の制御構造を扱い、特定製品の実装仕様とは分けて考える。</p>
@@ -1186,7 +1188,34 @@ Task を Loop にできる
 </code></pre>
 <p>Agent が仕事を進められることと、その仕事の継続と終了を条件化できることは別である。</p>
 <p><strong>Loop は曖昧さを消さない。終了を条件として書ける仕事ほど Loop に向く。</strong></p>
-<h3 id="46-確定判定と推論判定">46. 確定判定と推論判定</h3>
+<h3 id="46-Signalは1回のLoopが返す変化">46. Signalは1回のLoopが返す変化</h3>
+<p>Signalは、1回のLoopから得られる、次のiterationを変える情報である。</p>
+<p>進んだ、戻った、別の方向を試すべきだ、といった変化がSignalになる。</p>
+<p>SignalはVerificationではない。<br/>
+要求を満たしたかではなく、次のiterationをどう変えるかに使う。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>向き</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bound</td>
+<td>外 → 内</td>
+<td>「ここを越えるな」</td>
+</tr>
+<tr>
+<td>Signal</td>
+<td>内 → 外</td>
+<td>「今回の反復で、状態がこちらへ動いた」</td>
+</tr>
+</tbody>
+</table>
+<p>BoundがLoopの外から輪郭を与えるのに対し、SignalはLoopの内側から外へ返される。</p>
+<h3 id="47-確定判定と推論判定">47. 確定判定と推論判定</h3>
 <p>Loop controller の判定には、<strong>確定判定</strong>と<strong>推論判定</strong>がある。</p>
 <p>確定判定は、観測された状態とルールから結果が一意に決まる判定である。</p>
 <p>推論判定は、観測だけでは結果が一意に決まらず、推論を必要とする判定である。</p>
@@ -1194,7 +1223,7 @@ Task を Loop にできる
 <p>確定できない部分だけを推論判定へ渡す。</p>
 <p>推論判定を使う場合も、遷移可能な範囲を先に制約できるなら制約する。</p>
 <p><strong>確定できるものは確定し、確定できないものだけを推論する。</strong></p>
-<h3 id="47-推論判定の出力空間を狭める">47. 推論判定の出力空間を狭める</h3>
+<h3 id="48-推論判定の出力空間を狭める">48. 推論判定の出力空間を狭める</h3>
 <p>推論判定では、Agent に自由な判断を返させるのではなく、条件ごとに許される状態語をあらかじめ狭くする。</p>
 <p>たとえば、review の結果を、</p>
 <pre><code class="language-text">承認 approved
@@ -1218,7 +1247,7 @@ Loop controller
 <p>確定できる基準は外に出し、残りだけを推論に残す。</p>
 <p>推論条件ごとに出力空間を狭めれば、推論判定の自由度を減らせる。</p>
 <p>推論条件ごとに、出力空間を狭める状態語を設計する。</p>
-<h3 id="48-判定と状態変更を分ける">48. 判定と状態変更を分ける</h3>
+<h3 id="49-判定と状態変更を分ける">49. 判定と状態変更を分ける</h3>
 <p>判定では、判定する処理と、対象の状態を変更する処理を分ける。</p>
 <p>判定の途中で対象を修正すると、判定対象そのものが変わる。</p>
 <pre><code class="language-text">観測
@@ -1248,7 +1277,7 @@ Loop controller
 <p>判定者は状態を判定し、状態の変更は次の処理へ渡す。</p>
 <p><strong>判定と状態変更を分ければ、何を判定したのかを残せる。</strong></p>
 <h2 id="第VIII部-製品固有の制約">第VIII部　製品固有の制約</h2>
-<h3 id="49-製品固有の制約は一般原理と分ける">49. 製品固有の制約は一般原理と分ける</h3>
+<h3 id="50-製品固有の制約は一般原理と分ける">50. 製品固有の制約は一般原理と分ける</h3>
 <p>Task / Loop の一般原理と、製品ごとの実装上の制約は分けて考える。</p>
 <pre><code class="language-text">一般原理
   │
@@ -1285,9 +1314,10 @@ nrslib — <em>TAKT Workflow ガイド</em><br/>
 <a href="https://github.com/nrslib/takt/blob/main/docs/workflows.ja.md">https://github.com/nrslib/takt/blob/main/docs/workflows.ja.md</a></p>
 </li>
 </ul>
+
 </article>
 <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-15 04:30 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-17 04:16 JST</footer>
 </body>
 </html>
