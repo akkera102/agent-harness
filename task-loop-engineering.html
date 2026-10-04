@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="akkera102">
-<meta name="last-modified" content="2026-09-17 04:16 JST">
+<meta name="last-modified" content="2026-09-29 09:48 JST">
 <meta name="description" content="AgentのTaskとLoopを、Trigger、Goal、Thought、Bound、Verification、判定などの制御構造から設計するガイド。">
 <title>Task / Loop Engineering Guide</title>
 <style>
@@ -26,7 +26,7 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <main id="top">
 <header class="doc-head">
 <h1 class="doc-title">Task / Loop Engineering Guide</h1>
-<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-17 04:16 JST</span><span>Language: Japanese</span></div>
+<div class="meta"><span>Author: akkera102</span><span>Updated: 2026-09-29 09:48 JST</span><span>Language: Japanese</span></div>
 </header>
 <nav class="toc" aria-label="目次">
 <div class="toc-title">目次</div>
@@ -87,8 +87,9 @@ footer{max-width:var(--max);margin:0 auto;padding:0 34px 50px;color:var(--muted)
 <li class="toc-h3"><a href="#47-確定判定と推論判定">47. 確定判定と推論判定</a></li>
 <li class="toc-h3"><a href="#48-推論判定の出力空間を狭める">48. 推論判定の出力空間を狭める</a></li>
 <li class="toc-h3"><a href="#49-判定と状態変更を分ける">49. 判定と状態変更を分ける</a></li>
+<li class="toc-h3"><a href="#50-TaskはAgentの制御面を表す">50. TaskはAgentの制御面を表す</a></li>
 <li class="toc-h2"><a href="#第VIII部-製品固有の制約">第VIII部　製品固有の制約</a></li>
-<li class="toc-h3"><a href="#50-製品固有の制約は一般原理と分ける">50. 製品固有の制約は一般原理と分ける</a></li>
+<li class="toc-h3"><a href="#51-製品固有の制約は一般原理と分ける">51. 製品固有の制約は一般原理と分ける</a></li>
 <li class="toc-h2"><a href="#付録A-参照資料">付録A. 参照資料</a></li>
 <li class="toc-h3"><a href="#引用着想元">引用・着想元</a></li>
 </ul>
@@ -1276,8 +1277,95 @@ Loop controller
 <p>そのため、作業者と検査員を同じ処理にまとめると、作業と判定が互いに影響しやすい。</p>
 <p>判定者は状態を判定し、状態の変更は次の処理へ渡す。</p>
 <p><strong>判定と状態変更を分ければ、何を判定したのかを残せる。</strong></p>
+<h3 id="50-TaskはAgentの制御面を表す">50. TaskはAgentの制御面を表す</h3>
+<p>Task は、Agent が行う仕事そのものだけを表すものではない。</p>
+<p>Goal、Bound、Verification、Stop を条件として持たせると、Task は <strong>Agent がいつ実行し、いつ確認し、いつ止まるかを決める制御面</strong>として見ることができる。</p>
+<pre><code class="language-text">Task
+ │
+ ├─ Goal
+ ├─ Bound
+ ├─ Verification
+ └─ Stop
+       ↓
+Agent の進行を制御する
+</code></pre>
+<p>ここで、条件と進行状態は分けて考える。</p>
+<p>Agent の進行状態を、たとえば次のように置く。</p>
+<pre><code class="language-text">evaluating
+    ↓
+ready
+    ↓
+executing
+    ↓
+verifying
+    ↓
+done
+</code></pre>
+<p>各状態では、Task に定義された条件の使われ方が異なる。</p>
+<table>
+<thead>
+<tr>
+<th>ProgressState</th>
+<th>4条件の役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>evaluating</td>
+<td>Goal / Bound / Verification / Stop を確定する</td>
+</tr>
+<tr>
+<td>ready</td>
+<td>4条件が実行可能水準にあることが進入条件</td>
+</tr>
+<tr>
+<td>executing</td>
+<td>Bound を守り、Stop の発火を監視する</td>
+</tr>
+<tr>
+<td>verifying</td>
+<td>Verification で結果を判定し、Bound 逸脱も確認する</td>
+</tr>
+<tr>
+<td>done</td>
+<td>Verification によって Goal の成立を確認した終端状態</td>
+</tr>
+</tbody>
+</table>
+<p><code>ready</code> や <code>done</code> に条件を新しく持たせる必要はない。</p>
+<p><code>ready</code> は、必要な条件が揃った結果として入れる状態である。</p>
+<p><code>done</code> は、Verification によって Goal の成立を確認した結果として入る状態である。</p>
+<pre><code class="language-text">条件が揃う
+   ↓
+ ready
+
+Goal を Verification で確認
+   ↓
+ done
+</code></pre>
+<p>一方、<code>executing</code> と <code>verifying</code> では、Task の条件が実際の制御に使われる。</p>
+<p>実行中は Bound を越えないようにし、Stop が成立したかを監視する。</p>
+<p>確認中は Verification によって結果を判定し、実行結果が Bound を外れていないかも確認する。</p>
+<pre><code class="language-text">executing
+  │
+  ├─ Bound を守る
+  ├─ Stop を監視する
+  │    └─ Continue不可 → Return
+  ↓
+verifying
+  │
+  ├─ Bound の確認
+  │    └─ Continue不可 → Return
+  └─ Verification
+       ├─ Pass → done
+       ├─ Fail → executing
+       └─ 判定不能 → Return
+</code></pre>
+<p>この構造では、Verification は <strong>Task 内で次の状態を決める判定</strong>である。</p>
+<p>Task 内で進行できなくなった場合は、<strong>Return によって制御を外へ戻す。</strong></p>
+<p><strong>Task は、仕事を Agent の状態と遷移へ写像した制御面である。</strong></p>
 <h2 id="第VIII部-製品固有の制約">第VIII部　製品固有の制約</h2>
-<h3 id="50-製品固有の制約は一般原理と分ける">50. 製品固有の制約は一般原理と分ける</h3>
+<h3 id="51-製品固有の制約は一般原理と分ける">51. 製品固有の制約は一般原理と分ける</h3>
 <p>Task / Loop の一般原理と、製品ごとの実装上の制約は分けて考える。</p>
 <pre><code class="language-text">一般原理
   │
@@ -1318,6 +1406,6 @@ nrslib — <em>TAKT Workflow ガイド</em><br/>
 </article>
 <a class="backtop" href="#top">↑ ページ上部へ戻る</a>
 </main>
-<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-17 04:16 JST</footer>
+<footer>Task / Loop Engineering Guide / Author: akkera102 / Updated: 2026-09-29 09:48 JST</footer>
 </body>
 </html>
